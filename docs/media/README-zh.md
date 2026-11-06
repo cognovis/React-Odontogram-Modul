@@ -31,7 +31,7 @@
 ### 📦 作为 npm 包使用
 
 该牙位图作为一个独立自包含的 React 组件库发布在 npm 上：
-`@cognovis/odontogram`。
+`@cognovis/react-odontogram`。
 
 #### 环境要求
 - **React 18 或 19**（声明为 peer dependency —— 由你的应用提供）。
@@ -41,7 +41,8 @@
 #### 安装
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### 基本用法
@@ -49,8 +50,8 @@ bun add @cognovis/odontogram react react-dom
 在应用中的任意位置渲染 `OdontogramShell`，并**仅导入一次**样式表：
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -101,7 +102,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // launch the onboarding tour
   // …and many more setX/getX settings functions
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 完整的 API 表面（约 44 个函数，以及 `OdontogramSummary`、`OdontogramThemeConfig`、`OdontogramPlugin`、`PerioViewMode` 等类型）在随附的声明文件中均有完整的类型定义。
@@ -112,8 +113,8 @@ import {
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="zh" numberingSystem="FDI" />;
@@ -124,7 +125,7 @@ export default function OdontogramClient() {
 
 #### 重要说明与当前限制
 - **仅支持 ESM** —— 该包发布主 ES 模块（`dist/odontogram.js`），并附带相应的类型声明（`dist/index.d.ts`）。它面向打包工具的模块解析方式；不提供 CommonJS 构建版本。
-- **样式表是独立的** —— 你**必须**导入一次 `@cognovis/odontogram/style.css`；它不会被自动注入。样式为全局 CSS，作用域限定在 `.odontogram-root` 下，并由 `--odon-*` CSS 变量驱动。 在尚未发布的版本中，它不再在 `:root`、`html` 或 `body` 上设置任何内容：宿主页面的背景、字体和自身的设计令牌保持不变；附加到 `<body>` 的界面（导览、弹出框）带有 `.odontogram-portal` 类。
+- **样式表是独立的** —— 你**必须**导入一次 `@cognovis/react-odontogram/style.css`；它不会被自动注入。样式为全局 CSS，作用域限定在 `.odontogram-root` 下，并由 `--odon-*` CSS 变量驱动。 在尚未发布的版本中，它不再在 `:root`、`html` 或 `body` 上设置任何内容：宿主页面的背景、字体和自身的设计令牌保持不变；附加到 `<body>` 的界面（导览、弹出框）带有 `.odontogram-portal` 类。
 - **SSR / 仅限客户端** —— 该组件在挂载时会读取 DOM（`document`），因此必须在浏览器中运行。在支持 SSR 的框架中，请在 Client Component（`"use client"`）中渲染它，或通过仅限客户端的动态导入方式加载。
 - **资源是自包含的** —— 牙齿和图标的 SVG 在构建时被内联到 JavaScript 包中；**无需配置任何运行时资源请求**，也无需向你的 public 文件夹额外复制任何文件。
 - **多实例，单个生效编辑器** —— 每个挂载的 `<OdontogramShell>` 都可通过独立会话（`createOdontogramSession()`）持有自己的临床状态，两个会话之间永不共享数据。交互式 DOM 编辑器仍是全局唯一引擎，因此同一时刻恰好由一个挂载实例驱动：该实例渲染图表，其余实例渲染未激活占位符，并可继续通过其会话 API 完整读写。当前实例卸载后，等待中的实例接管。
@@ -584,7 +585,7 @@ bun run dev                                 # 然后打开 http://localhost:5173
 
 切勿把管理员凭据写入 `VITE_*`。
 
-HTTP 部分是独立的包 [`@cognovis/odontogram-fhir`](../../odontogram-fhir)：它承载 Aidbox 传输层与网关工厂，也是唯一依赖 `@cognovis/fhir-sdk/client` 的地方。本包提供网关 **SPI** 以及会话的加载、保存与写入计划委托——即不含 HTTP 的那一半——并且仍然**不**包含 `@cognovis/fhir-sdk/client`。图表和传输包 5.2.6 声明必需的 SDK peer 依赖 `^0.22.0 || ^0.23.0` 和精确的开发依赖 `0.23.0`（Dental Core 0.10.0）。可执行应用固定 SDK `0.23.0`，无需 override 即可共享一个副本。设置与加载/保存机制见 [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md)。
+HTTP 部分是独立的包 [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir)：它承载 Aidbox 传输层与网关工厂，也是唯一依赖 `@cognovis/fhir-sdk/client` 的地方。本包提供网关 **SPI** 以及会话的加载、保存与写入计划委托——即不含 HTTP 的那一半——并且仍然**不**包含 `@cognovis/fhir-sdk/client`。图表和传输包 5.2.6 声明必需的 SDK peer 依赖 `^0.22.0 || ^0.23.0` 和精确的开发依赖 `0.23.0`（Dental Core 0.10.0）。可执行应用固定 SDK `0.23.0`，无需 override 即可共享一个副本。设置与加载/保存机制见 [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md)。
 
 **带日期的检查、评估状态与种植体周围记录（自 2.4.0 起）：**
 

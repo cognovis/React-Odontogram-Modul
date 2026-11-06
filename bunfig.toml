@@ -1,0 +1,4 @@
+# The @cognovis scope resolves from the Cognovis registry, which serves it
+# without authentication. `.npmrc` beside this file says the same for npm.
+[install.scopes]
+"@cognovis" = "https://npm.cognovis.de/"

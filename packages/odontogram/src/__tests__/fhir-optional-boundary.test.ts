@@ -108,7 +108,7 @@ describe("optional FHIR package boundary", () => {
   // vendor SDK to talk to a server at all — a devDependency, reachable from no
   // library entry point and not in `files`. Bead odontogram-0w9 made that
   // containment structural: the app is `apps/standalone` and the transport is
-  // `@cognovis/odontogram-fhir`, neither of them this package.
+  // `@cognovis/react-odontogram-fhir`, neither of them this package.
   // `6fi-live-boundary.test.ts` holds that; here only the shipped graph is
   // asserted.
   it("keeps commercial integration modules out of the shipped package graph", () => {

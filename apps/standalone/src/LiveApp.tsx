@@ -15,14 +15,14 @@
 // library's twelve-language surface for a developer tool.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import OdontogramShell, { createOdontogramSession } from "@cognovis/odontogram";
+import OdontogramShell, { createOdontogramSession } from "@cognovis/react-odontogram";
 import type {
   LoadOutcome,
   LoadReport,
   OdontogramSession,
   SkippedResource,
-} from "@cognovis/odontogram";
-import { createAidboxGateway } from "@cognovis/odontogram-fhir";
+} from "@cognovis/react-odontogram";
+import { createAidboxGateway } from "@cognovis/react-odontogram-fhir";
 import { resolveLiveConfig } from "./config";
 import type { LiveConfig, LiveEnv } from "./config";
 

@@ -29,7 +29,7 @@ This project is an interactive, browser-based odontogram editor that supports fa
 ### 📦 Use as an npm package
 
 The odontogram ships as a self-contained React component library on npm:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Requirements
 - **React 18 or 19** (declared as a peer dependency — provided by your app).
@@ -39,7 +39,8 @@ The odontogram ships as a self-contained React component library on npm:
 #### Installation
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Basic usage
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Render `OdontogramShell` and import the stylesheet **once** anywhere in your app:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -99,7 +100,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // launch the onboarding tour
   // …and many more setX/getX settings functions
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 The full surface (≈ 44 functions + types such as `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) is fully typed in the bundled declarations.
@@ -110,8 +111,8 @@ The component is client-only, so render it from a Client Component:
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="en" numberingSystem="FDI" />;
@@ -122,7 +123,7 @@ Or load it with a client-only dynamic import: `dynamic(() => import("./Odontogra
 
 #### Important notes & current limitations
 - **ESM-only** — the package publishes a main ES module (`dist/odontogram.js`), with matching type declarations (`dist/index.d.ts`). It targets bundler module resolution; there is no CommonJS build.
-- **The stylesheet is separate** — you **must** import `@cognovis/odontogram/style.css` once; it is not injected automatically. Styling is global CSS scoped under `.odontogram-root` and driven by `--odon-*` CSS variables. In the unreleased version it sets nothing on `:root`, `html` or `body`: the host's page background, font and own tokens stay untouched; surfaces appended to `<body>` (tour, popovers) carry `.odontogram-portal`.
+- **The stylesheet is separate** — you **must** import `@cognovis/react-odontogram/style.css` once; it is not injected automatically. Styling is global CSS scoped under `.odontogram-root` and driven by `--odon-*` CSS variables. In the unreleased version it sets nothing on `:root`, `html` or `body`: the host's page background, font and own tokens stay untouched; surfaces appended to `<body>` (tour, popovers) carry `.odontogram-portal`.
 - **SSR / client-only** — the component reads the DOM on mount (`document`), so it must run in the browser. In SSR frameworks, render it in a Client Component (`"use client"`) or via a client-only dynamic import.
 - **Assets are self-contained** — the tooth and icon SVGs are inlined into the JavaScript bundle at build time; there is **no runtime asset fetch** to configure and nothing extra to copy to your public folder.
 - **Multiple instances, one live editor** — each mounted `<OdontogramShell>` can hold its own clinical state through an isolated session (`createOdontogramSession()`), and two sessions never share data. The interactive DOM editor is still a single global engine, so exactly one mounted instance drives it at a time: that instance renders the chart, the others render an inactive placeholder and stay fully readable and writable through their session API. Ownership passes to a waiting instance when the current one unmounts.
@@ -600,7 +601,7 @@ FHIR conversion is a pure optional projection of the UI-domain document. Dental 
 
 The standalone app (`apps/standalone`) boots in live mode — on `?live`, on `?patient=<id>`, or whenever an Aidbox configuration is present in its environment — and then loads one patient's chart straight from an Aidbox server, renders it in the ordinary shell through the session API above, and writes changes back as Dental Core resources under deterministic ids, so a re-save updates instead of duplicating. Copy `apps/standalone/.env.example` to `apps/standalone/.env` and fill in a scoped machine client; see [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md). Never put an admin credential in `VITE_*`.
 
-The HTTP half is its own package, `@cognovis/odontogram-fhir`, which holds the Aidbox transport and gateway factory and depends on `@cognovis/fhir-sdk/client`. This package ships the Aidbox gateway **SPI** and the session load/save/write-plan delegates — the HTTP-free half, under `src/live` — and does **not** include `@cognovis/fhir-sdk/client`. The chart and transport 5.2.6 declare the required SDK peer `^0.22.0 || ^0.23.0` and exact dev pin `0.23.0` (Dental Core 0.10.0). The executable host pins SDK `0.23.0` and shares one copy without an override. Setup and the load/save mechanics are in [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+The HTTP half is its own package, `@cognovis/react-odontogram-fhir`, which holds the Aidbox transport and gateway factory and depends on `@cognovis/fhir-sdk/client`. This package ships the Aidbox gateway **SPI** and the session load/save/write-plan delegates — the HTTP-free half, under `src/live` — and does **not** include `@cognovis/fhir-sdk/client`. The chart and transport 5.2.6 declare the required SDK peer `^0.22.0 || ^0.23.0` and exact dev pin `0.23.0` (Dental Core 0.10.0). The executable host pins SDK `0.23.0` and shares one copy without an override. Setup and the load/save mechanics are in [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
 
 **Dated examinations, assessment status and peri-implant capture (from 2.4.0):**
 

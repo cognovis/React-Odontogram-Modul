@@ -45,8 +45,8 @@ try {
     assert.equal(manifest.dependencies?.["@cognovis/fhir-sdk"], undefined);
   }
   writeFileSync(join(consumer, "consumer.ts"), [
-    'import Odontogram, { type AidboxGateway } from "@cognovis/odontogram";',
-    'import { createAidboxGateway } from "@cognovis/odontogram-fhir";',
+    'import Odontogram, { type AidboxGateway } from "@cognovis/react-odontogram";',
+    'import { createAidboxGateway } from "@cognovis/react-odontogram-fhir";',
     'const gateway: AidboxGateway = createAidboxGateway({ baseUrl: "https://example.invalid", clientId: "packed", clientSecret: "synthetic" });',
     "void Odontogram; void gateway;",
   ].join("\n"));

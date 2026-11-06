@@ -8,7 +8,7 @@
 // entry point can reach.
 //
 // Bead odontogram-0w9 made that containment structural rather than textual:
-// the app is `apps/standalone` and the transport is `@cognovis/odontogram-fhir`,
+// the app is `apps/standalone` and the transport is `@cognovis/react-odontogram-fhir`,
 // so neither is reachable from this package at all. What remains here is the
 // SDK's own half — the session SPI stays, the client factory is absent, and
 // nothing under `src/` can reach either the app or the transport. The env-file

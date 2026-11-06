@@ -25,7 +25,7 @@
 import { createFetchTransport, createFhirClient, extractNextPageUrl } from "@cognovis/fhir-sdk/client";
 import type { FhirTransport } from "@cognovis/fhir-sdk/client";
 import type { AidboxConnection } from "./connection";
-import type { AidboxGateway, PagedSearchResult } from "@cognovis/odontogram";
+import type { AidboxGateway, PagedSearchResult } from "@cognovis/react-odontogram";
 
 /** Aidbox's FHIR endpoint sits under `/fhir` on the configured base URL. */
 export function fhirBaseUrl(baseUrl: string): string {

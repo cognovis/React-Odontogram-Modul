@@ -29,7 +29,7 @@ Tento projekt je interaktívny, prehliadačovo orientovaný editor odontogramu, 
 ### 📦 Použitie ako npm balík
 
 Odontogram sa distribuuje ako samostatná knižnica React komponentov na npm:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Požiadavky
 - **React 18 alebo 19** (deklarovaný ako peer dependency — zabezpečuje ho vaša aplikácia).
@@ -39,7 +39,8 @@ Odontogram sa distribuuje ako samostatná knižnica React komponentov na npm:
 #### Inštalácia
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Základné použitie
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Vykreslite `OdontogramShell` a **raz** kdekoľvek vo vašej aplikácii importujte hárok štýlov:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -99,7 +100,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // spustenie úvodnej prehliadky
   // …a mnoho ďalších funkcií nastavení setX/getX
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 Celý rozsah (≈ 44 funkcií + typy ako `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) je plne typovaný v priložených deklaráciách.
@@ -110,8 +111,8 @@ Komponent funguje iba na strane klienta, preto ho vykresľujte z klientskeho kom
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="sk" numberingSystem="FDI" />;
@@ -122,7 +123,7 @@ Alebo ho načítajte pomocou dynamického importu iba na strane klienta: `dynami
 
 #### Dôležité poznámky a súčasné obmedzenia
 - **Iba ESM** — balík publikuje hlavný ES modul (`dist/odontogram.js`) s príslušnými deklaráciami typov (`dist/index.d.ts`). Je cielený na rozlíšenie modulov bundlerom; neexistuje CommonJS zostavenie.
-- **Hárok štýlov je samostatný** — **musíte** raz importovať `@cognovis/odontogram/style.css`; nevkladá sa automaticky. Štýlovanie je globálne CSS ohraničené pod `.odontogram-root` a riadené CSS premennými `--odon-*`. V nevydanej verzii nenastavuje nič na `:root`, `html` ani `body`: pozadie stránky, písmo a vlastné tokeny hostiteľa zostávajú nedotknuté; plochy pripojené k `<body>` (sprievodca, vyskakovacie okná) nesú `.odontogram-portal`.
+- **Hárok štýlov je samostatný** — **musíte** raz importovať `@cognovis/react-odontogram/style.css`; nevkladá sa automaticky. Štýlovanie je globálne CSS ohraničené pod `.odontogram-root` a riadené CSS premennými `--odon-*`. V nevydanej verzii nenastavuje nič na `:root`, `html` ani `body`: pozadie stránky, písmo a vlastné tokeny hostiteľa zostávajú nedotknuté; plochy pripojené k `<body>` (sprievodca, vyskakovacie okná) nesú `.odontogram-portal`.
 - **SSR / iba klient** — komponent pri pripojení číta DOM (`document`), preto musí bežať v prehliadači. V SSR frameworkoch ho vykresľujte v klientskom komponente (`"use client"`) alebo cez dynamický import iba na strane klienta.
 - **Zdroje sú samostatné** — SVG súbory zubov a ikon sú pri zostavení vložené priamo do JavaScriptového balíka; **nie je potrebné konfigurovať žiadne získavanie zdrojov za behu** a nič netreba kopírovať do vášho verejného priečinka.
 - **Viac inštancií, jeden aktívny editor** — každá pripojená `<OdontogramShell>` môže držať vlastný klinický stav cez izolovanú reláciu (`createOdontogramSession()`) a dve relácie nikdy nezdieľajú dáta. Interaktívny DOM editor zostáva jediným globálnym enginom, takže ho naraz ovláda práve jedna pripojená inštancia: tá vykresľuje kartu, ostatné vykresľujú neaktívny zástupný prvok a zostávajú plne čitateľné a zapisovateľné cez svoje API relácie. Po odpojení aktívnej inštancie ju prevezme čakajúca.
@@ -588,7 +589,7 @@ bun run dev                                 # potom otvorte http://localhost:517
 
 Administrátorské poverenie nikdy nepatrí do `VITE_*`.
 
-HTTP polovica je vlastný balík, [`@cognovis/odontogram-fhir`](../../odontogram-fhir): obsahuje transport Aidboxu a továreň na bránu a ako jediný závisí od `@cognovis/fhir-sdk/client`. Tento balík dodáva **SPI** brány a session delegáty pre načítanie, uloženie a plán zápisu — polovicu bez HTTP — a naďalej **neobsahuje** `@cognovis/fhir-sdk/client`. Diagram a transport 5.2.6 deklarujú povinný peer SDK `^0.22.0 || ^0.23.0` a presnú vývojovú verziu `0.23.0` (Dental Core 0.10.0). Spustiteľná aplikácia pripína SDK `0.23.0` a zdieľa jednu kópiu bez override. Nastavenie a mechanika načítania/uloženia sú v [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+HTTP polovica je vlastný balík, [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir): obsahuje transport Aidboxu a továreň na bránu a ako jediný závisí od `@cognovis/fhir-sdk/client`. Tento balík dodáva **SPI** brány a session delegáty pre načítanie, uloženie a plán zápisu — polovicu bez HTTP — a naďalej **neobsahuje** `@cognovis/fhir-sdk/client`. Diagram a transport 5.2.6 deklarujú povinný peer SDK `^0.22.0 || ^0.23.0` a presnú vývojovú verziu `0.23.0` (Dental Core 0.10.0). Spustiteľná aplikácia pripína SDK `0.23.0` a zdieľa jednu kópiu bez override. Nastavenie a mechanika načítania/uloženia sú v [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
 
 **Datované vyšetrenia, stav posúdenia a peri-implantátový záznam (od 2.4.0):**
 

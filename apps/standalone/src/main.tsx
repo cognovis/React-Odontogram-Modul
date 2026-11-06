@@ -15,8 +15,8 @@
 
 import React from "react";
 import { createRoot } from "react-dom/client";
-import OdontogramShell from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import OdontogramShell from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 // The page itself (background, text colour, font, the :root tokens) is the
 // app's, not the chart's: the package stylesheet no longer styles a host page.
 import "./page.css";

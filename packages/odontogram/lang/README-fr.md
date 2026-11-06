@@ -29,7 +29,7 @@ Ce projet est un éditeur d'odontogramme dentaire interactif basé sur un naviga
 ### 📦 Utilisation comme paquet npm
 
 L'odontogramme est fourni sous forme de bibliothèque de composants React autonome sur npm :
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Prérequis
 - **React 18 ou 19** (déclaré comme dépendance de pair).
@@ -39,7 +39,8 @@ L'odontogramme est fourni sous forme de bibliothèque de composants React autono
 #### Installation
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Utilisation de base
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Rendrez `OdontogramShell` et importez la feuille de style **une seule fois** n'importe où dans votre application :
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -93,7 +94,7 @@ import {
   clearSelection,
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // lancer la visite guidée
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 #### Utilisation avec Next.js (App Router)
@@ -102,8 +103,8 @@ Le composant est côté client uniquement (lit le DOM au montage) :
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="fr" numberingSystem="FDI" />;
@@ -168,7 +169,7 @@ bun run dev                                 # puis ouvrez http://localhost:5173/
 
 Ne placez jamais des identifiants d'administrateur dans `VITE_*`.
 
-La moitié HTTP forme son propre paquet, [`@cognovis/odontogram-fhir`](../../odontogram-fhir) : il porte le transport Aidbox et la fabrique de passerelle, et il est le seul à dépendre de `@cognovis/fhir-sdk/client`. Le présent paquet livre la **SPI** de passerelle et les délégués de session pour le chargement, l'enregistrement et le plan d'écriture — la moitié sans HTTP — et n'inclut toujours **pas** `@cognovis/fhir-sdk/client`. Le diagramme et le transport 5.2.6 déclarent le peer SDK obligatoire `^0.22.0 || ^0.23.0` et la version exacte de développement `0.23.0` (Dental Core 0.10.0). L'application exécutable fixe le SDK `0.23.0` et partage une seule copie sans override. La configuration et la mécanique de chargement/enregistrement figurent dans [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+La moitié HTTP forme son propre paquet, [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir) : il porte le transport Aidbox et la fabrique de passerelle, et il est le seul à dépendre de `@cognovis/fhir-sdk/client`. Le présent paquet livre la **SPI** de passerelle et les délégués de session pour le chargement, l'enregistrement et le plan d'écriture — la moitié sans HTTP — et n'inclut toujours **pas** `@cognovis/fhir-sdk/client`. Le diagramme et le transport 5.2.6 déclarent le peer SDK obligatoire `^0.22.0 || ^0.23.0` et la version exacte de développement `0.23.0` (Dental Core 0.10.0). L'application exécutable fixe le SDK `0.23.0` et partage une seule copie sans override. La configuration et la mécanique de chargement/enregistrement figurent dans [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
 
 **Examens datés, statut d'évaluation et relevé péri-implantaire (à partir de 2.4.0) :**
 

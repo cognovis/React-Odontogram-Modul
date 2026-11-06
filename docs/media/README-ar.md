@@ -31,7 +31,7 @@
 ### 📦 الاستخدام كحزمة npm
 
 يُشحَن الأودونتوغرام كمكتبة مكوّنات React مستقلة بذاتها على npm:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### المتطلبات
 - **React 18 أو 19** (مُعلَنة كاعتمادية نظير (peer dependency) — يوفّرها تطبيقك).
@@ -41,7 +41,8 @@
 #### التثبيت
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### الاستخدام الأساسي
@@ -49,8 +50,8 @@ bun add @cognovis/odontogram react react-dom
 اعرض `OdontogramShell` واستورد ملف التنسيق **مرة واحدة فقط** في أي مكان من تطبيقك:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -101,7 +102,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // launch the onboarding tour
   // …and many more setX/getX settings functions
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 كامل الواجهة (نحو 44 دالة + أنواع مثل `OdontogramSummary`، `OdontogramThemeConfig`، `OdontogramPlugin`، `PerioViewMode`، …) مُنمَّطة بالكامل ضمن التصريحات المرفقة.
@@ -112,8 +113,8 @@ import {
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="ar" numberingSystem="FDI" />;
@@ -124,7 +125,7 @@ export default function OdontogramClient() {
 
 #### ملاحظات مهمة وقيود حالية
 - **ESM فقط** — تنشر الحزمة وحدة ES رئيسية (`dist/odontogram.js`) مع تصريحات الأنواع المقابلة (`dist/index.d.ts`). وهي موجَّهة لاستبانة وحدات حزم التجميع (bundler)؛ لا يوجد بناء CommonJS.
-- **ملف التنسيق منفصل** — **يجب** عليك استيراد `@cognovis/odontogram/style.css` مرة واحدة؛ فهو لا يُحقَن تلقائيًا. التنسيق عبارة عن CSS عام محصور ضمن `.odontogram-root` ومُتحكَّم به عبر متغيرات CSS من نوع `--odon-*`. في الإصدار غير المنشور لا يضبط شيئًا على `:root` أو `html` أو `body`: تبقى خلفية صفحة المضيف وخطها ومتغيراتها دون تغيير؛ والعناصر المُلحقة بـ `<body>` (الجولة، النوافذ المنبثقة) تحمل `.odontogram-portal`.
+- **ملف التنسيق منفصل** — **يجب** عليك استيراد `@cognovis/react-odontogram/style.css` مرة واحدة؛ فهو لا يُحقَن تلقائيًا. التنسيق عبارة عن CSS عام محصور ضمن `.odontogram-root` ومُتحكَّم به عبر متغيرات CSS من نوع `--odon-*`. في الإصدار غير المنشور لا يضبط شيئًا على `:root` أو `html` أو `body`: تبقى خلفية صفحة المضيف وخطها ومتغيراتها دون تغيير؛ والعناصر المُلحقة بـ `<body>` (الجولة، النوافذ المنبثقة) تحمل `.odontogram-portal`.
 - **العرض من جهة الخادم / جهة العميل فقط** — يقرأ المكوّن DOM عند التركيب (`document`)، لذا يجب أن يعمل داخل المتصفح. في أطر عمل SSR، اعرضه ضمن مكوّن عميل (`"use client"`) أو عبر استيراد ديناميكي مخصَّص لجهة العميل فقط.
 - **الأصول مكتفية ذاتيًا** — تُدرَج رسومات الأسنان والأيقونات بصيغة SVG ضمن حزمة JavaScript وقت البناء؛ **لا يوجد** أي طلب أصول وقت التشغيل يلزم إعداده، ولا شيء إضافي يلزم نسخه إلى مجلدك العام.
 - **نسخ متعددة ومحرِّر واحد فعّال** — يمكن لكل `<OdontogramShell>` مُركَّبة أن تحتفظ بحالتها السريرية الخاصة عبر جلسة معزولة (`createOdontogramSession()`), ولا تتشارك جلستان البيانات أبدًا. ما زال المحرِّر التفاعلي في DOM محركًا عالميًا واحدًا، لذا تقوده نسخة مُركَّبة واحدة بالضبط في كل لحظة: تلك النسخة تعرض المخطط، والبقية تعرض عنصرًا نائبًا غير مفعَّل وتظل قابلة للقراءة والكتابة بالكامل عبر واجهة جلستها. وعند إزالة النسخة الفعّالة تتسلّم إحدى النسخ المنتظِرة.
@@ -597,7 +598,7 @@ bun run dev                                 # ثم افتح http://localhost:517
 لا تضع بيانات اعتماد إدارية في `VITE_*` أبداً.
 
 الشقّ الخاص بـHTTP حزمة مستقلة بذاتها،
-[`@cognovis/odontogram-fhir`](../../odontogram-fhir): تحمل ناقل Aidbox ومصنع البوابة، وهي وحدها
+[`@cognovis/react-odontogram-fhir`](../../odontogram-fhir): تحمل ناقل Aidbox ومصنع البوابة، وهي وحدها
 التي تعتمد على `@cognovis/fhir-sdk/client`. أما هذه الحزمة فتقدّم **واجهة** البوابة ومفوَّضات الجلسة
 للتحميل والحفظ وخطة الكتابة — الشقّ الخالي من HTTP — ولا تزال **لا** تتضمّن
 `@cognovis/fhir-sdk/client`. وتعلن حزمتا المخطط والنقل 5.2.6 اعتماد SDK نظيرًا إلزاميًا بالنطاق `^0.22.0 || ^0.23.0`، واعتماد تطوير بالإصدار الدقيق `0.23.0` ‏(Dental Core 0.10.0). يثبّت التطبيق التنفيذي SDK بالإصدار `0.23.0` ويشارك نسخة واحدة دون تجاوز.

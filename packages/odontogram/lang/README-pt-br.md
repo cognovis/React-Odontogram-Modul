@@ -29,7 +29,7 @@ Este projeto é um editor de odontograma interativo, executado no navegador, que
 ### 📦 Usar como pacote npm
 
 O odontograma é distribuído como uma biblioteca de componentes React autocontida no npm:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Requisitos
 - **React 18 ou 19** (declarado como peer dependency — fornecido pela sua aplicação).
@@ -39,7 +39,8 @@ O odontograma é distribuído como uma biblioteca de componentes React autoconti
 #### Instalação
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Uso básico
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Renderize o `OdontogramShell` e importe a folha de estilos **uma única vez** em qualquer lugar da sua aplicação:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -99,7 +100,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // inicia o tour de integração
   // …e muitas outras funções de configuração setX/getX
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 A superfície completa (≈ 44 funções + tipos como `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) está totalmente tipada nas declarações incluídas.
@@ -110,8 +111,8 @@ O componente é somente client-side, então renderize-o a partir de um Client Co
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="pt-br" numberingSystem="FDI" />;
@@ -122,7 +123,7 @@ Ou carregue-o com um import dinâmico somente client-side: `dynamic(() => import
 
 #### Notas importantes e limitações atuais
 - **Somente ESM** — o pacote publica um módulo ES principal (`dist/odontogram.js`), com declarações de tipos correspondentes (`dist/index.d.ts`). Ele é voltado para a resolução de módulos de bundlers; não há build CommonJS.
-- **A folha de estilos é separada** — você **deve** importar `@cognovis/odontogram/style.css` uma vez; ela não é injetada automaticamente. A estilização é CSS global escopado sob `.odontogram-root` e controlado pelas variáveis CSS `--odon-*`. Na versão ainda não publicada ela não define nada em `:root`, `html` ou `body`: o fundo da página, a fonte e os tokens do host ficam intactos; superfícies anexadas ao `<body>` (tour, popovers) levam `.odontogram-portal`.
+- **A folha de estilos é separada** — você **deve** importar `@cognovis/react-odontogram/style.css` uma vez; ela não é injetada automaticamente. A estilização é CSS global escopado sob `.odontogram-root` e controlado pelas variáveis CSS `--odon-*`. Na versão ainda não publicada ela não define nada em `:root`, `html` ou `body`: o fundo da página, a fonte e os tokens do host ficam intactos; superfícies anexadas ao `<body>` (tour, popovers) levam `.odontogram-portal`.
 - **SSR / somente client-side** — o componente lê o DOM na montagem (`document`), portanto deve rodar no navegador. Em frameworks com SSR, renderize-o em um Client Component (`"use client"`) ou via um import dinâmico somente client-side.
 - **Recursos autocontidos** — os SVGs de dentes e ícones são embutidos (inline) no bundle JavaScript em tempo de build; **não há busca de recursos em tempo de execução** a configurar e nada extra para copiar para sua pasta pública.
 - **Várias instâncias, um editor ativo** — cada `<OdontogramShell>` montado pode manter seu próprio estado clínico por meio de uma sessão isolada (`createOdontogramSession()`), e duas sessões nunca compartilham dados. O editor DOM interativo continua sendo um único engine global, portanto exatamente uma instância montada o controla por vez: essa instância renderiza o gráfico, as demais renderizam um marcador inativo e seguem totalmente legíveis e graváveis pela sua API de sessão. Ao desmontar a instância ativa, uma em espera assume.
@@ -586,7 +587,7 @@ bun run dev                                 # depois abra http://localhost:5173/
 
 Nunca coloque uma credencial de administrador em `VITE_*`.
 
-A metade HTTP é um pacote próprio, [`@cognovis/odontogram-fhir`](../../odontogram-fhir): contém o transporte do Aidbox e a fábrica do gateway, e é o único que depende de `@cognovis/fhir-sdk/client`. Este pacote entrega a **SPI** do gateway e os delegados de sessão de carregamento/gravação/plano de escrita — a metade sem HTTP — e continua **não** incluindo `@cognovis/fhir-sdk/client`. O diagrama e o transporte 5.2.6 declaram o peer obrigatório do SDK `^0.22.0 || ^0.23.0` e a versão exata de desenvolvimento `0.23.0` (Dental Core 0.10.0). A aplicação executável fixa o SDK `0.23.0` e compartilha uma única cópia sem overrides. A configuração e a mecânica de carregamento/gravação estão em [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+A metade HTTP é um pacote próprio, [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir): contém o transporte do Aidbox e a fábrica do gateway, e é o único que depende de `@cognovis/fhir-sdk/client`. Este pacote entrega a **SPI** do gateway e os delegados de sessão de carregamento/gravação/plano de escrita — a metade sem HTTP — e continua **não** incluindo `@cognovis/fhir-sdk/client`. O diagrama e o transporte 5.2.6 declaram o peer obrigatório do SDK `^0.22.0 || ^0.23.0` e a versão exata de desenvolvimento `0.23.0` (Dental Core 0.10.0). A aplicação executável fixa o SDK `0.23.0` e compartilha uma única cópia sem overrides. A configuração e a mecânica de carregamento/gravação estão em [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
 
 **Exames datados, status de avaliação e registro peri-implantar (a partir de 2.4.0):**
 

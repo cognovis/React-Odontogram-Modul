@@ -25,8 +25,8 @@ FHIR-dialect and JSON-bundle symbols are not, the session SPI's internals
 (`isSaveAllowed`, `assembleLoadResult`, `SEARCHED_RESOURCE_TYPES`,
 `buildWritePlan`, `PAYLOAD_VERSION`) are not exported either,
 `dist/odontogram.js` carries no `@cognovis/fhir-sdk/client` import (the HTTP
-client lives in `@cognovis/odontogram-fhir`), and a temporary consumer can
-`import` the package by its published name while `@cognovis/odontogram/fhir`
+client lives in `@cognovis/react-odontogram-fhir`), and a temporary consumer can
+`import` the package by its published name while `@cognovis/react-odontogram/fhir`
 fails to resolve.
 
 ```

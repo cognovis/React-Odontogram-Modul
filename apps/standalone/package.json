@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@cognovis/fhir-sdk": "0.23.0",
-    "@cognovis/odontogram": "workspace:*",
-    "@cognovis/odontogram-fhir": "workspace:*",
+    "@cognovis/react-odontogram": "workspace:*",
+    "@cognovis/react-odontogram-fhir": "workspace:*",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

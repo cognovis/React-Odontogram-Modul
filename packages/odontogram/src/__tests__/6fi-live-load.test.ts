@@ -14,7 +14,7 @@
 // Bead odontogram-0w9 moved the PAGING half of this suite out. Those cases
 // drove `searchAllPages` against a fake transport, i.e. they were about how a
 // server answers rather than about what a chart is, and they now live with the
-// transport in `@cognovis/odontogram-fhir`. Everything here drives
+// transport in `@cognovis/react-odontogram-fhir`. Everything here drives
 // `loadPatientChart` / `assembleLoadResult` through a fake GATEWAY, which is
 // the SDK's own HTTP-free seam — including the one CHART-level consequence of
 // unstable pagination (a load that fails rather than showing a mouth with a
@@ -340,7 +340,7 @@ describe("odontogram-6fi: a page that never arrives", () => {
 // Aidbox paginates without a stable sort, so two pages of a 128-resource search
 // return 128 resources of which only 100 to 118 are DISTINCT: some come twice,
 // and just as many never come at all. The transport's own suite
-// (`@cognovis/odontogram-fhir`, `0w9-aidbox-paging`) holds the measurements and
+// (`@cognovis/react-odontogram-fhir`, `0w9-aidbox-paging`) holds the measurements and
 // the fix — a requested `_sort=_id` and a DISTINCT count, since 128 arrived
 // against a total of 128 and a plain count could not see it.
 //

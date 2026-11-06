@@ -9,7 +9,7 @@ export default defineConfig({
     alias: {
       // The sibling package is resolved from source, so the transport's tests
       // never depend on the chart SDK's dist/ being built first.
-      '@cognovis/odontogram': path.resolve(__dirname, '../odontogram/src/index.ts'),
+      '@cognovis/react-odontogram': path.resolve(__dirname, '../odontogram/src/index.ts'),
     },
   },
   test: {

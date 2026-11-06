@@ -57,9 +57,9 @@ export default defineConfig(() => ({
       // lets an edit in either package hot-reload. It is an ALIAS, never a
       // copy: no library or transport source lives under `apps/`, and the
       // packages' published `exports` maps stay untouched.
-      '@cognovis/odontogram/style.css': path.resolve(packages, 'odontogram/src/index.css'),
-      '@cognovis/odontogram': path.resolve(packages, 'odontogram/src/index.ts'),
-      '@cognovis/odontogram-fhir': path.resolve(packages, 'odontogram-fhir/src/index.ts'),
+      '@cognovis/react-odontogram/style.css': path.resolve(packages, 'odontogram/src/index.css'),
+      '@cognovis/react-odontogram': path.resolve(packages, 'odontogram/src/index.ts'),
+      '@cognovis/react-odontogram-fhir': path.resolve(packages, 'odontogram-fhir/src/index.ts'),
       // `@cognovis/fhir-sdk/client` pulls in server-only SQL and
       // de-identification helpers that import `node:crypto`. The app never
       // calls them; see `src/shims/node-crypto.ts`.

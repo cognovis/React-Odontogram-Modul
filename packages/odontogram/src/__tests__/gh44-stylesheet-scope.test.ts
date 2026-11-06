@@ -2,7 +2,7 @@
 // Dirk Saeger, Malte Sussdorff 2026
 
 // GitHub cognovis/odontogram#44, AC1. A host imports
-// `@cognovis/odontogram/style.css` globally (an embedding host may, in its root layout), so
+// `@cognovis/react-odontogram/style.css` globally (an embedding host may, in its root layout), so
 // every page-level rule in it lands on the host's whole page: a `:root` token
 // block replaced the host's own `--muted`, `--card` and `--accent`, and the
 // `html`/`body`/`*` rules restyled its page. The chart's tokens live on

@@ -29,7 +29,7 @@ Este proyecto es un editor de odontograma interactivo basado en navegador que pe
 ### 📦 Uso como paquete npm
 
 El odontograma se publica como una biblioteca de componentes React autocontenida en npm:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Requisitos
 - **React 18 o 19** (declarado como dependencia peer — lo proporciona tu aplicación).
@@ -39,7 +39,8 @@ El odontograma se publica como una biblioteca de componentes React autocontenida
 #### Instalación
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Uso básico
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Renderiza `OdontogramShell` e importa la hoja de estilos **una sola vez** en tu aplicación:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -99,7 +100,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // lanzar el tour de introducción
   // …y muchas más funciones setX/getX de ajustes
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 Toda la superficie (≈ 44 funciones + tipos como `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) está completamente tipada en las declaraciones incluidas.
@@ -110,8 +111,8 @@ El componente es solo de cliente, así que renderízalo desde un Client Componen
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="es" numberingSystem="FDI" />;
@@ -122,7 +123,7 @@ O cárgalo con un import dinámico solo de cliente: `dynamic(() => import("./Odo
 
 #### Notas importantes y limitaciones actuales
 - **Solo ESM** — el paquete publica un módulo ES principal (`dist/odontogram.js`), con declaraciones de tipos correspondientes (`dist/index.d.ts`). Está pensado para la resolución de módulos de un bundler; no hay build CommonJS.
-- **La hoja de estilos es aparte** — **debes** importar `@cognovis/odontogram/style.css` una vez; no se inyecta automáticamente. Los estilos son CSS global bajo `.odontogram-root`, gobernados por variables CSS `--odon-*`. En la versión aún no publicada no define nada en `:root`, `html` ni `body`: el fondo de página, la fuente y los tokens propios del host quedan intactos; las superficies añadidas a `<body>` (tour, popovers) llevan `.odontogram-portal`.
+- **La hoja de estilos es aparte** — **debes** importar `@cognovis/react-odontogram/style.css` una vez; no se inyecta automáticamente. Los estilos son CSS global bajo `.odontogram-root`, gobernados por variables CSS `--odon-*`. En la versión aún no publicada no define nada en `:root`, `html` ni `body`: el fondo de página, la fuente y los tokens propios del host quedan intactos; las superficies añadidas a `<body>` (tour, popovers) llevan `.odontogram-portal`.
 - **SSR / solo cliente** — el componente lee el DOM al montarse (`document`), por lo que debe ejecutarse en el navegador. En frameworks con SSR, renderízalo en un Client Component (`"use client"`) o mediante un import dinámico solo de cliente.
 - **Recursos autocontenidos** — los SVG de dientes e iconos se incrustan en el bundle de JavaScript en tiempo de compilación; **no hay ninguna descarga de recursos en tiempo de ejecución** que configurar ni nada extra que copiar a tu carpeta pública.
 - **Varias instancias, un solo editor activo** — cada `<OdontogramShell>` montado puede mantener su propio estado clínico mediante una sesión aislada (`createOdontogramSession()`), y dos sesiones nunca comparten datos. El editor DOM interactivo sigue siendo un único motor global, así que exactamente una instancia montada lo controla a la vez: esa instancia renderiza el gráfico, las demás renderizan un marcador inactivo y siguen siendo totalmente legibles y modificables mediante su API de sesión. Al desmontarse la instancia activa, otra en espera toma el control.
@@ -592,7 +593,7 @@ bun run dev                                 # después abra http://localhost:517
 
 Nunca ponga una credencial de administrador en `VITE_*`.
 
-La mitad HTTP es su propio paquete, [`@cognovis/odontogram-fhir`](../../odontogram-fhir), que contiene el transporte de Aidbox y la fábrica del gateway y es lo único que depende de `@cognovis/fhir-sdk/client`. Este paquete entrega la **SPI** del gateway y los delegados de sesión de carga/guardado/plan de escritura — la mitad sin HTTP — y sigue **sin** incluir `@cognovis/fhir-sdk/client`. El gráfico y el transporte 5.2.6 declaran el peer obligatorio del SDK `^0.22.0 || ^0.23.0` y la versión exacta de desarrollo `0.23.0` (Dental Core 0.10.0). La aplicación ejecutable fija el SDK `0.23.0` y comparte una sola copia sin overrides. La configuración y la mecánica de carga/guardado están en [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+La mitad HTTP es su propio paquete, [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir), que contiene el transporte de Aidbox y la fábrica del gateway y es lo único que depende de `@cognovis/fhir-sdk/client`. Este paquete entrega la **SPI** del gateway y los delegados de sesión de carga/guardado/plan de escritura — la mitad sin HTTP — y sigue **sin** incluir `@cognovis/fhir-sdk/client`. El gráfico y el transporte 5.2.6 declaran el peer obligatorio del SDK `^0.22.0 || ^0.23.0` y la versión exacta de desarrollo `0.23.0` (Dental Core 0.10.0). La aplicación ejecutable fija el SDK `0.23.0` y comparte una sola copia sin overrides. La configuración y la mecánica de carga/guardado están en [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
 
 **Exámenes fechados, estado de valoración y registro periimplantario (desde 2.4.0):**
 

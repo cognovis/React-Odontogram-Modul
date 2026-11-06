@@ -8,7 +8,7 @@
 // application. It used to be a file inside the chart library's dev app, which
 // meant each consumer re-implemented it. It is now one package.
 //
-// The arrow points ONE way: this package depends on `@cognovis/odontogram` for
+// The arrow points ONE way: this package depends on `@cognovis/react-odontogram` for
 // the `AidboxGateway` shape it fills, never the reverse. The chart SDK stays
 // HTTP-free and keeps the session SPI (`loadFromAidbox` / `saveToAidbox`),
 // which takes a gateway rather than making requests itself.
@@ -27,4 +27,4 @@ export type { AidboxConnection } from "./connection";
 
 // Re-exported so a host that only wants to talk to Aidbox needs one import.
 // These are the chart SDK's own types; this package adds nothing to them.
-export type { AidboxGateway, PagedSearchResult } from "@cognovis/odontogram";
+export type { AidboxGateway, PagedSearchResult } from "@cognovis/react-odontogram";

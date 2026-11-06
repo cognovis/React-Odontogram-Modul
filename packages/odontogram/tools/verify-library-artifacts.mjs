@@ -71,7 +71,7 @@ const consumerDirectory = mkdtempSync(join(root, ".odontogram-library-consumer-"
 
 try {
   writeFileSync(join(consumerDirectory, "consumer.ts"), [
-    'import Odontogram from "@cognovis/odontogram";',
+    'import Odontogram from "@cognovis/react-odontogram";',
     "void Odontogram;",
     "",
   ].join("\n"));
@@ -87,7 +87,7 @@ try {
   ], { cwd: root, stdio: "inherit" });
 
   writeFileSync(join(consumerDirectory, "forbidden.ts"), [
-    'import { buildFhirBundle } from "@cognovis/odontogram/fhir";',
+    'import { buildFhirBundle } from "@cognovis/react-odontogram/fhir";',
     "void buildFhirBundle;",
     "",
   ].join("\n"));
@@ -107,7 +107,7 @@ try {
     forbiddenFailed = true;
   }
   if (!forbiddenFailed) {
-    throw new Error("A consumer must not be able to import @cognovis/odontogram/fhir");
+    throw new Error("A consumer must not be able to import @cognovis/react-odontogram/fhir");
   }
 } finally {
   rmSync(consumerDirectory, { recursive: true, force: true });

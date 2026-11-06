@@ -37,7 +37,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       external: [
-        '@cognovis/odontogram',
+        '@cognovis/react-odontogram',
         '@cognovis/fhir-sdk',
         '@cognovis/fhir-sdk/client',
       ],

@@ -2,10 +2,10 @@
 
 The standalone app (`apps/standalone`) can chart a patient that lives on an
 [Aidbox](https://www.health-samurai.io/aidbox) FHIR server instead of a local
-JSON document. The chart SDK (`@cognovis/odontogram`) holds the HTTP-free half:
+JSON document. The chart SDK (`@cognovis/react-odontogram`) holds the HTTP-free half:
 the gateway SPI and the session load, save and write-plan delegates. The HTTP
 half, the Aidbox transport and gateway factory, is
-`@cognovis/odontogram-fhir`. All FHIR content is Dental Core.
+`@cognovis/react-odontogram-fhir`. All FHIR content is Dental Core.
 
 ## Configuration
 

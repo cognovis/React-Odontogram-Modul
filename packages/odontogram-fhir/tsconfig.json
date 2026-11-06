@@ -12,7 +12,7 @@
     "strict": false,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": "."
-    // Bead odontogram-0w9: NO source alias for `@cognovis/odontogram`, here or
+    // Bead odontogram-0w9: NO source alias for `@cognovis/react-odontogram`, here or
     // in `tsconfig.build.json`. Type checking resolves it through the
     // workspace link to the SDK's published `dist/index.d.ts` — the same file
     // an outside consumer reads — so `bun run build:lib` has to have run once.

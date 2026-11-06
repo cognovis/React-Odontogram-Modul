@@ -23,7 +23,8 @@ An interactive, SVG-based **dental odontogram (dental chart) editor** for **Reac
 ## 📦 Installation
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 **Requirements:** React **18 or 19** (peer dependency); a bundler that supports the `exports` field and ESM (Vite, webpack 5, Next.js, Rollup, esbuild, Parcel). The package is **ESM-only**.
@@ -33,8 +34,8 @@ bun add @cognovis/odontogram react react-dom
 Render `OdontogramShell` and import the stylesheet **once**:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return <OdontogramShell language="en" numberingSystem="FDI" darkMode={false} />;
@@ -52,7 +53,7 @@ import {
   exportSvg, exportImage,
   createOdontogramSession, // FHIR: session.loadFromAidbox / saveToAidbox
   setReadOnly, startIntroTour,
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 > **SSR:** the component is client-only (reads the DOM on mount). In Next.js render it in a Client Component (`"use client"`) or via a client-only dynamic import.
@@ -72,7 +73,7 @@ keep two mounted odontograms independent:
 import {
   OdontogramShell, createOdontogramSession,
   type OdontogramDocument, type OdontogramSession,
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 
 const upper: OdontogramSession = createOdontogramSession(savedUpperDocument);
 const lower: OdontogramSession = createOdontogramSession(savedLowerDocument);
@@ -136,7 +137,7 @@ bun run dev                                 # then open http://localhost:5173/?l
 
 Never put an admin credential in `VITE_*`.
 
-The HTTP half is its own package, [`@cognovis/odontogram-fhir`](../odontogram-fhir), which holds the Aidbox transport and gateway factory and depends on `@cognovis/fhir-sdk/client`. This package ships the Aidbox gateway **SPI** and the session load/save/write-plan delegates — the HTTP-free half — and still does **not** include `@cognovis/fhir-sdk/client`. `@cognovis/fhir-sdk` is a required peer here, for the Dental Core mapping classes; the executable host owns its exact version. Setup and the load/save mechanics are in [`docs/aidbox-live-mode.md`](../../docs/aidbox-live-mode.md). Odontogram 5.2.6 supports SDK `^0.22.0 || ^0.23.0` and is built and tested with exact dev pin `0.23.0` (Dental Core 0.10.0). Consumers pin that SDK themselves, without an override. The paired transport release `@cognovis/odontogram-fhir@5.2.6` uses the same SDK peer range and dev pin, so chart and transport share the host SDK.
+The HTTP half is its own package, [`@cognovis/react-odontogram-fhir`](../odontogram-fhir), which holds the Aidbox transport and gateway factory and depends on `@cognovis/fhir-sdk/client`. This package ships the Aidbox gateway **SPI** and the session load/save/write-plan delegates — the HTTP-free half — and still does **not** include `@cognovis/fhir-sdk/client`. `@cognovis/fhir-sdk` is a required peer here, for the Dental Core mapping classes; the executable host owns its exact version. Setup and the load/save mechanics are in [`docs/aidbox-live-mode.md`](../../docs/aidbox-live-mode.md). Odontogram 5.2.6 supports SDK `^0.22.0 || ^0.23.0` and is built and tested with exact dev pin `0.23.0` (Dental Core 0.10.0). Consumers pin that SDK themselves, without an override. The paired transport release `@cognovis/react-odontogram-fhir@5.2.6` uses the same SDK peer range and dev pin, so chart and transport share the host SDK.
 
 ## 🦷 Periodontal charting
 

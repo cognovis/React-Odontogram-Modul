@@ -1,9 +1,9 @@
 {
-  "name": "@cognovis/odontogram-fhir",
+  "name": "@cognovis/react-odontogram-fhir",
   "version": "5.2.6",
   "license": "MIT",
   "type": "module",
-  "description": "Aidbox HTTP transport for @cognovis/odontogram: the one @cognovis/fhir-sdk/client factory behind the chart SDK's HTTP-free session gateway.",
+  "description": "Aidbox HTTP transport for @cognovis/react-odontogram: the one @cognovis/fhir-sdk/client factory behind the chart SDK's HTTP-free session gateway.",
   "files": [
     "dist"
   ],
@@ -26,7 +26,7 @@
     "prepublishOnly": "bun run build:lib"
   },
   "dependencies": {
-    "@cognovis/odontogram": "workspace:*"
+    "@cognovis/react-odontogram": "workspace:*"
   },
   "devDependencies": {
     "@cognovis/fhir-sdk": "0.23.0",

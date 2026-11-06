@@ -63,8 +63,8 @@ describe("bead odontogram-0w9: the standalone app's boundary", () => {
   it("is the private workspace app, consuming both packages by name", () => {
     expect(packageJson.name).toBe("@cognovis/odontogram-standalone");
     expect(packageJson.private).toBe(true);
-    expect(packageJson.dependencies["@cognovis/odontogram"]).toBe("workspace:*");
-    expect(packageJson.dependencies["@cognovis/odontogram-fhir"]).toBe("workspace:*");
+    expect(packageJson.dependencies["@cognovis/react-odontogram"]).toBe("workspace:*");
+    expect(packageJson.dependencies["@cognovis/react-odontogram-fhir"]).toBe("workspace:*");
   });
 
   it("has ONE html entry, and it is not live.html", () => {

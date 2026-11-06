@@ -29,7 +29,7 @@
 ### 📦 Использование в качестве npm-пакета
 
 Одонтограмма поставляется как самодостаточная библиотека React-компонентов на npm:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Требования
 - **React 18 или 19** (объявлен как peer-зависимость — предоставляется вашим приложением).
@@ -39,7 +39,8 @@
 #### Установка
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Базовое использование
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Отрисуйте `OdontogramShell` и импортируйте таблицу стилей **один раз** в любом месте вашего приложения:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -99,7 +100,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // запустить обучающий тур
   // …и многие другие функции настроек setX/getX
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 Полная поверхность API (≈ 44 функции + типы, такие как `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) полностью типизирована во встроенных объявлениях.
@@ -110,8 +111,8 @@ import {
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="ru" numberingSystem="FDI" />;
@@ -122,7 +123,7 @@ export default function OdontogramClient() {
 
 #### Важные замечания и текущие ограничения
 - **Только ESM** — пакет публикует основной ES-модуль (`dist/odontogram.js`) с соответствующими декларациями типов (`dist/index.d.ts`). Он ориентирован на разрешение модулей сборщиком; сборки CommonJS нет.
-- **Таблица стилей отдельная** — вы **обязаны** импортировать `@cognovis/odontogram/style.css` один раз; она не подключается автоматически. Стилизация — это глобальный CSS, ограниченный областью `.odontogram-root` и управляемый CSS-переменными `--odon-*`. В неопубликованной версии она ничего не задаёт для `:root`, `html` и `body`: фон страницы, шрифт и собственные токены хоста не затрагиваются; элементы, добавляемые в `<body>` (тур, всплывающие окна), несут класс `.odontogram-portal`.
+- **Таблица стилей отдельная** — вы **обязаны** импортировать `@cognovis/react-odontogram/style.css` один раз; она не подключается автоматически. Стилизация — это глобальный CSS, ограниченный областью `.odontogram-root` и управляемый CSS-переменными `--odon-*`. В неопубликованной версии она ничего не задаёт для `:root`, `html` и `body`: фон страницы, шрифт и собственные токены хоста не затрагиваются; элементы, добавляемые в `<body>` (тур, всплывающие окна), несут класс `.odontogram-portal`.
 - **SSR / только клиент** — компонент обращается к DOM при монтировании (`document`), поэтому он должен выполняться в браузере. В SSR-фреймворках отрисовывайте его в клиентском компоненте (`"use client"`) или через клиентский динамический импорт.
 - **Ресурсы самодостаточны** — SVG зубов и иконок встраиваются в JavaScript-бандл на этапе сборки; **не требуется** загрузка ресурсов во время выполнения и нечего дополнительно копировать в вашу публичную папку.
 - **Несколько экземпляров, один активный редактор** — каждый смонтированный `<OdontogramShell>` может хранить собственное клиническое состояние через изолированную сессию (`createOdontogramSession()`), и две сессии никогда не разделяют данные. Интерактивный DOM-редактор по-прежнему остаётся единым глобальным движком, поэтому им управляет ровно один смонтированный экземпляр: он отрисовывает карту, остальные отрисовывают неактивную заглушку и остаются полностью доступными для чтения и записи через API сессии. При размонтировании активного экземпляра управление принимает ожидающий.
@@ -591,7 +592,7 @@ bun run dev                                 # затем откройте http:/
 
 Учётные данные администратора никогда не помещают в `VITE_*`.
 
-HTTP-половина — отдельный пакет, [`@cognovis/odontogram-fhir`](../../odontogram-fhir): в нём транспорт Aidbox и фабрика шлюза, и только он зависит от `@cognovis/fhir-sdk/client`. Данный пакет поставляет **SPI** шлюза и делегаты сессии для загрузки, сохранения и плана записи — половину без HTTP — и по-прежнему **не** включает `@cognovis/fhir-sdk/client`. Диаграмма и транспорт 5.2.6 объявляют обязательную peer-зависимость SDK `^0.22.0 || ^0.23.0` и точную версию для разработки `0.23.0` (Dental Core 0.10.0). Исполняемое приложение фиксирует SDK `0.23.0` и использует одну общую копию без overrides. Настройка и механика загрузки/сохранения описаны в [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+HTTP-половина — отдельный пакет, [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir): в нём транспорт Aidbox и фабрика шлюза, и только он зависит от `@cognovis/fhir-sdk/client`. Данный пакет поставляет **SPI** шлюза и делегаты сессии для загрузки, сохранения и плана записи — половину без HTTP — и по-прежнему **не** включает `@cognovis/fhir-sdk/client`. Диаграмма и транспорт 5.2.6 объявляют обязательную peer-зависимость SDK `^0.22.0 || ^0.23.0` и точную версию для разработки `0.23.0` (Dental Core 0.10.0). Исполняемое приложение фиксирует SDK `0.23.0` и использует одну общую копию без overrides. Настройка и механика загрузки/сохранения описаны в [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
 
 **Датированные обследования, статус оценки и периимплантатная фиксация (с 2.4.0):**
 

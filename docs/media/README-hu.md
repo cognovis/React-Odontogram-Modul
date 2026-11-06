@@ -29,7 +29,7 @@ Ez a projekt egy interaktív, böngészőben futó odontogram szerkesztő, amely
 ### 📦 Használat npm csomagként
 
 Az odontogram önálló React komponenskönyvtárként érhető el az npm-en:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Követelmények
 - **React 18 vagy 19** (peer dependency-ként deklarálva — az alkalmazásod biztosítja).
@@ -39,7 +39,8 @@ Az odontogram önálló React komponenskönyvtárként érhető el az npm-en:
 #### Telepítés
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Alapvető használat
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Renderelj `OdontogramShell`-t, és importáld a stíluslapot **egyszer**, bárhol az alkalmazásodban:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -99,7 +100,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // bemutató túra indítása
   // …és még sok további setX/getX beállítás függvény
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 A teljes felület (≈ 44 függvény + olyan típusok, mint az `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) teljesen típusosan szerepel a mellékelt deklarációkban.
@@ -110,8 +111,8 @@ A komponens kizárólag kliensoldali, ezért egy Client Component-ből kell rend
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="hu" numberingSystem="FDI" />;
@@ -122,7 +123,7 @@ Vagy töltsd be egy kizárólag kliensoldali dinamikus importtal: `dynamic(() =>
 
 #### Fontos megjegyzések és jelenlegi korlátok
 - **Kizárólag ESM** — a csomag fő ES modult (`dist/odontogram.js`) publikál, a megfelelő típusdeklarációkkal (`dist/index.d.ts`). A bundler modulfeloldást célozza; nincs CommonJS build.
-- **A stíluslap külön van** — kötelező egyszer importálnod a `@cognovis/odontogram/style.css` fájlt; ez nem töltődik be automatikusan. A stílus globális CSS, amely a `.odontogram-root` alá van skálázva, és `--odon-*` CSS változók vezérlik. A még ki nem adott verzióban semmit sem állít a `:root`, `html` vagy `body` elemre: a gazdaoldal háttere, betűtípusa és saját tokenjei érintetlenek maradnak; a `<body>`-hoz fűzött felületek (bemutató, felugró ablakok) a `.odontogram-portal` osztályt kapják.
+- **A stíluslap külön van** — kötelező egyszer importálnod a `@cognovis/react-odontogram/style.css` fájlt; ez nem töltődik be automatikusan. A stílus globális CSS, amely a `.odontogram-root` alá van skálázva, és `--odon-*` CSS változók vezérlik. A még ki nem adott verzióban semmit sem állít a `:root`, `html` vagy `body` elemre: a gazdaoldal háttere, betűtípusa és saját tokenjei érintetlenek maradnak; a `<body>`-hoz fűzött felületek (bemutató, felugró ablakok) a `.odontogram-portal` osztályt kapják.
 - **SSR / kizárólag kliensoldali** — a komponens csatoláskor (mount) olvassa a DOM-ot (`document`), ezért a böngészőben kell futnia. SSR keretrendszerekben egy Client Component-ben (`"use client"`) vagy kizárólag kliensoldali dinamikus importon keresztül kell renderelni.
 - **Az eszközök (assets) önállóak** — a fog- és ikon-SVG-k build időben be vannak ágyazva a JavaScript bundle-be; **nincs futásidejű asset lekérés**, amit be kellene állítani, és semmi extrát nem kell átmásolni a public mappádba.
 - **Több példány, egy élő szerkesztő** — minden beillesztett `<OdontogramShell>` saját klinikai állapotot tarthat egy elszigetelt munkameneten keresztül (`createOdontogramSession()`), és két munkamenet soha nem oszt meg adatot. Az interaktív DOM-szerkesztő továbbra is egyetlen globális motor, ezért egyszerre pontosan egy beillesztett példány vezérli: az rendereli a diagramot, a többi inaktív helyőrzőt rendel, és a munkamenet API-ján át továbbra is teljesen olvasható és írható. Az aktív példány leszerelésekor egy várakozó veszi át.
@@ -591,7 +592,7 @@ bun run dev                                 # majd nyissa meg: http://localhost:
 
 Adminisztrátori hitelesítő adat soha ne kerüljön `VITE_*` kulcsba.
 
-A HTTP-fél saját csomag, a [`@cognovis/odontogram-fhir`](../../odontogram-fhir): ez tartalmazza az Aidbox-transzportot és a gateway-gyárat, és egyedül ez függ a `@cognovis/fhir-sdk/client`-től. Ez a csomag a gateway-**SPI**-t és a munkamenet betöltés/mentés/írásterv delegáltjait szállítja — a HTTP-mentes felet —, és továbbra **sem** tartalmazza a `@cognovis/fhir-sdk/client`-et. Az 5.2.6-ös diagram és transzport kötelező SDK peer függősége `^0.22.0 || ^0.23.0`, pontos fejlesztői verziója `0.23.0` (Dental Core 0.10.0). A futtató alkalmazás az SDK `0.23.0` verzióját rögzíti, és felülírás nélkül egyetlen példányt használ. A beállítás és a betöltés/mentés mechanikája a [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md) fájlban található.
+A HTTP-fél saját csomag, a [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir): ez tartalmazza az Aidbox-transzportot és a gateway-gyárat, és egyedül ez függ a `@cognovis/fhir-sdk/client`-től. Ez a csomag a gateway-**SPI**-t és a munkamenet betöltés/mentés/írásterv delegáltjait szállítja — a HTTP-mentes felet —, és továbbra **sem** tartalmazza a `@cognovis/fhir-sdk/client`-et. Az 5.2.6-ös diagram és transzport kötelező SDK peer függősége `^0.22.0 || ^0.23.0`, pontos fejlesztői verziója `0.23.0` (Dental Core 0.10.0). A futtató alkalmazás az SDK `0.23.0` verzióját rögzíti, és felülírás nélkül egyetlen példányt használ. A beállítás és a betöltés/mentés mechanikája a [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md) fájlban található.
 
 **Dátumozott vizsgálatok, felmérési státusz és peri-implantáris rögzítés (2.4.0-tól):**
 

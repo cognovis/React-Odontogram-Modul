@@ -22,12 +22,20 @@ This is a [Bun](https://bun.sh) workspace:
 
 | Path | Package | What it is |
 |---|---|---|
-| `packages/odontogram/` | `@cognovis/odontogram` | The chart SDK (React component library) |
-| `packages/odontogram-fhir/` | `@cognovis/odontogram-fhir` | The Aidbox HTTP transport for the chart SDK |
+| `packages/odontogram/` | `@cognovis/react-odontogram` | The chart SDK (React component library) |
+| `packages/odontogram-fhir/` | `@cognovis/react-odontogram-fhir` | The Aidbox HTTP transport for the chart SDK |
 | `apps/standalone/` | `@cognovis/odontogram-standalone` | A standalone app that consumes both (private) |
 
-The packages are not yet published to a public npm registry. Use them from
-source for now.
+The two packages and their `@cognovis/fhir-sdk` peer are published on the
+Cognovis registry, which serves them without authentication:
+
+```
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
+```
+
+This repository's own `.npmrc` and `bunfig.toml` already point the
+`@cognovis` scope there.
 
 ## Getting started
 

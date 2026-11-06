@@ -14,12 +14,12 @@
   "scripts": {
     "dev": "bun run --filter @cognovis/odontogram-standalone dev",
     "build": "bun run build:lib && bun run --filter @cognovis/odontogram-standalone build",
-    "build:lib": "bun run --filter @cognovis/odontogram build:lib && bun run --filter @cognovis/odontogram-fhir build:lib",
+    "build:lib": "bun run --filter @cognovis/react-odontogram build:lib && bun run --filter @cognovis/react-odontogram-fhir build:lib",
     "test": "bun run --filter '*' test",
     "typecheck": "tsc -p packages/odontogram --noEmit && tsc -p packages/odontogram-fhir --noEmit && tsc -p apps/standalone --noEmit",
     "lint": "eslint .",
-    "docs": "bun run --filter @cognovis/odontogram docs",
-    "verify:lib-artifacts": "bun run --filter @cognovis/odontogram verify:lib-artifacts",
+    "docs": "bun run --filter @cognovis/react-odontogram docs",
+    "verify:lib-artifacts": "bun run --filter @cognovis/react-odontogram verify:lib-artifacts",
     "verify:packed-sdk": "bun scripts/verify-packed-sdk.mjs"
   },
   "devDependencies": {

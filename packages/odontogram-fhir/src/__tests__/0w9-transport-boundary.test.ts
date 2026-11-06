@@ -8,7 +8,7 @@
 // SDK's `AidboxGateway` shape — nothing else. Three properties keep it thin,
 // and each of them is a mistake that has already been made somewhere:
 //
-//   1. The arrow points ONE way. This package depends on `@cognovis/odontogram`
+//   1. The arrow points ONE way. This package depends on `@cognovis/react-odontogram`
 //      for the gateway shape; the SDK must never depend back, or the HTTP-free
 //      guarantee that lets the chart run in a test and in every host
 //      application is gone.
@@ -24,7 +24,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import * as transport from "../index";
-import * as chartSdk from "@cognovis/odontogram";
+import * as chartSdk from "@cognovis/react-odontogram";
 
 const root = process.cwd();
 const packageJson = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
@@ -69,7 +69,7 @@ function relative(paths: string[]): string[] {
 
 describe("bead odontogram-0w9: the Aidbox transport package's boundary", () => {
   it("is the package the Aidbox factories are exported from", () => {
-    expect(packageJson.name).toBe("@cognovis/odontogram-fhir");
+    expect(packageJson.name).toBe("@cognovis/react-odontogram-fhir");
     expect(typeof transport.createAidboxGateway).toBe("function");
     expect(typeof transport.createAidboxTransport).toBe("function");
     expect(typeof transport.searchAllPages).toBe("function");
@@ -94,7 +94,7 @@ describe("bead odontogram-0w9: the Aidbox transport package's boundary", () => {
     const workspaceDeps = Object.entries(deps)
       .filter(([, range]) => typeof range === "string" && range.startsWith("workspace:"))
       .map(([name]) => name);
-    expect(workspaceDeps).toEqual(["@cognovis/odontogram"]);
+    expect(workspaceDeps).toEqual(["@cognovis/react-odontogram"]);
     // The executable host owns the SDK shared by the chart and its transport.
     expect(deps["@cognovis/fhir-sdk"]).toBeUndefined();
     expect(packageJson.peerDependencies["@cognovis/fhir-sdk"]).toBe("^0.22.0 || ^0.23.0");

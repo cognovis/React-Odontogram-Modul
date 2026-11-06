@@ -29,7 +29,7 @@ Ten projekt to interaktywny edytor odontogramu oparty na przeglądarce, umożliw
 ### 📦 Użycie jako pakiet npm
 
 Odontogram jest dostępny jako samodzielna biblioteka komponentów React na npm:
-`@cognovis/odontogram`.
+`@cognovis/react-odontogram`.
 
 #### Wymagania
 - **React 18 lub 19** (zadeklarowany jako peer dependency — dostarczany przez Twoją aplikację).
@@ -39,7 +39,8 @@ Odontogram jest dostępny jako samodzielna biblioteka komponentów React na npm:
 #### Instalacja
 
 ```bash
-bun add @cognovis/odontogram react react-dom
+echo "@cognovis:registry=https://npm.cognovis.de" >> .npmrc
+bun add @cognovis/react-odontogram @cognovis/fhir-sdk react react-dom
 ```
 
 #### Podstawowe użycie
@@ -47,8 +48,8 @@ bun add @cognovis/odontogram react react-dom
 Wyrenderuj `OdontogramShell` i zaimportuj arkusz stylów **raz** w dowolnym miejscu swojej aplikacji:
 
 ```tsx
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export function Chart() {
   return (
@@ -99,7 +100,7 @@ import {
   registerPlugins, setPluginState, getPluginState,
   startIntroTour,            // uruchamia wprowadzającą wycieczkę
   // …i wiele innych funkcji ustawień setX/getX
-} from "@cognovis/odontogram";
+} from "@cognovis/react-odontogram";
 ```
 
 Pełny zakres API (≈ 44 funkcje + typy takie jak `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) jest w pełni otypowany w dołączonych deklaracjach.
@@ -110,8 +111,8 @@ Komponent działa wyłącznie po stronie klienta, dlatego renderuj go w komponen
 
 ```tsx
 "use client";
-import { OdontogramShell } from "@cognovis/odontogram";
-import "@cognovis/odontogram/style.css";
+import { OdontogramShell } from "@cognovis/react-odontogram";
+import "@cognovis/react-odontogram/style.css";
 
 export default function OdontogramClient() {
   return <OdontogramShell language="pl" numberingSystem="FDI" />;
@@ -122,7 +123,7 @@ Ewentualnie załaduj go za pomocą dynamicznego importu tylko po stronie klienta
 
 #### Ważne uwagi i obecne ograniczenia
 - **Wyłącznie ESM** — pakiet publikuje główny moduł ES (`dist/odontogram.js`) z odpowiadającymi deklaracjami typów (`dist/index.d.ts`). Jest przeznaczony dla rozwiązywania modułów przez bundler; nie ma builda CommonJS.
-- **Arkusz stylów jest oddzielny** — **musisz** zaimportować `@cognovis/odontogram/style.css` raz; nie jest on wstrzykiwany automatycznie. Stylowanie to globalny CSS ograniczony do `.odontogram-root` i sterowany zmiennymi CSS `--odon-*`. W nieopublikowanej wersji nie ustawia niczego na `:root`, `html` ani `body`: tło strony, czcionka i własne tokeny hosta pozostają nietknięte; elementy dołączane do `<body>` (przewodnik, wyskakujące okna) mają klasę `.odontogram-portal`.
+- **Arkusz stylów jest oddzielny** — **musisz** zaimportować `@cognovis/react-odontogram/style.css` raz; nie jest on wstrzykiwany automatycznie. Stylowanie to globalny CSS ograniczony do `.odontogram-root` i sterowany zmiennymi CSS `--odon-*`. W nieopublikowanej wersji nie ustawia niczego na `:root`, `html` ani `body`: tło strony, czcionka i własne tokeny hosta pozostają nietknięte; elementy dołączane do `<body>` (przewodnik, wyskakujące okna) mają klasę `.odontogram-portal`.
 - **SSR / tylko po stronie klienta** — komponent odczytuje DOM przy montowaniu (`document`), więc musi działać w przeglądarce. W frameworkach SSR renderuj go w komponencie klienckim (`"use client"`) lub poprzez dynamiczny import tylko po stronie klienta.
 - **Zasoby są samodzielne** — pliki SVG zębów i ikon są osadzane w pakiecie JavaScript w czasie budowania; **nie ma żadnego pobierania zasobów w czasie działania** do konfigurowania ani niczego dodatkowego do skopiowania do folderu publicznego.
 - **Wiele instancji, jeden aktywny edytor** — każda zamontowana `<OdontogramShell>` może utrzymywać własny stan kliniczny poprzez odizolowaną sesję (`createOdontogramSession()`), a dwie sesje nigdy nie współdzielą danych. Interaktywny edytor DOM pozostaje jednym globalnym silnikiem, więc steruje nim dokładnie jedna zamontowana instancja naraz: to ona renderuje wykres, pozostałe renderują nieaktywny znacznik i pozostają w pełni czytelne oraz zapisywalne przez swoje API sesji. Po odmontowaniu aktywnej instancji przejmuje ją oczekująca.
@@ -591,7 +592,7 @@ bun run dev                                 # następnie otwórz http://localhos
 
 Nigdy nie umieszczaj danych administratora w `VITE_*`.
 
-Połowa HTTP to osobny pakiet, [`@cognovis/odontogram-fhir`](../../odontogram-fhir): zawiera transport Aidboxa i fabrykę bramy i jako jedyny zależy od `@cognovis/fhir-sdk/client`. Ten pakiet dostarcza **SPI** bramy oraz delegaty sesji dla wczytywania, zapisu i planu zapisu — połowę bez HTTP — i nadal **nie** zawiera `@cognovis/fhir-sdk/client`. Diagram i transport 5.2.6 deklarują wymagany peer SDK `^0.22.0 || ^0.23.0` i dokładną wersję deweloperską `0.23.0` (Dental Core 0.10.0). Aplikacja wykonywalna przypina SDK `0.23.0` i współdzieli jedną kopię bez override. Konfiguracja i mechanika wczytywania/zapisu znajdują się w [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+Połowa HTTP to osobny pakiet, [`@cognovis/react-odontogram-fhir`](../../odontogram-fhir): zawiera transport Aidboxa i fabrykę bramy i jako jedyny zależy od `@cognovis/fhir-sdk/client`. Ten pakiet dostarcza **SPI** bramy oraz delegaty sesji dla wczytywania, zapisu i planu zapisu — połowę bez HTTP — i nadal **nie** zawiera `@cognovis/fhir-sdk/client`. Diagram i transport 5.2.6 deklarują wymagany peer SDK `^0.22.0 || ^0.23.0` i dokładną wersję deweloperską `0.23.0` (Dental Core 0.10.0). Aplikacja wykonywalna przypina SDK `0.23.0` i współdzieli jedną kopię bez override. Konfiguracja i mechanika wczytywania/zapisu znajdują się w [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
 
 **Datowane badania, status oceny i zapis okołowszczepowy (od 2.4.0):**
 

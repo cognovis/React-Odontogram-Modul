@@ -7,7 +7,7 @@
 //
 // Bead odontogram-0w9: the same invariants, now read from the SDK package
 // inside the Bun workspace. The HTTP client factory no longer lives beside the
-// session SPI — it is its own package, `@cognovis/odontogram-fhir`, which the
+// session SPI — it is its own package, `@cognovis/react-odontogram-fhir`, which the
 // SDK must not depend on in either direction of the manifest.
 
 import { execSync } from "node:child_process";
@@ -20,7 +20,7 @@ const root = process.cwd();
 /** The Bun workspace root, two levels up from `packages/odontogram`. */
 const workspaceRoot = resolve(root, "../..");
 const FHIR_SDK_CLIENT = "@cognovis/fhir-sdk/client";
-const TRANSPORT_PACKAGE = "@cognovis/odontogram-fhir";
+const TRANSPORT_PACKAGE = "@cognovis/react-odontogram-fhir";
 
 function read(relative: string): string {
   return readFileSync(resolve(root, relative), "utf8");
@@ -77,7 +77,7 @@ describe("odontogram-wt5: FHIR layer is SDK-only", () => {
   });
 
   it("uses the tested registry FHIR SDK peer and drops codegen packages", () => {
-    expect(packageJson.name).toBe("@cognovis/odontogram");
+    expect(packageJson.name).toBe("@cognovis/react-odontogram");
     expect(packageJson.dependencies?.["@cognovis/fhir-sdk"]).toBeUndefined();
     expect(packageJson.peerDependencies?.["@cognovis/fhir-sdk"]).toBe("^0.22.0 || ^0.23.0");
     expect(packageJson.devDependencies?.["@cognovis/fhir-sdk"]).toBe("0.23.0");
@@ -91,7 +91,7 @@ describe("odontogram-wt5: FHIR layer is SDK-only", () => {
     expect(existsSync(resolve(workspaceRoot, "package-lock.json"))).toBe(false);
     expect(existsSync(resolve(root, "package-lock.json"))).toBe(false);
     const lock = parseBunLock(readWorkspace("bun.lock"));
-    expect(lock.workspaces?.["packages/odontogram"]?.name).toBe("@cognovis/odontogram");
+    expect(lock.workspaces?.["packages/odontogram"]?.name).toBe("@cognovis/react-odontogram");
     expect(lock.workspaces?.["packages/odontogram"]?.version).toBe(packageJson.version);
     const sdk = lock.packages?.["@cognovis/fhir-sdk"] as [string, string, ...unknown[]] | undefined;
     expect(sdk?.[0]).toBe("@cognovis/fhir-sdk@0.23.0");

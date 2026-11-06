@@ -2,7 +2,7 @@
    Dirk Saeger, Malte Sussdorff 2026
 
    The standalone app's PAGE. Until 5.0.2 these rules shipped inside
-   @cognovis/odontogram/style.css, where every host that imported the chart's
+   @cognovis/react-odontogram/style.css, where every host that imported the chart's
    stylesheet got them too: the chart's tokens on :root and on `.dark`, the
    page gradient and text colour on <body> (GitHub cognovis/odontogram#44).
    The package now scopes its tokens to .odontogram-root/.odontogram-portal;

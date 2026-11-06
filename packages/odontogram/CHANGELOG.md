@@ -7,6 +7,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- First public pre-release snapshot of `@cognovis/odontogram` and
-  `@cognovis/odontogram-fhir`. Earlier development history is not part of this
+- First public pre-release snapshot of `@cognovis/react-odontogram` and
+  `@cognovis/react-odontogram-fhir`. Earlier development history is not part of this
   repository.

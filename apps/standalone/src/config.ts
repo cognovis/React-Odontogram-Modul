@@ -16,7 +16,7 @@
 // SDK and the published Aidbox transport both take their configuration as an
 // argument; the app is what resolves it.
 
-import type { AidboxConnection } from "@cognovis/odontogram-fhir";
+import type { AidboxConnection } from "@cognovis/react-odontogram-fhir";
 
 /** The Vite environment keys the live mode reads. All are optional at the type level. */
 export interface LiveEnv {
