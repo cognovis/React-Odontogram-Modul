@@ -1,0 +1,1950 @@
+{
+  "schemaVersion": 1,
+  "catalog": "docs/contracts/odontogram-value-catalog.json",
+  "writer": {
+    "repository": "cognovis/odontogram",
+    "commit": "58961ee73f7da0b5016c06f418788e97beb23ffa",
+    "path": "packages/odontogram/src/fhir/toFhirDentalCore.ts"
+  },
+  "decision": "docs/adr/ADR-002-dental-core-tooth-state-codes.md",
+  "entries": [
+    {
+      "group": "toothSelection",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-absent",
+      "valueSet": "tooth-presence",
+      "carrier": "DentalToothState.component[toothPresence]"
+    },
+    {
+      "group": "toothSelection",
+      "value": "tooth-base",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-present",
+      "valueSet": "tooth-presence",
+      "carrier": "DentalToothState.component[toothPresence]"
+    },
+    {
+      "group": "toothSelection",
+      "value": "milktooth",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "primary-tooth-present",
+      "valueSet": "tooth-presence",
+      "carrier": "DentalToothState.component[toothPresence]"
+    },
+    {
+      "group": "toothSelection",
+      "value": "implant",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "implant-in-tooth-position",
+      "valueSet": "tooth-presence",
+      "carrier": "DentalToothState.component[toothPresence]"
+    },
+    {
+      "group": "toothSelection",
+      "value": "tooth-under-gum",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-retained-under-gingiva",
+      "valueSet": "tooth-presence",
+      "carrier": "DentalToothState.component[toothPresence]"
+    },
+    {
+      "group": "toothSelection",
+      "value": "no-tooth-after-extraction",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-absent-extracted",
+      "valueSet": "tooth-presence",
+      "carrier": "DentalToothState.component[toothPresence]"
+    },
+    {
+      "group": "toothSelection",
+      "value": "not-erupted",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-not-erupted",
+      "valueSet": "tooth-presence",
+      "carrier": "DentalToothState.component[toothPresence]"
+    },
+    {
+      "group": "endo",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState]"
+    },
+    {
+      "group": "endo",
+      "value": "endo-medical-filling",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "intracanal-medicament",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState]"
+    },
+    {
+      "group": "endo",
+      "value": "endo-filling",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "root-canal-filling",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState]"
+    },
+    {
+      "group": "endo",
+      "value": "endo-filling-incomplete",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "incomplete-root-canal-filling",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState]"
+    },
+    {
+      "group": "endo",
+      "value": "endo-glass-pin",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "glass-fiber-post",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState]"
+    },
+    {
+      "group": "endo",
+      "value": "endo-metal-pin",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "metal-post",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState]"
+    },
+    {
+      "group": "fillingMaterial",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial] with ToothSurfaceExt"
+    },
+    {
+      "group": "fillingMaterial",
+      "value": "amalgam",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "amalgam",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial] with ToothSurfaceExt"
+    },
+    {
+      "group": "fillingMaterial",
+      "value": "composite",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "composite-resin",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial] with ToothSurfaceExt"
+    },
+    {
+      "group": "fillingMaterial",
+      "value": "gic",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "glass-ionomer-cement",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial] with ToothSurfaceExt"
+    },
+    {
+      "group": "fillingMaterial",
+      "value": "temporary",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "temporary-material",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial] with ToothSurfaceExt"
+    },
+    {
+      "group": "prosthesis",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "prosthesis",
+      "value": "healing-abutment",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "healing-abutment",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "prosthesis",
+      "value": "locator",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "locator-attachment",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "prosthesis",
+      "value": "locator-denture",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "locator-retained-overdenture",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "prosthesis",
+      "value": "bar",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "bar-attachment",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "prosthesis",
+      "value": "bar-denture",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "bar-retained-overdenture",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "prosthesis",
+      "value": "removable-partial",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "removable-partial-denture",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "prosthesis",
+      "value": "removable-full",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "complete-removable-denture",
+      "valueSet": "prosthetic-state",
+      "carrier": "DentalToothState.component[prostheticState]"
+    },
+    {
+      "group": "mobility",
+      "value": "none",
+      "status": "out-of-scope",
+      "reason": "Absence of mobility is not emitted: the writer omits the component and a tooth-mobility result records an observed grade only."
+    },
+    {
+      "group": "mobility",
+      "value": "m1",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-mobility-grade-1",
+      "valueSet": "tooth-mobility",
+      "carrier": "DentalPeriodontalFinding.component[toothMobility]"
+    },
+    {
+      "group": "mobility",
+      "value": "m2",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-mobility-grade-2",
+      "valueSet": "tooth-mobility",
+      "carrier": "DentalPeriodontalFinding.component[toothMobility]"
+    },
+    {
+      "group": "mobility",
+      "value": "m3",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tooth-mobility-grade-3",
+      "valueSet": "tooth-mobility",
+      "carrier": "DentalPeriodontalFinding.component[toothMobility]"
+    },
+    {
+      "group": "mods",
+      "value": "inflammation",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "inflammation",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-tooth-modifier]",
+      "property": "legacy-tooth-modifier"
+    },
+    {
+      "group": "mods",
+      "value": "parodontal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "periodontal-involvement",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-tooth-modifier]",
+      "property": "legacy-tooth-modifier"
+    },
+    {
+      "group": "mods",
+      "value": "mobility",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "mobility",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-tooth-modifier]",
+      "property": "legacy-tooth-modifier"
+    },
+    {
+      "group": "periapicalType",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[periapical-lesion-type]",
+      "property": "periapical-lesion-type"
+    },
+    {
+      "group": "periapicalType",
+      "value": "granuloma",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "granuloma",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[periapical-lesion-type]",
+      "property": "periapical-lesion-type"
+    },
+    {
+      "group": "periapicalType",
+      "value": "cyst",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "radicular-cyst",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[periapical-lesion-type]",
+      "property": "periapical-lesion-type"
+    },
+    {
+      "group": "periapicalType",
+      "value": "abscess",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "periapical-abscess",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[periapical-lesion-type]",
+      "property": "periapical-lesion-type"
+    },
+    {
+      "group": "caries",
+      "value": "caries-subcrown",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "secondary-caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]"
+    },
+    {
+      "group": "caries",
+      "value": "caries-buccal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "bodySite.extension[surface] = FDI-surface#B"
+    },
+    {
+      "group": "caries",
+      "value": "caries-lingual",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "bodySite.extension[surface] = FDI-surface#L"
+    },
+    {
+      "group": "caries",
+      "value": "caries-mesial",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "bodySite.extension[surface] = FDI-surface#M"
+    },
+    {
+      "group": "caries",
+      "value": "caries-distal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "bodySite.extension[surface] = FDI-surface#D"
+    },
+    {
+      "group": "caries",
+      "value": "caries-occlusal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "bodySite.extension[surface] = FDI-surface#O"
+    },
+    {
+      "group": "fillingSurfaces",
+      "value": "buccal",
+      "status": "out-of-scope",
+      "reason": "Structural location, not a Dental Core value: the restored surface is HL7 FDI-surface on ToothSurfaceExt of the restoration component."
+    },
+    {
+      "group": "fillingSurfaces",
+      "value": "lingual",
+      "status": "out-of-scope",
+      "reason": "Structural location, not a Dental Core value: the restored surface is HL7 FDI-surface on ToothSurfaceExt of the restoration component."
+    },
+    {
+      "group": "fillingSurfaces",
+      "value": "mesial",
+      "status": "out-of-scope",
+      "reason": "Structural location, not a Dental Core value: the restored surface is HL7 FDI-surface on ToothSurfaceExt of the restoration component."
+    },
+    {
+      "group": "fillingSurfaces",
+      "value": "distal",
+      "status": "out-of-scope",
+      "reason": "Structural location, not a Dental Core value: the restored surface is HL7 FDI-surface on ToothSurfaceExt of the restoration component."
+    },
+    {
+      "group": "fillingSurfaces",
+      "value": "occlusal",
+      "status": "out-of-scope",
+      "reason": "Structural location, not a Dental Core value: the restored surface is HL7 FDI-surface on ToothSurfaceExt of the restoration component."
+    },
+    {
+      "group": "toothSubstrate",
+      "value": "natural",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "natural-tooth-structure",
+      "valueSet": "tooth-substrate",
+      "carrier": "DentalToothState.component[toothSubstrate]"
+    },
+    {
+      "group": "toothSubstrate",
+      "value": "radix",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "retained-root",
+      "valueSet": "tooth-substrate",
+      "carrier": "DentalToothState.component[toothSubstrate]"
+    },
+    {
+      "group": "toothSubstrate",
+      "value": "broken",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "crown-destroyed",
+      "valueSet": "tooth-substrate",
+      "carrier": "DentalToothState.component[toothSubstrate]"
+    },
+    {
+      "group": "toothSubstrate",
+      "value": "crownprep",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "prepared-for-crown",
+      "valueSet": "tooth-substrate",
+      "carrier": "DentalToothState.component[toothSubstrate]"
+    },
+    {
+      "group": "restorationType",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType]"
+    },
+    {
+      "group": "restorationType",
+      "value": "crown",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "crown",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType]"
+    },
+    {
+      "group": "restorationType",
+      "value": "inlay",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "inlay",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType]"
+    },
+    {
+      "group": "restorationType",
+      "value": "onlay",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "onlay",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType]"
+    },
+    {
+      "group": "restorationType",
+      "value": "veneer",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "veneer",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType]"
+    },
+    {
+      "group": "restorationType",
+      "value": "bridge",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "bridge-unit",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "emax",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "lithium-disilicate-ceramic",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "gold",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "gold-alloy",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "gradia",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "indirect-composite",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "zircon",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "zirconia",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "metal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "cast-metal-alloy",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "metal-ceramic",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "metal-ceramic",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "telescope",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "telescopic-crown",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType]",
+      "note": "A telescope is a restoration type, not a material; the catalog lists it under restorationMaterial."
+    },
+    {
+      "group": "restorationMaterial",
+      "value": "temporary",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "temporary-material",
+      "valueSet": "restoration-material",
+      "carrier": "DentalToothState.component[restorationMaterial]"
+    },
+    {
+      "group": "pulpDx",
+      "value": "normal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "normal-pulp",
+      "valueSet": "pulp-diagnosis",
+      "carrier": "DentalPulpDiagnosis.value[x]"
+    },
+    {
+      "group": "pulpDx",
+      "value": "reversible-pulpitis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "reversible-pulpitis",
+      "valueSet": "pulp-diagnosis",
+      "carrier": "DentalPulpDiagnosis.value[x]"
+    },
+    {
+      "group": "pulpDx",
+      "value": "irreversible-pulpitis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "irreversible-pulpitis",
+      "valueSet": "pulp-diagnosis",
+      "carrier": "DentalPulpDiagnosis.value[x]"
+    },
+    {
+      "group": "pulpDx",
+      "value": "necrosis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "pulp-necrosis",
+      "valueSet": "pulp-diagnosis",
+      "carrier": "DentalPulpDiagnosis.value[x]"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "pulpa-sana",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "pulpa-sana",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "hyperaemia-pulpae",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "hyperaemia-pulpae",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "pulpitis-acuta-serosa",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "pulpitis-acuta-serosa",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "pulpitis-acuta-purulenta",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "pulpitis-acuta-purulenta",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "pulpitis-chronica-clausa",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "pulpitis-chronica-clausa",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "pulpitis-chronica-ulcerosa",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "pulpitis-chronica-ulcerosa",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "pulpitis-chronica-hyperplastica",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "pulpitis-chronica-hyperplastica",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "necrosis-pulpae",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "necrosis-pulpae",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "pulpLatin",
+      "value": "gangraena-pulpae",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "gangraena-pulpae",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[legacy-latin-pulp-diagnosis]",
+      "property": "legacy-latin-pulp-diagnosis"
+    },
+    {
+      "group": "apicalDx",
+      "value": "normal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "normal-apical-tissues",
+      "valueSet": "apical-diagnosis",
+      "carrier": "DentalApicalDiagnosis.value[x]"
+    },
+    {
+      "group": "apicalDx",
+      "value": "symptomatic-apical-periodontitis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "symptomatic-apical-periodontitis",
+      "valueSet": "apical-diagnosis",
+      "carrier": "DentalApicalDiagnosis.value[x]"
+    },
+    {
+      "group": "apicalDx",
+      "value": "asymptomatic-apical-periodontitis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "asymptomatic-apical-periodontitis",
+      "valueSet": "apical-diagnosis",
+      "carrier": "DentalApicalDiagnosis.value[x]"
+    },
+    {
+      "group": "apicalDx",
+      "value": "acute-apical-abscess",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "acute-apical-abscess",
+      "valueSet": "apical-diagnosis",
+      "carrier": "DentalApicalDiagnosis.value[x]"
+    },
+    {
+      "group": "apicalDx",
+      "value": "chronic-apical-abscess",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "chronic-apical-abscess",
+      "valueSet": "apical-diagnosis",
+      "carrier": "DentalApicalDiagnosis.value[x]"
+    },
+    {
+      "group": "apicalDx",
+      "value": "condensing-osteitis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "condensing-osteitis",
+      "valueSet": "apical-diagnosis",
+      "carrier": "DentalApicalDiagnosis.value[x]"
+    },
+    {
+      "group": "resorptionType",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-resorption-type]",
+      "property": "root-resorption-type"
+    },
+    {
+      "group": "resorptionType",
+      "value": "internal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "internal",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-resorption-type]",
+      "property": "root-resorption-type"
+    },
+    {
+      "group": "resorptionType",
+      "value": "external-cervical",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "external-cervical",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-resorption-type]",
+      "property": "root-resorption-type"
+    },
+    {
+      "group": "wearEdge",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[incisal-occlusal-wear-type]",
+      "property": "incisal-occlusal-wear-type"
+    },
+    {
+      "group": "wearEdge",
+      "value": "attrition",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "attrition",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[incisal-occlusal-wear-type]",
+      "property": "incisal-occlusal-wear-type"
+    },
+    {
+      "group": "wearEdge",
+      "value": "erosion",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "erosion",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[incisal-occlusal-wear-type]",
+      "property": "incisal-occlusal-wear-type"
+    },
+    {
+      "group": "wearCervical",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[cervical-wear-type]",
+      "property": "cervical-wear-type"
+    },
+    {
+      "group": "wearCervical",
+      "value": "abrasion",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "abrasion",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[cervical-wear-type]",
+      "property": "cervical-wear-type"
+    },
+    {
+      "group": "wearCervical",
+      "value": "abfraction",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "abfraction",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[cervical-wear-type]",
+      "property": "cervical-wear-type"
+    },
+    {
+      "group": "wearCervical",
+      "value": "erosion",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "erosion",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[cervical-wear-type]",
+      "property": "cervical-wear-type"
+    },
+    {
+      "group": "discoloration",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-discoloration-type]",
+      "property": "tooth-discoloration-type"
+    },
+    {
+      "group": "discoloration",
+      "value": "tetracycline",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "tetracycline-staining",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-discoloration-type]",
+      "property": "tooth-discoloration-type"
+    },
+    {
+      "group": "discoloration",
+      "value": "fluorosis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "fluorosis",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-discoloration-type]",
+      "property": "tooth-discoloration-type"
+    },
+    {
+      "group": "discoloration",
+      "value": "nonvital",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "nonvital-darkening",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-discoloration-type]",
+      "property": "tooth-discoloration-type"
+    },
+    {
+      "group": "discoloration",
+      "value": "extrinsic",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "extrinsic-staining",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-discoloration-type]",
+      "property": "tooth-discoloration-type"
+    },
+    {
+      "group": "discoloration",
+      "value": "other",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "other-discoloration",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-discoloration-type]",
+      "property": "tooth-discoloration-type"
+    },
+    {
+      "group": "orthoAppliance",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[orthodontic-appliance-type]",
+      "property": "orthodontic-appliance-type"
+    },
+    {
+      "group": "orthoAppliance",
+      "value": "bracket",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "bracket",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[orthodontic-appliance-type]",
+      "property": "orthodontic-appliance-type"
+    },
+    {
+      "group": "orthoAppliance",
+      "value": "band",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "band",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[orthodontic-appliance-type]",
+      "property": "orthodontic-appliance-type"
+    },
+    {
+      "group": "orthoDrift",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[horizontal-tooth-displacement]",
+      "property": "horizontal-tooth-displacement"
+    },
+    {
+      "group": "orthoDrift",
+      "value": "mesial",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "mesial",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[horizontal-tooth-displacement]",
+      "property": "horizontal-tooth-displacement"
+    },
+    {
+      "group": "orthoDrift",
+      "value": "distal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "distal",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[horizontal-tooth-displacement]",
+      "property": "horizontal-tooth-displacement"
+    },
+    {
+      "group": "orthoVertical",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[vertical-tooth-displacement]",
+      "property": "vertical-tooth-displacement"
+    },
+    {
+      "group": "orthoVertical",
+      "value": "extrusion",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "extrusion",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[vertical-tooth-displacement]",
+      "property": "vertical-tooth-displacement"
+    },
+    {
+      "group": "orthoVertical",
+      "value": "intrusion",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "intrusion",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[vertical-tooth-displacement]",
+      "property": "vertical-tooth-displacement"
+    },
+    {
+      "group": "rootCaries",
+      "value": "none",
+      "status": "out-of-scope",
+      "reason": "A caries finding records a lesion; the absence of root caries is not emitted."
+    },
+    {
+      "group": "rootCaries",
+      "value": "active",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "root-caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "component[lesionActivity] = caries-lesion-activity#active"
+    },
+    {
+      "group": "rootCaries",
+      "value": "arrested",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "root-caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "component[lesionActivity] = caries-lesion-activity#arrested"
+    },
+    {
+      "group": "rootCaries",
+      "value": "active-cavitated",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "cavitated-root-caries",
+      "valueSet": "caries-finding",
+      "carrier": "DentalCariesFinding.value[x]",
+      "qualifier": "component[lesionActivity] = caries-lesion-activity#active"
+    },
+    {
+      "group": "orthoBracketSide",
+      "value": "buccal",
+      "status": "out-of-scope",
+      "reason": "Structural location, not a Dental Core value: the bracket surface is HL7 FDI-surface on RecordedBracketSurfaceExt (ADR-001)."
+    },
+    {
+      "group": "orthoBracketSide",
+      "value": "lingual",
+      "status": "out-of-scope",
+      "reason": "Structural location, not a Dental Core value: the bracket surface is HL7 FDI-surface on RecordedBracketSurfaceExt (ADR-001)."
+    },
+    {
+      "group": "sensibility",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[pulp-sensibility-test]",
+      "property": "pulp-sensibility-test"
+    },
+    {
+      "group": "sensibility",
+      "value": "vital",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "vital",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[pulp-sensibility-test]",
+      "property": "pulp-sensibility-test"
+    },
+    {
+      "group": "sensibility",
+      "value": "no-response",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "no-response",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[pulp-sensibility-test]",
+      "property": "pulp-sensibility-test"
+    },
+    {
+      "group": "sensibility",
+      "value": "questionable",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "questionable",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[pulp-sensibility-test]",
+      "property": "pulp-sensibility-test"
+    },
+    {
+      "group": "percussion",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[percussion-test]",
+      "property": "percussion-test"
+    },
+    {
+      "group": "percussion",
+      "value": "negative",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "negative",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[percussion-test]",
+      "property": "percussion-test"
+    },
+    {
+      "group": "percussion",
+      "value": "sensitive",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "sensitive",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[percussion-test]",
+      "property": "percussion-test"
+    },
+    {
+      "group": "eruptionStage",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-eruption-stage]",
+      "property": "tooth-eruption-stage"
+    },
+    {
+      "group": "eruptionStage",
+      "value": "emerging",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "emerging",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-eruption-stage]",
+      "property": "tooth-eruption-stage"
+    },
+    {
+      "group": "eruptionStage",
+      "value": "half-crown",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "half-crown",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-eruption-stage]",
+      "property": "tooth-eruption-stage"
+    },
+    {
+      "group": "eruptionStage",
+      "value": "full-crown",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "full-crown",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[tooth-eruption-stage]",
+      "property": "tooth-eruption-stage"
+    },
+    {
+      "group": "rootFracture",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-fracture]",
+      "property": "root-fracture"
+    },
+    {
+      "group": "rootFracture",
+      "value": "vertical",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "vertical",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-fracture]",
+      "property": "root-fracture"
+    },
+    {
+      "group": "rootFracture",
+      "value": "horizontal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "horizontal",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-fracture]",
+      "property": "root-fracture"
+    },
+    {
+      "group": "rootPostType",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-post-type]",
+      "property": "root-post-type"
+    },
+    {
+      "group": "rootPostType",
+      "value": "glass-fiber",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "glass-fiber-post",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-post-type]",
+      "property": "root-post-type"
+    },
+    {
+      "group": "rootPostType",
+      "value": "metal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "metal-post",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-post-type]",
+      "property": "root-post-type"
+    },
+    {
+      "group": "rootResection",
+      "value": "none",
+      "status": "out-of-scope",
+      "reason": "Text-preserved by ADR-001 on RecordedRootResectionExt; clinical admission of root-resection terminology is a separate decision."
+    },
+    {
+      "group": "rootResection",
+      "value": "hemisection",
+      "status": "out-of-scope",
+      "reason": "Text-preserved by ADR-001 on RecordedRootResectionExt; clinical admission of root-resection terminology is a separate decision."
+    },
+    {
+      "group": "rootResection",
+      "value": "amputation",
+      "status": "out-of-scope",
+      "reason": "Text-preserved by ADR-001 on RecordedRootResectionExt; clinical admission of root-resection terminology is a separate decision."
+    },
+    {
+      "group": "rootResection",
+      "value": "premolarisation",
+      "status": "out-of-scope",
+      "reason": "Text-preserved by ADR-001 on RecordedRootResectionExt; clinical admission of root-resection terminology is a separate decision."
+    },
+    {
+      "group": "cejVisibility",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[cej-identifiability]",
+      "property": "cej-identifiability"
+    },
+    {
+      "group": "cejVisibility",
+      "value": "detectable",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "detectable",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[cej-identifiability]",
+      "property": "cej-identifiability"
+    },
+    {
+      "group": "cejVisibility",
+      "value": "not-detectable",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "not-detectable",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[cej-identifiability]",
+      "property": "cej-identifiability"
+    },
+    {
+      "group": "rootConcavity",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-concavity-category]",
+      "property": "root-concavity-category"
+    },
+    {
+      "group": "rootConcavity",
+      "value": "mild",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "mild",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-concavity-category]",
+      "property": "root-concavity-category"
+    },
+    {
+      "group": "rootConcavity",
+      "value": "deep",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "deep",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[root-concavity-category]",
+      "property": "root-concavity-category"
+    },
+    {
+      "group": "retention",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[prosthesis-retention-element]",
+      "property": "prosthesis-retention-element"
+    },
+    {
+      "group": "retention",
+      "value": "clasp",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "clasp",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[prosthesis-retention-element]",
+      "property": "prosthesis-retention-element"
+    },
+    {
+      "group": "retention",
+      "value": "attachment",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "attachment",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[prosthesis-retention-element]",
+      "property": "prosthesis-retention-element"
+    },
+    {
+      "group": "retention",
+      "value": "bar-abutment",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "bar-abutment",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[prosthesis-retention-element]",
+      "property": "prosthesis-retention-element"
+    },
+    {
+      "group": "retentionSide",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[retention-engaged-side]",
+      "property": "retention-engaged-side"
+    },
+    {
+      "group": "retentionSide",
+      "value": "mesial",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "mesial",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[retention-engaged-side]",
+      "property": "retention-engaged-side"
+    },
+    {
+      "group": "retentionSide",
+      "value": "distal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "distal",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[retention-engaged-side]",
+      "property": "retention-engaged-side"
+    },
+    {
+      "group": "retentionSide",
+      "value": "both",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "both",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[retention-engaged-side]",
+      "property": "retention-engaged-side"
+    },
+    {
+      "group": "gingivalThickness",
+      "value": "unknown",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[unqualified-gingival-phenotype]",
+      "property": "unqualified-gingival-phenotype"
+    },
+    {
+      "group": "gingivalThickness",
+      "value": "thin",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "thin",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[unqualified-gingival-phenotype]",
+      "property": "unqualified-gingival-phenotype"
+    },
+    {
+      "group": "gingivalThickness",
+      "value": "medium",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "medium",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[unqualified-gingival-phenotype]",
+      "property": "unqualified-gingival-phenotype"
+    },
+    {
+      "group": "gingivalThickness",
+      "value": "thick",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "thick",
+      "valueSet": "dental-chart-value",
+      "carrier": "DentalChartState.component[unqualified-gingival-phenotype]",
+      "property": "unqualified-gingival-phenotype"
+    },
+    {
+      "group": "millerClass",
+      "value": "none",
+      "status": "out-of-scope",
+      "reason": "No recession class is assigned; the writer emits no classification component."
+    },
+    {
+      "group": "millerClass",
+      "value": "i",
+      "status": "coded",
+      "system": "miller-gingival-recession-1985",
+      "code": "I",
+      "valueSet": "miller-gingival-recession-1985",
+      "carrier": "DentalGingivalRecessionAssessment.component[millerClassification]"
+    },
+    {
+      "group": "millerClass",
+      "value": "ii",
+      "status": "coded",
+      "system": "miller-gingival-recession-1985",
+      "code": "II",
+      "valueSet": "miller-gingival-recession-1985",
+      "carrier": "DentalGingivalRecessionAssessment.component[millerClassification]"
+    },
+    {
+      "group": "millerClass",
+      "value": "iii",
+      "status": "coded",
+      "system": "miller-gingival-recession-1985",
+      "code": "III",
+      "valueSet": "miller-gingival-recession-1985",
+      "carrier": "DentalGingivalRecessionAssessment.component[millerClassification]"
+    },
+    {
+      "group": "millerClass",
+      "value": "iv",
+      "status": "coded",
+      "system": "miller-gingival-recession-1985",
+      "code": "IV",
+      "valueSet": "miller-gingival-recession-1985",
+      "carrier": "DentalGingivalRecessionAssessment.component[millerClassification]"
+    },
+    {
+      "group": "periImplant",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "peri-implant-health",
+      "valueSet": "peri-implant-status",
+      "carrier": "DentalPeriImplantFinding.component[periImplantStatus]"
+    },
+    {
+      "group": "periImplant",
+      "value": "mucositis",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "peri-implant-mucositis",
+      "valueSet": "peri-implant-status",
+      "carrier": "DentalPeriImplantFinding.component[periImplantStatus]"
+    },
+    {
+      "group": "periImplant",
+      "value": "peri-implantitis-mild",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "peri-implantitis-mild-bone-loss",
+      "valueSet": "peri-implant-status",
+      "carrier": "DentalPeriImplantFinding.component[periImplantStatus]"
+    },
+    {
+      "group": "periImplant",
+      "value": "peri-implantitis-moderate",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "peri-implantitis-moderate-bone-loss",
+      "valueSet": "peri-implant-status",
+      "carrier": "DentalPeriImplantFinding.component[periImplantStatus]"
+    },
+    {
+      "group": "periImplant",
+      "value": "peri-implantitis-severe",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "peri-implantitis-severe-bone-loss",
+      "valueSet": "peri-implant-status",
+      "carrier": "DentalPeriImplantFinding.component[periImplantStatus]"
+    },
+    {
+      "group": "radiographicDepth",
+      "value": "none",
+      "status": "out-of-scope",
+      "reason": "No radiographic depth is recorded; the writer emits no finding."
+    },
+    {
+      "group": "radiographicDepth",
+      "value": "E1",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "enamel-outer-half",
+      "valueSet": "radiographic-caries-depth",
+      "carrier": "DentalRadiographicCariesDepth.value[x]"
+    },
+    {
+      "group": "radiographicDepth",
+      "value": "E2",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "enamel-inner-half",
+      "valueSet": "radiographic-caries-depth",
+      "carrier": "DentalRadiographicCariesDepth.value[x]"
+    },
+    {
+      "group": "radiographicDepth",
+      "value": "D1",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "dentin-outer-third",
+      "valueSet": "radiographic-caries-depth",
+      "carrier": "DentalRadiographicCariesDepth.value[x]"
+    },
+    {
+      "group": "radiographicDepth",
+      "value": "D2",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "dentin-middle-third",
+      "valueSet": "radiographic-caries-depth",
+      "carrier": "DentalRadiographicCariesDepth.value[x]"
+    },
+    {
+      "group": "radiographicDepth",
+      "value": "D3",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "dentin-inner-third",
+      "valueSet": "radiographic-caries-depth",
+      "carrier": "DentalRadiographicCariesDepth.value[x]"
+    },
+    {
+      "group": "fillingDefect",
+      "value": "none",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "none",
+      "valueSet": "restoration-status",
+      "carrier": "DentalToothState.component[restorationStatus] with ToothSurfaceExt"
+    },
+    {
+      "group": "fillingDefect",
+      "value": "marginal",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "marginal-defect",
+      "valueSet": "restoration-status",
+      "carrier": "DentalToothState.component[restorationStatus] with ToothSurfaceExt"
+    },
+    {
+      "group": "fillingDefect",
+      "value": "fracture",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "restoration-fracture",
+      "valueSet": "restoration-status",
+      "carrier": "DentalToothState.component[restorationStatus] with ToothSurfaceExt"
+    },
+    {
+      "group": "fillingDefect",
+      "value": "wear",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "restoration-wear",
+      "valueSet": "restoration-status",
+      "carrier": "DentalToothState.component[restorationStatus] with ToothSurfaceExt"
+    }
+  ],
+  "additionalWrittenTokens": [
+    {
+      "token": "direct-filling",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "direct-filling",
+      "valueSet": "restoration-type",
+      "carrier": "DentalToothState.component[restorationType] with ToothSurfaceExt",
+      "note": "Written for each filled surface."
+    },
+    {
+      "token": "crown-leakage",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "crown-leakage",
+      "valueSet": "restoration-status",
+      "carrier": "DentalToothState.component[restorationStatus]",
+      "note": "Written for the crownLeakage flag."
+    },
+    {
+      "token": "endoCanals:filling",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "root-canal-filling",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState] with MeasurementLocationDetailExt",
+      "note": "Observed per-root state; the source root stays text in MeasurementLocationDetailExt and the state text may remain. Target state stays text in RecordedRootEndodonticStateExt (ADR-001)."
+    },
+    {
+      "token": "endoCanals:post",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "root-post",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState] with MeasurementLocationDetailExt",
+      "note": "Observed per-root state; the source root stays text in MeasurementLocationDetailExt and the state text may remain. Target state stays text in RecordedRootEndodonticStateExt (ADR-001)."
+    },
+    {
+      "token": "endoCanals:incomplete",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "incomplete-root-canal-filling",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState] with MeasurementLocationDetailExt",
+      "note": "Observed per-root state; the source root stays text in MeasurementLocationDetailExt and the state text may remain. Target state stays text in RecordedRootEndodonticStateExt (ADR-001)."
+    },
+    {
+      "token": "endoCanals:temporary",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "intracanal-medicament",
+      "valueSet": "root-endodontic-state",
+      "carrier": "DentalToothState.component[rootEndodonticState] with MeasurementLocationDetailExt",
+      "note": "Observed per-root state; the source root stays text in MeasurementLocationDetailExt and the state text may remain. Target state stays text in RecordedRootEndodonticStateExt (ADR-001)."
+    },
+    {
+      "token": "furcation-1",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "furcation-grade-1",
+      "valueSet": "furcation-grade",
+      "carrier": "DentalPeriodontalFinding.component[furcation]"
+    },
+    {
+      "token": "furcation-2",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "furcation-grade-2",
+      "valueSet": "furcation-grade",
+      "carrier": "DentalPeriodontalFinding.component[furcation]"
+    },
+    {
+      "token": "furcation-3",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "furcation-grade-3",
+      "valueSet": "furcation-grade",
+      "carrier": "DentalPeriodontalFinding.component[furcation]"
+    },
+    {
+      "token": "furcation-4",
+      "status": "coded",
+      "system": "dental-chart-value",
+      "code": "furcation-grade-4",
+      "valueSet": "furcation-grade",
+      "carrier": "DentalPeriodontalFinding.component[furcation]"
+    },
+    {
+      "token": "caries-severity-0",
+      "status": "coded",
+      "system": "icdas-caries-severity",
+      "code": "0",
+      "valueSet": "icdas-caries-severity",
+      "carrier": "DentalCariesFinding.component[cariesSeverity]",
+      "note": "The writer puts the score into the caries value; Dental Core carries value caries plus the ICDAS severity component."
+    },
+    {
+      "token": "caries-severity-1",
+      "status": "coded",
+      "system": "icdas-caries-severity",
+      "code": "1",
+      "valueSet": "icdas-caries-severity",
+      "carrier": "DentalCariesFinding.component[cariesSeverity]",
+      "note": "The writer puts the score into the caries value; Dental Core carries value caries plus the ICDAS severity component."
+    },
+    {
+      "token": "caries-severity-2",
+      "status": "coded",
+      "system": "icdas-caries-severity",
+      "code": "2",
+      "valueSet": "icdas-caries-severity",
+      "carrier": "DentalCariesFinding.component[cariesSeverity]",
+      "note": "The writer puts the score into the caries value; Dental Core carries value caries plus the ICDAS severity component."
+    },
+    {
+      "token": "caries-severity-3",
+      "status": "coded",
+      "system": "icdas-caries-severity",
+      "code": "3",
+      "valueSet": "icdas-caries-severity",
+      "carrier": "DentalCariesFinding.component[cariesSeverity]",
+      "note": "The writer puts the score into the caries value; Dental Core carries value caries plus the ICDAS severity component."
+    },
+    {
+      "token": "caries-severity-4",
+      "status": "coded",
+      "system": "icdas-caries-severity",
+      "code": "4",
+      "valueSet": "icdas-caries-severity",
+      "carrier": "DentalCariesFinding.component[cariesSeverity]",
+      "note": "The writer puts the score into the caries value; Dental Core carries value caries plus the ICDAS severity component."
+    },
+    {
+      "token": "caries-severity-5",
+      "status": "coded",
+      "system": "icdas-caries-severity",
+      "code": "5",
+      "valueSet": "icdas-caries-severity",
+      "carrier": "DentalCariesFinding.component[cariesSeverity]",
+      "note": "The writer puts the score into the caries value; Dental Core carries value caries plus the ICDAS severity component."
+    },
+    {
+      "token": "caries-severity-6",
+      "status": "coded",
+      "system": "icdas-caries-severity",
+      "code": "6",
+      "valueSet": "icdas-caries-severity",
+      "carrier": "DentalCariesFinding.component[cariesSeverity]",
+      "note": "The writer puts the score into the caries value; Dental Core carries value caries plus the ICDAS severity component."
+    },
+    {
+      "token": "pulpDx",
+      "status": "coded",
+      "system": "dental-component",
+      "code": "pulp-diagnosis",
+      "valueSet": "dental-finding-code",
+      "carrier": "DentalFinding.code",
+      "note": "Observation or component code written locally by the odontogram."
+    },
+    {
+      "token": "apicalDx",
+      "status": "coded",
+      "system": "dental-component",
+      "code": "apical-diagnosis",
+      "valueSet": "dental-finding-code",
+      "carrier": "DentalFinding.code",
+      "note": "Observation or component code written locally by the odontogram."
+    },
+    {
+      "token": "radiographic-depth",
+      "status": "coded",
+      "system": "dental-component",
+      "code": "radiographic-caries-depth",
+      "valueSet": "dental-finding-code",
+      "carrier": "DentalFinding.code",
+      "note": "Observation or component code written locally by the odontogram."
+    },
+    {
+      "token": "cervical-involvement",
+      "status": "coded",
+      "system": "dental-component",
+      "code": "cervical-involvement",
+      "valueSet": "dental-finding-code",
+      "carrier": "DentalFinding.code",
+      "note": "Observation or component code written locally by the odontogram."
+    },
+    {
+      "token": "tooth-mobility",
+      "status": "coded",
+      "system": "dental-component",
+      "code": "tooth-mobility",
+      "valueSet": "dental-finding-code",
+      "carrier": "component code of a Dental Core finding slice",
+      "note": "Observation or component code written locally by the odontogram."
+    },
+    {
+      "token": "calculus",
+      "status": "coded",
+      "system": "dental-component",
+      "code": "calculus",
+      "valueSet": "dental-finding-code",
+      "carrier": "component code of a Dental Core finding slice",
+      "note": "Observation or component code written locally by the odontogram."
+    },
+    {
+      "token": "peri-implant-status",
+      "status": "coded",
+      "system": "dental-component",
+      "code": "peri-implant-status",
+      "valueSet": "dental-finding-code",
+      "carrier": "component code of a Dental Core finding slice",
+      "note": "Observation or component code written locally by the odontogram."
+    },
+    {
+      "token": "assessed",
+      "status": "out-of-scope",
+      "reason": "Assessment point status with code assessment:<point>: odontogram examination workflow state, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "not-assessed",
+      "status": "out-of-scope",
+      "reason": "Assessment point status with code assessment:<point>: odontogram examination workflow state, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "unmeasurable",
+      "status": "out-of-scope",
+      "reason": "Assessment point status with code assessment:<point>: odontogram examination workflow state, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "not-applicable",
+      "status": "out-of-scope",
+      "reason": "Assessment point status with code assessment:<point>: odontogram examination workflow state, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "assessment:<point>",
+      "status": "out-of-scope",
+      "reason": "Odontogram examination workflow code, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "odontogram-note",
+      "status": "out-of-scope",
+      "reason": "Free-text note carrier; the text is in Observation.note, no coded value exists."
+    },
+    {
+      "token": "extractionPlan",
+      "status": "out-of-scope",
+      "reason": "ServiceRequest order code: orders use the existing SNOMED CT DentalToothOrderVS, not a Dental Core value."
+    },
+    {
+      "token": "crownReplace",
+      "status": "out-of-scope",
+      "reason": "ServiceRequest order code: orders use the existing SNOMED CT DentalToothOrderVS, not a Dental Core value."
+    },
+    {
+      "token": "crownNeeded",
+      "status": "out-of-scope",
+      "reason": "ServiceRequest order code: orders use the existing SNOMED CT DentalToothOrderVS, not a Dental Core value."
+    },
+    {
+      "token": "shared-resource-diabetesStatus",
+      "status": "out-of-scope",
+      "reason": "Provenance reason for a shared patient-level resource, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "shared-resource-hba1c",
+      "status": "out-of-scope",
+      "reason": "Provenance reason for a shared patient-level resource, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "shared-resource-smokingStatus",
+      "status": "out-of-scope",
+      "reason": "Provenance reason for a shared patient-level resource, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "shared-resource-edentulous",
+      "status": "out-of-scope",
+      "reason": "Provenance reason for a shared patient-level resource, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "smokingStatus",
+      "status": "out-of-scope",
+      "reason": "Patient-level smoking status is LOINC 72166-2 with its answer list, outside Dental Core terminology."
+    },
+    {
+      "token": "implant-diameter",
+      "status": "out-of-scope",
+      "reason": "Device.property type for implant or restoration product data, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "implant-length",
+      "status": "out-of-scope",
+      "reason": "Device.property type for implant or restoration product data, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "restoration-shade",
+      "status": "out-of-scope",
+      "reason": "Device.property type for implant or restoration product data, not a tooth-state or chart-finding value."
+    },
+    {
+      "token": "dental-laboratory",
+      "status": "out-of-scope",
+      "reason": "Device.property type for implant or restoration product data, not a tooth-state or chart-finding value."
+    }
+  ]
+}

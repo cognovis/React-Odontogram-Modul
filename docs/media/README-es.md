@@ -1,0 +1,885 @@
+# 🦷 React Advanced Odontogram
+
+[![Download](https://img.shields.io/badge/Download-React--Odontogram--Modul-blue?style=for-the-badge&logo=github)](https://github.com/ZoliQua/React-Odontogram-Modul/releases)
+[![Version](https://img.shields.io/badge/version-5.2.6-green?style=for-the-badge)](https://github.com/ZoliQua/React-Odontogram-Modul)
+[![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)](https://github.com/ZoliQua/React-Odontogram-Modul/blob/main/LICENSE)
+[![DOI](../src/assets/zenodo.21156787.svg)](https://doi.org/10.5281/zenodo.21156787)
+
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+
+---
+
+> 🌐 **Languages:**  🇬🇧 [English](README-en.md) | 🇪🇸 [Español](README-es.md) | 🇩🇪 [Deutsch](README-de.md) | 🇭🇺 [Magyar](README-hu.md) | 🇮🇹 [Italiano](README-it.md) | 🇸🇰 [Slovenčina](README-sk.md) | 🇵🇱 [Polski](README-pl.md) | 🇷🇺 [Русский](README-ru.md) | 🇧🇷 [Português (BR)](README-pt-br.md) | 🇸🇦 [العربية](README-ar.md) | 🇨🇳 [简体中文](README-zh.md) | 🇫🇷 [Français](README-fr.md)
+
+---
+
+## 🇪🇸 Español
+
+### 📋 Descripción general
+Este proyecto es un editor de odontograma interactivo basado en navegador que permite un registro rápido del estado dental con una interfaz limpia. Renderiza plantillas SVG de dientes en capas para representar restauraciones, caries, estado endodóntico, movilidad y otros detalles clínicos, proporcionando selección múltiple, filtros de selección y estados predefinidos. Cada posición dentaria tiene su propio dibujo — dieciséis vistas laterales permanentes, veinte vistas oclusales y la dentición temporal — y la vista superior de los dientes anteriores es lo que permite registrar un hallazgo palatino en un incisivo, algo que la vista lateral no puede mostrar.
+
+---
+![Editor de odontograma — vista previa en español](screenshot_es_odontogram.png)
+
+🔗 **Test URL:** https://react-odontogram-modul.vercel.app/
+
+---
+
+### 📦 Uso como paquete npm
+
+El odontograma se publica como una biblioteca de componentes React autocontenida en npm:
+`@cognovis/odontogram`.
+
+#### Requisitos
+- **React 18 o 19** (declarado como dependencia peer — lo proporciona tu aplicación).
+- Un **bundler** que entienda el campo `exports` y ESM: Vite, webpack 5, Next.js, Rollup, esbuild, Parcel. El paquete es **solo ESM**.
+- Node **≥ 18** para las herramientas.
+
+#### Instalación
+
+```bash
+bun add @cognovis/odontogram react react-dom
+```
+
+#### Uso básico
+
+Renderiza `OdontogramShell` e importa la hoja de estilos **una sola vez** en tu aplicación:
+
+```tsx
+import { OdontogramShell } from "@cognovis/odontogram";
+import "@cognovis/odontogram/style.css";
+
+export function Chart() {
+  return (
+    <OdontogramShell
+      language="es"          // hu | en | de | es | it | sk | pl | ru | pt-br | ar | zh | fr
+      numberingSystem="FDI"  // FDI | Universal | Palmer
+      darkMode={false}
+    />
+  );
+}
+```
+
+#### Props del componente
+
+`OdontogramShell` es un componente controlado. Las props más habituales:
+
+| Prop | Tipo | Por defecto | Descripción |
+|------|------|-------------|-------------|
+| `language` | `Language` | `"hu"` | Idioma de la interfaz (`hu`/`en`/`de`/`es`/`it`/`sk`/`pl`/`ru`/`pt-br`/`ar`/`zh`). |
+| `numberingSystem` | `"FDI" \| "Universal" \| "Palmer"` | `"FDI"` | Sistema de numeración dental. |
+| `darkMode` | `boolean` | `false` | Activa el tema oscuro. |
+| `readOnly` | `boolean` | `false` | Desactiva toda edición (solo lectura). |
+| `themeConfig` | `OdontogramThemeConfig` | — | Sobrescribe las variables CSS del tema (`--odon-*`). |
+| `plugins` | `OdontogramPlugin[]` | — | Registra plugins de estado / capas adicionales. |
+| `enableNotes` | `boolean` | `false` | Habilita las notas por diente. |
+| `enableIcdas` | `boolean` | `false` | Habilita la puntuación de caries ICDAS II. |
+| `onLanguageChange` / `onNumberingChange` / `onDarkModeChange` | `(value) => void` | — | Se disparan cuando el usuario cambia el ajuste desde la interfaz. |
+
+También se aceptan props de nivel de detalle más finas (`pulpDetailLevel`, `secondaryCariesMode`, `rootCariesMode`, `radiographicDepthMode`, `wearDetailLevel`, `discolorationDetailLevel`, `surfaceNotation`, `showStatusCard`, `showOrthoCard`) — consulta los tipos `.d.ts` incluidos para la lista completa y tipada.
+
+#### API pública (exports con nombre)
+
+`OdontogramShell` es a la vez el export por defecto y un export con nombre. La API de estado imperativa, el componente `PerioChart` independiente, el tour guiado y todos los tipos públicos son exports con nombre del mismo punto de entrada:
+
+```ts
+import {
+  OdontogramShell,           // también el export por defecto
+  PerioChart,                // gráfico periodontal independiente
+  // leer estado
+  getOdontogramSummary,
+  getToothStateSummary,
+  onStateChange,             // suscribirse a los cambios de estado
+  // exportar / importar
+  exportSvg, exportImage,    // exportación vectorial / ráster
+  // control
+  setReadOnly, getReadOnly,
+  clearSelection,
+  registerPlugins, setPluginState, getPluginState,
+  startIntroTour,            // lanzar el tour de introducción
+  // …y muchas más funciones setX/getX de ajustes
+} from "@cognovis/odontogram";
+```
+
+Toda la superficie (≈ 44 funciones + tipos como `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) está completamente tipada en las declaraciones incluidas.
+
+#### Uso con Next.js (App Router)
+
+El componente es solo de cliente, así que renderízalo desde un Client Component:
+
+```tsx
+"use client";
+import { OdontogramShell } from "@cognovis/odontogram";
+import "@cognovis/odontogram/style.css";
+
+export default function OdontogramClient() {
+  return <OdontogramShell language="es" numberingSystem="FDI" />;
+}
+```
+
+O cárgalo con un import dinámico solo de cliente: `dynamic(() => import("./OdontogramClient"), { ssr: false })`.
+
+#### Notas importantes y limitaciones actuales
+- **Solo ESM** — el paquete publica un módulo ES principal (`dist/odontogram.js`), con declaraciones de tipos correspondientes (`dist/index.d.ts`). Está pensado para la resolución de módulos de un bundler; no hay build CommonJS.
+- **La hoja de estilos es aparte** — **debes** importar `@cognovis/odontogram/style.css` una vez; no se inyecta automáticamente. Los estilos son CSS global bajo `.odontogram-root`, gobernados por variables CSS `--odon-*`. En la versión aún no publicada no define nada en `:root`, `html` ni `body`: el fondo de página, la fuente y los tokens propios del host quedan intactos; las superficies añadidas a `<body>` (tour, popovers) llevan `.odontogram-portal`.
+- **SSR / solo cliente** — el componente lee el DOM al montarse (`document`), por lo que debe ejecutarse en el navegador. En frameworks con SSR, renderízalo en un Client Component (`"use client"`) o mediante un import dinámico solo de cliente.
+- **Recursos autocontenidos** — los SVG de dientes e iconos se incrustan en el bundle de JavaScript en tiempo de compilación; **no hay ninguna descarga de recursos en tiempo de ejecución** que configurar ni nada extra que copiar a tu carpeta pública.
+- **Varias instancias, un solo editor activo** — cada `<OdontogramShell>` montado puede mantener su propio estado clínico mediante una sesión aislada (`createOdontogramSession()`), y dos sesiones nunca comparten datos. El editor DOM interactivo sigue siendo un único motor global, así que exactamente una instancia montada lo controla a la vez: esa instancia renderiza el gráfico, las demás renderizan un marcador inactivo y siguen siendo totalmente legibles y modificables mediante su API de sesión. Al desmontarse la instancia activa, otra en espera toma el control.
+
+---
+
+### ✨ Características principales
+- 🖱️ Selección rápida y selección múltiple (CMD/CTRL + clic)
+- 🦷 Tipos de dientes: permanente, primario (de leche), implante, subgingival, ausente
+- 🍼 La dentición temporal tiene anatomía propia: ocho plantillas generadas cubren los veinte dientes temporales con sus propias proporciones radiculares, longitudes y anchuras medidas, una pulpa relativamente mayor y raíces divergentes alrededor del germen permanente. Al registrar un diente como temporal se monta su dibujo en lugar del de su sucesor. En FHIR el diente se identifica como **51–85**, porque en FDI el propio número indica a qué dentición pertenece; en la importación ese número decide y solo se sobrescribe la presencia
+- 🦷 Sustrato dental (ortogonal a cualquier restauración): natural, radix (resto radicular), fracturado, preparado para corona
+- 👑 Restauraciones por tipo × material: corona / incrustación (inlay) / incrustación oclusal (onlay) / carilla / puente en e.max, oro, gradia, circonio, metal, metal-cerámica, telescópica o temporal (el onlay es solo de vista oclusal) — se eligen desde un único selector combinado "Corona – …" de pocos clics; las coronas `metal` heredadas migran a `metal-ceramic` (metal-cerámica); los implantes usan el mismo modelo tipo × material, compuesto con una capa de conector de implante. El selector se acota según el tipo de diente: un implante solo ofrece corona/puente (más sus cinco opciones de anclaje, ver abajo); un diente ausente/hueco solo ofrece póntico de puente (más removible parcial/completa); un sustrato `radix` oculta por completo el control de restauración (no se puede registrar restauración sobre un resto radicular)
+- 🦿 Prótesis removibles/de anclaje en el eje dedicado `prosthesis` (entradas "Kivehető:" en el selector combinado): pilar de cicatrización del implante, localizador, localizador con sobredentadura, barra, barra con sobredentadura; prótesis parcial o completa removible soportada por dientes
+- 🌉 Los dientes de puente renderizan tanto la corona como el conector de silla de montar; una superposición de tramo de puente multidiente renderiza un conector continuo y adaptado a la arcada a través de los dientes de puente consecutivos (pónticos + pilares) y los espacios entre ellos (la arcada superior e inferior usan geometría de silla espejada, manteniendo el conector alineado en ambas arcadas), incluido en la exportación PNG/JPG/SVG; añadir un puente mediante un estado predefinido recalcula la superposición de inmediato
+- 🔍 Registro de caries en 6 superficies: mesial, distal, bucal, lingual, oclusal, subcoronal
+- 🪥 Materiales de obturación por superficie: amalgama, composite, ionómero de vidrio, temporal
+- 🏥 Un único selector combinado "Estado pulpar / endo" (agrupado: pulpa vital vs. tratada/endo) para la obturación medicinal, completa o incompleta, más un selector independiente para el material del poste radicular (`rootPostType`: none / glass-fiber / metal): el tratamiento endodóntico y el diagnóstico pulpar AAE (`pulpDx`: normal / pulpitis reversible / irreversible / necrosis) son mutuamente excluyentes, mientras que el poste puede coexistir con cualquier estado de obturación radicular. Un diente con tratamiento de conducto (`endo` distinto de `none`) no puede tener a la vez un diagnóstico pulpar vital; al tratarlo, `pulpDx` se normaliza a `normal` y se suprime el glifo de pulpa enferma. La pulpitis reversible se renderiza con un glifo reducido. Un ajuste opcional de 3 niveles de detalle pulpar (`pulpDetailLevel`: simple / AAE / latín práctico) muestra 9 subtipos en latín práctico (pulpa sana … gangraena pulpae) mediante `pulpLatin`; resección y pin parapulpar siguen siendo indicadores especiales aparte
+- 🦴 Diagnóstico apical (`apicalDx`: periodontitis apical sintomática/asintomática, absceso apical agudo/crónico, osteítis condensante) determina directamente el glifo periapical; el subtipo de lesión granuloma/quiste solo se muestra bajo periodontitis apical sintomática/asintomática (se eliminó el subtipo redundante "absceso", ya cubierto por el diagnóstico apical)
+- 🩹 Tarjeta combinada "Raíz y periodonto" (sección colapsable única para hallazgos radiculares/periapicales y periodontales)
+- ⚕️ Modificaciones: inflamación periapical (visible solo en dientes ausentes/alvéolo de extracción; oculta en dientes presentes, donde el glifo periapical lo determina únicamente `apicalDx`, y en implantes, donde lo cubre `periImplant`), enfermedad periodontal, grados de movilidad (M1/M2/M3, ocultos en implantes)
+- 🦷🔩 Estado periimplantario (`periImplant`: none / mucositis / peri-implantitis-mild / -moderate / -severe) — clasificación del World Workshop 2018, mostrada como un selector dedicado en los implantes; la mucositis reutiliza el glifo gingival periodontal, y la periimplantitis añade una capa graduada `peri-implant-bone-loss` (opacidad 0.4/0.7/1.0). Los implantes ya no renderizan el glifo de lesión periapical — su inflamación se expresa mediante este eje — y las casillas de modificadores periodontales quedan ocultas en los implantes (se retira el renombrado ad-hoc "Peri-implantitis" de la casilla)
+- 🏷️ Indicadores especiales: corona necesaria, reemplazo de corona necesario, espacio cerrado, plan de extracción, sellado de fisuras, pérdida de punto de contacto
+- 👁️ Vista oclusal, muelas del juicio, visibilidad de hueso y pulpa
+- 🔢 12 filtros de selección (todos, presentes, permanentes, de leche, implantes, ausentes, superior/inferior, frontales/molares)
+- 📊 Estados predefinidos (restablecer, dentición primaria, dentición mixta, edéntulo)
+- 📦 34 plantillas de restauración predefinidas (puentes, prótesis removibles, prótesis con barra e implantes)
+- 💾 Exportación/importación de estado en JSON (versión 2.20; las importaciones siguen aceptando las versiones heredadas 1.4 y 2.0 a 2.19, y se migran automáticamente, con estados personalizados de plugins y notas por diente)
+- 🧭 **La ortodoncia es la tercera vista clínica** (`odontogram-c51`): un selector `Odontogram | Estado periodontal | Ortodoncia` (`#appViewToggle`) alberga la tarjeta de análisis de modelos siguiente. El odontograma nunca se desmonta, solo se oculta, de modo que cambiar de vista no puede alterar el registro. La vista de ortodoncia no tiene ventana propia, por lo que sigue siendo un segmento del selector incluso donde el estado periodontal está configurado como ventana emergente: entonces solo desaparece ese segmento.
+- 📐 **Análisis de modelos** (`odontogram-c51.1`): Tonn y Bolton a partir de las anchuras mesiodistales, con la suma incisiva objetivo, la discrepancia dentaria y qué arcada lleva el exceso. Las anchuras se introducen en una arcada o como lista — dos vistas de un mismo registro. Un diente que no está en el modelo (no erupcionado, perdido, bajo la encía) toma la anchura de su homólogo contralateral, marcada visiblemente como suposición. Además resalte, sobremordida y desviación de la línea media dentaria por arcada
+- 🔗 Aidbox Dental Core vía `@cognovis/fhir-sdk`: el anfitrión inyecta un gateway; la sesión carga y guarda. Exportación/importación JSON de estado con migraciones
+- ✚ Selección de superficies en cruz (B/M/O/D/L) para caries y obturaciones
+- 🧱 Materiales de obturación por superficie (obturaciones mixtas, p. ej. bucal amalgama + distal composite)
+- 🖼️ Exportación de imagen PNG/JPG/SVG del odontograma (descargable; PNG/JPG rasterizado desde SVG vectorial)
+- 🦷 Caries/subcaries como máquina de estados por superficie: una superficie cariada sin obturación se renderiza como caries primaria (opacidad por niveles ICDAS); en cuanto esa superficie tiene una obturación, se renderiza como caries recurrente (capa `subcaries-{surface}`, puntuada con CARS) — ambas nunca están activas a la vez en la misma superficie
+- 🎯 Severidad unificada por superficie (`cariesSeverity`, 0–6, sustituye los antiguos campos separados de profundidad ICDAS + CARS): se lee como profundidad ICDAS en una superficie primaria y como puntuación CARS con nombre (Sana … Cavidad extensa) en una recurrente, mediante un popup contextual que muestra solo la escala relevante para el estado actual de la superficie
+- 🌱 Caries radicular (`rootCaries`: none / active / arrested / active-cavitated), que activa la capa de ilustración dedicada de caries radicular con una opacidad según la severidad (active 0.5 / arrested 0.7 / active-cavitated completa)
+- 🎚️ Tres ajustes de granularidad de caries (`secondaryCariesMode`, `rootCariesMode`, `radiographicDepthMode`) más un interruptor `cariesDepthEnabled`, que reducen cada escala a una vista de selector más simple sin perder el valor almacenado
+- 🩹 Línea de resumen de subcaries en el panel de obturaciones: lista, debajo de los controles de obturación, cualquier diente seleccionado con caries recurrente y sus superficies (p. ej. "36 (O) tiene subcaries junto a su obturación.")
+- 🪛 Defectos de obturación por superficie (`fillingDefect`: none / marginal / fracture / wear) en restauraciones directas, independientes de la caries recurrente — se registran mediante un indicador por superficie en la tarjeta de Obturaciones (espejo del indicador de profundidad de caries, con su lista de opciones apilada verticalmente), se renderizan en el odontograma y se muestran en el tooltip y en el resumen de obturaciones de toda la boca con una etiqueta explícita (p. ej. "36 (O) – Defecto de obturación: O: marginal"), igual que la caries recurrente se etiqueta en la línea de Caries; la tarjeta de Obturaciones también muestra una nota para cualquier diente seleccionado con un defecto de obturación registrado (p. ej. "En 36 hay un defecto de obturación registrado."), en paralelo a la nota de subcaries ya existente
+- 🔗 Elementos de retención que sujetan una prótesis removible a un diente natural (`retention`, `retentionSide`) — tres anclajes, no un eje: un **gancho** solo necesita que el diente esté, un **atache** y un **pilar de barra** necesitan una corona. UN valor por diente, nunca un conjunto. El gancho se DIBUJA como un brazo de cuarto de arco sobre la corona (vientre hacia la encía, reflejado por arcada); el atache y la barra llevan las marcas de charly `( G )` y `ste`. El **tramo de barra se deriva**, nunca se almacena, y una barra puede apoyarse a la vez en pilares implantarios y naturales
+- 🎨 **Los colores de las restauraciones se pueden elegir** (Ajustes → Colores). Cada relleno es una variable CSS con el color de fábrica como reserva; e.max y metal-cerámica pintan desde una rampa de nueve paradas y la elección conserva su barrido de luminosidad. Preferencia de la clínica, no parte del documento.
+- 🔩 Un **producto de implante vacío solo es una laguna donde la clínica colocó el implante** (`isImplantProductGap`) — uno con el que llegó el paciente es un registro completo, porque no todo paciente lleva pasaporte de implante. Derivado de la exploración inicial, nunca almacenado.
+- 🦷🔻 Afectación cervical de una obturación o de una lesión de caries (`cervicalSurfaces`: un conjunto sobre las superficies vestibular y oral) — la región cervical **no** es una sexta superficie, sino una marca sobre una existente (BEMA la escribe como el sufijo "vz"/"lz"), por lo que nunca cambia el recuento de superficies que lee un nivel de posición (`getFillingSurfaceCount()`); se registra en el mismo desplegable por superficie que abren la cruz de caries y la de obturaciones, se señala en la celda de la superficie con la letra del sufijo y se muestra en el tooltip y en la línea del hallazgo que califica en el resumen de boca completa. Deliberadamente no se dibuja en el odontograma — la vista lateral no tiene capa lingual alguna
+- 🦷💥 Desgaste dental tipificado por causa clínica y localización (`wearEdge`: none / attrition / erosion, incisal/oclusal; `wearCervical`: none / abrasion / abfraction / erosion, cervical) — sustituye los dos indicadores on/off de desgaste por bruxismo; se registra mediante dos menús desplegables en la fila de desgaste, reutiliza el arte existente y se muestra en el tooltip y en una nueva sección de resumen "Desgaste" de toda la boca
+- 🎨 Decoloración dental por causa (`discoloration`: none / tetracycline / fluorosis / nonvital / extrinsic / other) en dientes permanentes y temporales — tiñe la corona natural mostrada con un color representativo cuando el diente no tiene restauración y su sustrato es natural; se muestra en el tooltip y en una nueva sección de resumen "Decoloración" de toda la boca; completa el conjunto de condiciones de superficie y estructurales junto con los defectos de obturación y el desgaste
+- ✏️ Los dientes anteriores (incisivos/caninos) rotulan su superficie oclusal como "incisal" en toda la interfaz (selector, popup, resúmenes); la clave de superficie almacenada sigue siendo `occlusal`
+- 🔤 Notación de superficie según la posición del diente (Ajustes → Detalles del diente → "Notación de superficie", simple/completa, por defecto completa): en modo completo, la letra y la etiqueta de superficie de caries/obturación siguen la anatomía dental — oclusal → I/incisal en dientes anteriores, bucal → L/labial en dientes anteriores, lingual → P/palatino en dientes superiores y L/lingual en dientes inferiores (mesial/distal/subcoronal no cambian); el modo simple usa siempre el conjunto genérico B/M/O/D/L/SC, sin importar la posición del diente. Se aplica al resumen de toda la boca y a ambos selectores de superficie (caries y defecto de obturación), tanto la letra como el texto; la clave de superficie almacenada no se ve afectada
+- 🦷↕️ Registro ortodóntico por diente (`orthoAppliance`: none / bracket / band; `orthoDrift`: none / mesial / distal; `orthoVertical`: none / extrusion / intrusion; `orthoRotation`: booleano) en un diente natural presente (permanente o temporal) — reutiliza el arte ortodóntico inactivo de la v2.5.0 (sin SVG nuevo); se muestra en el gráfico, en el tooltip y en una nueva sección de resumen "Ortodoncia" de toda la boca
+- 🪨 Cálculo, y reabsorción radicular tipificada como interna o cervical externa (`resorptionType`)
+- 📏 Profundidad de caries por superficie (superficial / dentina / profunda), o puntuación ICDAS II opcional (0–6) con `enableIcdas`
+- 🩹 Indicador de filtración marginal de corona, visible solo con una restauración de corona o puente
+- 🧰 Barra superior unificada de iconos con un modal de Ajustes por pestañas (General / Paneles / Detalles del diente / Caries / Pulpa / Notas / Periodontal — numeración, notas, visibilidad de paneles, ICDAS, interruptor de profundidad de caries, granularidad de caries radicular/radiográfica, nivel de detalle pulpar, nivel de detalle de desgaste/decoloración dental, información dental)
+- 🗂️ Ajustes → pestaña "Paneles": muestra/oculta de forma independiente los paneles de resumen de Estados y de Ortodoncia
+- 🦷🩺 Ajustes → pestaña "Periodontal": 16 interruptores de mostrar/ocultar por índice para las filas del odontograma periodontal (agrupados en bolsa/higiene/mucogingival/soporte/periimplantario — PD/GM/CAL/BOP, placa, PI, GI, visibilidad de CEJ, concavidad radicular, KG, GT, furca, movilidad, clase de Miller, mPI, mBI), cada uno con su propia descripción, más una opción de nombre de índice traducido frente a canónico (canónico = un nombre científico fijo en inglés/latín en todos los idiomas de la interfaz; los tooltips siempre permanecen localizados con independencia de este ajuste). Ambas son preferencias a nivel de aplicación (como `perioViewMode`) — nunca forman parte de la carga de exportación
+- 🩹 El control de caries secundaria (CARS) se fusionó en la pestaña de Ajustes de Caries, colocado encima de Profundidad radiográfica (se retira la pestaña separada "Caries secundaria")
+- 🎚️ Nivel de detalle dental: un ajuste simple/complejo para el desgaste dental y la decoloración (Ajustes → Detalles del diente). El modo simple muestra un interruptor sí/no por hallazgo (desgaste activado → attrition/abrasion, decoloración activada → other); el modo complejo (por defecto) conserva los menús desplegables de tipo/causa, y el valor almacenado se conserva al cambiar de nivel
+- 📋 Panel de información dental: resumen de texto en vivo de todo el odontograma (recuentos de dientes, listas presentes/ausentes, caries incl. secundaria, obturaciones, endodoncias, prótesis, implantes, estado periodontal) — visible por defecto, conmutable en Ajustes
+- 🗂️ Menú de exportación unificado (Estado JSON / FHIR / PNG / JPG)
+- 📥 Menú de importación con importación FHIR (recupera Bundles exportados)
+- ⏳ Superposición de progreso durante la exportación de imagen
+- 🎓 Tour interactivo de introducción de 12 pasos
+- 🔢 Tres sistemas de numeración (FDI, Universal, Palmer)
+- 🌐 I18n — 12 idiomas de interfaz (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR) con selector de idioma; el árabe muestra la interfaz de derecha a izquierda, con los odontogramas periodontal y dental fijados de izquierda a derecha (AR/ZH/FR son traducciones automáticas, pendientes de revisión por hablantes nativos)
+- 🌗 Modo oscuro con botón de alternancia (independiente o controlado por la aplicación principal)
+- 🎨 Configuración de tema personalizado (prop `themeConfig`) con CSS custom properties (`--odon-*`)
+- 📱 UX táctil móvil: popover de zoom al tocar, menú contextual con pulsación larga, zoom con pellizco, áreas táctiles WCAG 44px, navegación por arcada
+- 🔌 Sistema de plugins SVG personalizados: superposiciones visuales, estado personalizado por diente, soporte de exportación/importación JSON
+- ⚠️ Validación de estado con advertencias para combinaciones incompatibles
+- 🏷️ Tooltip automático de estado en las losetas dentales (muestra todos los estados activos)
+- 🩺 Tooltip por diente y panel de resumen de toda la boca modernizados: ambos muestran el conjunto completo de hallazgos clínicos (diagnóstico pulpar/apical + subtipo de lesión, reabsorción radicular, estado periimplantario, caries radicular graduada, cálculo, filtración marginal de corona, fractura, pérdida de contacto, desgaste tipificado incisal/oclusal y cervical), con una sección "Diagnósticos" dedicada, una sección "Desgaste" dedicada en el panel y un calificador de gravedad de caries de grano grueso (superficial/moderada/profunda)
+- ♿ Accesibilidad por teclado (WCAG): roles ARIA listbox/option, selección con Enter/Espacio, navegación con flechas, contornos focus-visible
+- 🔒 Modo solo lectura: desactivar todas las interacciones para vistas de impresión/informes
+- ✨ Animaciones de selección: borde punteado pulsante y sombra brillante en los dientes seleccionados (compatible con prefers-reduced-motion)
+- 📝 Notas por diente: doble clic para añadir/editar notas, icono de nota junto al número de diente, tooltip con texto de nota, una línea "Notas individuales" en el panel de resumen de toda la boca, exportación/importación JSON
+- 🔀 División de odontograma Estado ↔ Plan: un selector `Estado | Plan` en la cabecera del odontograma alterna entre un odontograma de **estado** actual y un odontograma de **plan** (tratamiento propuesto), cada uno con sus propios estados por diente; el odontograma de plan se inicia como copia del de estado la primera vez que se cambia a él, y las ediciones en uno nunca afectan al otro. La exportación/importación (`exportStatus`/importación de archivo) siempre operan sobre el odontograma de estado; el odontograma de plan se lee/escribe por separado mediante su propia API (ver API pública más abajo) y — cuando difiere del estado — se incluye como sección adicional `plan` en la exportación JSON
+- 📝 Cuadro "Qué cambia": cuando el plan difiere del estado actual, un cuadro bajo el panel de información dental enumera cada diferencia por diente y por eje de tratamiento (presencia, sustrato, restauración, prótesis, corona planificada, ortodoncia, pulpa/endo, apical) como una línea `diente: eje  de → a`; también disponible mediante programación a través de `getPlanChanges()`
+
+![Odontograma periodontal de boca completa — español](screenshot_es_perio.png)
+
+- 🅿️ Estilo de propuesta: en el modo Plan, los hallazgos que el plan **añade** respecto al estado actual (corona planificada, extracción, movimiento ortodóntico, prótesis, …) se renderizan con un **contorno "propuesto" distintivo, punteado y con tinte**, de modo que el plan se lea como intención y no como hecho — con una leyenda "punteado = propuesto" en la tarjeta del odontograma. El renderizado en modo Estado es idéntico byte a byte; el tratamiento visual es exclusivo del plan y se restablece por completo al volver al estado
+- 🚦 Restricción del modo Plan: el odontograma de Plan solo muestra lo que un dentista puede *hacer* — el selector base ofrece únicamente Ausente / Permanente / Implante, y los hallazgos de solo estado (caries, desgaste dental, decoloración, y todo el bloque periodontal — movilidad, cuadrícula de sondaje de seis sitios, modificadores de inflamación/periodontales, cálculo, estado periimplantario) quedan ocultos; el control de pulpa/endo conserva el **tratamiento** endodóntico (conducto / poste / apicectomía / pin parapulpar) mientras oculta el **diagnóstico** pulpar/apical y la reabsorción radicular. La restauración, la prótesis, la ortodoncia, la necesidad/reemplazo de corona y el plan de extracción siguen siendo planificables
+- 🧪 1746 pruebas automatizadas superadas (1 prueba adicional omitida) (Vitest) en 164 archivos de test (165 en total), para numeración, traducciones, plantillas, i18n, componente App, tema, táctil, plugins, accesibilidad y paridad de ejes clínicos/diagnósticos
+- 📖 Documentación API TypeDoc con comentarios JSDoc en todas las exportaciones públicas (`bun run docs`)
+
+### 📦 Módulos
+- 🦷 Cuadrícula del odontograma e interfaz de mosaicos dentales
+- 🎛️ Panel de controles y estado
+- 🎨 Motor de capas SVG y plantillas
+- 🔢 Numeración dental y mapeo de etiquetas (FDI/Universal/Palmer)
+- 🌐 Localización — 12 idiomas de interfaz (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR), incluyendo árabe (RTL)
+- 💾 Exportación/importación de estado
+- 📋 Extras de estado: plantillas de restauración predefinidas
+- 🎨 Configuración de tema: paleta de colores personalizable mediante propiedades CSS `--odon-*`
+- 📱 Interacciones táctiles móviles (zoom al tocar, pulsación larga, zoom con pellizco, alternador de arcada)
+- 🔌 Sistema de plugins SVG personalizados
+- ⚠️ Sistema de validación de estado y tooltips
+- ♿ Accesibilidad por teclado y soporte ARIA
+- 🔒 Modo solo lectura
+- ✨ Animaciones de selección
+- 📝 Notas por diente
+- 🧪 Suite de pruebas automatizadas (Vitest + Testing Library)
+
+### 🛠️ Controles de interfaz
+
+**🔝 Barra superior:**
+- Selector de idioma (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR desplegable)
+- Botón de modo oscuro (icono sol/luna, alterna entre tema claro y oscuro)
+- Selector de sistema de numeración (FDI/Universal/Palmer desplegable)
+- Botones Exportar estado / Importar estado
+
+**📊 Encabezado del gráfico:**
+- Alternador de vista oclusal
+- Alternador de visibilidad de muelas del juicio
+- Alternador de visibilidad de hueso
+- Alternador de visibilidad de pulpa
+- Botón borrar selección
+
+**🔍 Filtros de selección:**
+- Seleccionar todos / Todos presentes / Permanentes / De leche / Implantes / Todos ausentes
+- Superior / Superior 6 frontales / Molares superiores
+- Inferior / Inferior 6 frontales / Molares inferiores
+
+**📋 Estados predefinidos:**
+- Restablecer todo (restablecer boca)
+- Dentición primaria
+- Dentición mixta
+- Edéntulo alternador
+
+**📦 Desplegable de extras de estado:**
+- Puentes de circonio superiores/inferiores (12-22, 13-23, 16-26, arco completo)
+- Puentes metálicos superiores/inferiores (12-22, 13-23, 16-26, arco completo)
+- Prótesis parciales removibles superiores/inferiores
+- Prótesis completas removibles superiores/inferiores
+- Prótesis con barra superiores/inferiores con implantes
+
+**🦷 Panel editor de diente** (para el diente/dientes seleccionados, agrupado en tarjetas colapsables):
+- **Fila base:** selección de diente (tipo base incl. variantes de corona fracturada) y sustrato dental (natural/radix/fracturado/preparación de corona)
+- **Fila de restauración:** el menú desplegable combinado de restauración agrupado por tipo (Corona / Puente / Incrustación / Onlay / Carilla / «Kivehető:»), con cada línea nombrando su propio tipo y material (opciones fijas `restorationType`×`restorationMaterial` más las opciones de anclaje/removible de `prosthesis`, condicionadas por el tipo de diente); casilla de filtración marginal de corona (solo corona/puente); casillas de ubicación de corona fracturada; interruptores de corona necesaria / reemplazo de corona necesario
+- **Fila de desgaste y decoloración:** menú desplegable de tipo de desgaste incisal/oclusal, menú desplegable de tipo de desgaste cervical, menú desplegable de causa de decoloración (cada uno cambia a un interruptor simple sí/no en Ajustes → Detalles del diente → modo simple)
+- **Tarjeta de ortodoncia:** aparato, desplazamiento mesial/distal, movimiento vertical (extrusión/intrusión), interruptor de rotación — visible en un diente natural presente
+- **Tarjeta de caries:** menú desplegable de modo de profundidad de caries, casilla de caries subcoronal, menú desplegable de severidad de caries radicular, y el selector de caries por superficie B/M/O/D/L con un popup contextual de profundidad ICDAS/CARS y una insignia de profundidad radiográfica
+- **Tarjeta de obturaciones:** menú desplegable de material de obturación, selector de obturación por superficie (con material por superficie), indicador de defecto de obturación por superficie (marginal/fractura/desgaste), notas de subcaries y de defecto de obturación
+- **Tarjeta de raíz y periodonto:** selector combinado "Estado pulpar / endo", selector de diagnóstico apical, selector de subtipo de lesión periapical (solo periodontitis apical sintomática/asintomática), selector de tipo de reabsorción radicular, selector de grado de movilidad, selector de estado periimplantario (solo implantes)
+- **Indicadores especiales:** plan/herida de extracción, espacio cerrado, sellado de fisuras, pérdida de punto de contacto, cálculo, pin parapulpar, resección endodóntica, pilar de puente
+
+### ⌨️ Registro por abreviaturas
+
+Los hallazgos se registran en segundos, a menudo dictados. Con 46 ejes y 129 valores, el número
+de clics es el verdadero cuello de botella, así que el odontograma puede rellenarse tal como uno
+teclea (`odontogram-t8y`):
+
+```
+marcar 13–23      arrastrar sobre los dientes, Mayús + flecha o Mayús + clic
+E                 modo material: cerámica — permanece activo
+k                 seis coronas, una sola tecla
+```
+
+**El material va antes del hallazgo y permanece**, como modo y no como añadido. Una tecla de
+material tiene dos lecturas, porque obturación y restauración usan conjuntos de valores distintos:
+`K mo` es una obturación de composite en dos superficies, `K k` una corona de Gradia. Donde no
+existe una lectura, no se inventa ninguna.
+
+**El tabulador pasa al siguiente diente**, Mayús+tabulador vuelve, empezando en 18 y recorriendo
+la boca (18–28, luego 38–48), con retorno cíclico. Mueve la selección, no solo el foco, de modo
+que el diente en el que uno está queda resaltado. Las flechas no cambian.
+
+```
+G k    Tab    b          corona de oro y luego un póntico en el vecino
+A  mod Tab               una obturación de amalgama sobre tres superficies
+c mod K3                 caries en tres superficies, con gravedad
+```
+
+La correspondencia vive en `src/shorthand.ts`, sin DOM e independiente del motor, porque el mismo
+conjunto de hallazgos debe ser alcanzable por tres vías: teclado, consulta FHIR contra un sistema
+de gestión y voz.
+
+La abreviatura está transcrita del teclado de hallazgos de *charly* (solutio), no inventada.
+
+Un tramo sigue el **arco**, no la geometría (`odontogram-apn`): cruzar la línea media (de 13 a 23)
+sí, cambiar de maxilar nunca.
+
+### 🦷 Tipos de dientes y estados
+
+**Selección de diente (tipo base):**
+| Valor | Descripción |
+|---|---|
+| `none` | Diente ausente |
+| `tooth-base` | Diente permanente |
+| `milktooth` | Diente primario (deciduo) |
+| `implant` | Implante dental |
+| `tooth-under-gum` | Diente subgingival (no erupcionado) |
+
+**Variantes de diente fracturado:**
+`tooth-broken-inicisal`, `tooth-broken-distal-inicisal`, `tooth-broken-distal`, `tooth-broken-mesial-distal-inicisal`, `tooth-broken-mesial-distal`, `tooth-broken-mesial-inicisal`, `tooth-broken-mesial`, `no-tooth-after-extraction`
+
+**Sustrato dental (dientes permanentes):**
+`natural` (predeterminado), `radix` (resto radicular), `broken`, `crownprep` (preparado para corona)
+
+**Tipo de restauración (dientes permanentes):**
+`none`, `crown`, `inlay`, `onlay` (solo vista oclusal), `veneer`, `bridge`
+
+**Material de restauración (dientes permanentes):**
+`none`, `emax`, `gold`, `gradia`, `zircon`, `metal`, `metal-ceramic` (las coronas `metal` heredadas migran aquí), `telescope`, `temporary`
+
+**Las opciones de restauración están condicionadas por el tipo de diente** (`restorationOptions()` en `src/registry/restorations.ts`): un implante solo ofrece los tipos de restauración `crown`/`bridge` (compuestos con una capa de conector de implante) más las cinco entradas de anclaje `prosthesis` descritas abajo; un diente ausente/hueco solo ofrece un póntico `bridge` más las dos entradas de prótesis removible de `prosthesis`; un sustrato `radix` oculta por completo el control de restauración. Los campos planos heredados `crownMaterial`/`bridgeUnit` (valores de anclaje de implante/puente previos a v1.14) se retiran del modelo activo — solo se aceptan como ruta de migración de solo lectura para payloads antiguos.
+
+**Prótesis** (`prosthesis`; eje ortogonal removible/de anclaje, mostrado como entradas "Kivehető:" en el menú desplegable combinado de restauración):
+`none`, `healing-abutment`, `locator`, `locator-denture`, `bar`, `bar-denture` (anclajes de implante, con o sin sobredentadura), `removable-partial`, `removable-full` (prótesis soportadas por dientes en un diente ausente/hueco). Un diente tiene una restauración fija o una prótesis, nunca ambas — establecer una borra la otra.
+
+**Filtración marginal de corona** (`crownLeakage`; booleano): solo se muestra cuando `restorationType` es `crown` o `bridge`; activa la capa de ilustración `crown-leakage`.
+
+**Opciones endodónticas (dientes permanentes):**
+`none`, `endo-medical-filling`, `endo-filling`, `endo-filling-incomplete`
+
+**Material del poste radicular (dientes permanentes, independiente de `endo`):**
+`none`, `glass-fiber`, `metal`
+
+**Opciones endodónticas (dientes de leche):**
+`none`, `endo-medical-filling`
+
+`endo` y `pulpDx` se presentan mediante un único `<select>` combinado "Estado pulpar / endo" (agrupado: pulpa vital vs. tratada/endo) y son mutuamente excluyentes — elegir una opción tratada (`endo` distinto de `none`) restablece `pulpDx` a `normal`, y elegir un diagnóstico pulpar restablece `endo` a `none`.
+
+**Materiales de obturación (dientes permanentes):**
+`amalgam`, `composite`, `gic`, `temporary`
+
+**Materiales de obturación (dientes de leche):**
+`composite`, `gic`, `temporary`
+
+**Superficies de obturación/caries:**
+`mesial`, `distal`, `buccal`, `lingual`, `occlusal`, `subcrown` (solo caries)
+
+**Modificaciones:**
+`inflammation` (periapical), `parodontal` (periodontal), `mobility` (M1/M2/M3)
+
+**Tipo de lesión periapical** (`periapicalType`; califica el glifo periapical, solo se muestra bajo periodontitis apical sintomática/asintomática):
+`none`, `granuloma`, `cyst` — opciones del selector; el valor heredado `abscess` sigue aceptándose/almacenándose pero ya no se ofrece en el selector, por ser redundante con el diagnóstico apical. Al importar se descarta: se incorpora a `apicalDx` si el diente tiene el modificador de inflamación, o se limpia a `none` en caso contrario
+
+**Diagnóstico pulpar** (terminología AAE; `pulpDx`):
+`normal`, `reversible-pulpitis` (renderiza un glifo reducido), `irreversible-pulpitis`, `necrosis` — mutuamente excluyente con `endo`; se normaliza a `normal` en un diente con tratamiento de conducto
+
+**Diagnóstico pulpar, latín práctico** (`pulpLatin`; el selector de pulpa solo lo muestra cuando `pulpDetailLevel` es `latin`):
+`none`, `pulpa-sana`, `hyperaemia-pulpae`, `pulpitis-acuta-serosa`, `pulpitis-acuta-purulenta`, `pulpitis-chronica-clausa`, `pulpitis-chronica-ulcerosa`, `pulpitis-chronica-hyperplastica`, `necrosis-pulpae`, `gangraena-pulpae`
+
+**Nivel de detalle pulpar** (`pulpDetailLevel`, ajuste global): `simple`, `aae` (por defecto), `latin` — controla el vocabulario que ofrece el selector de pulpa
+
+**Diagnóstico apical** (`apicalDx`; determina el glifo periapical):
+`normal`, `symptomatic-apical-periodontitis`, `asymptomatic-apical-periodontitis`, `acute-apical-abscess`, `chronic-apical-abscess`, `condensing-osteitis`
+
+**Tipo de reabsorción radicular** (`resorptionType`):
+`none`, `internal`, `external-cervical`
+
+**Estado periimplantario** (`periImplant`; solo implantes, clasificación del World Workshop 2018): `mucositis` reutiliza el glifo gingival periodontal; `peri-implantitis-*` añade la capa `peri-implant-bone-loss` con opacidad graduada por severidad (leve 0.4 / moderada 0.7 / severa 1.0). Los implantes ya no renderizan el glifo de lesión periapical (su inflamación se expresa mediante este eje), y las casillas de modificadores inflamación/periodontal quedan ocultas en los implantes:
+`none`, `mucositis`, `peri-implantitis-mild`, `peri-implantitis-moderate`, `peri-implantitis-severe`
+
+**Severidad de caries** (`cariesSeverity`; campo unificado por superficie, `0`–`6`): en una superficie sin obturación se lee como escala de profundidad ICDAS (`superficial` / `dentin` / `deep`, o los códigos ICDAS II sin procesar `0–6` cuando `enableIcdas` está activado) y renderiza la capa primaria `caries-{surface}`; en una superficie con obturación se lee como una puntuación CARS con nombre (`0` sana … `6` cavidad extensa) y renderiza en su lugar la capa `subcaries-{surface}` (caries recurrente) — una superficie nunca es primaria y recurrente a la vez
+
+**Caries radicular** (`rootCaries`; activa la capa de ilustración `caries-root` en un diente presente, con opacidad según la severidad — `active` 0.5 / `arrested` 0.7 / `active-cavitated` completa):
+`none`, `active`, `arrested`, `active-cavitated`
+
+**Profundidad radiográfica de caries** (`radiographicDepth`; por superficie, independiente de la escala visual ICDAS/CARS `cariesSeverity`):
+`none`, `E1`, `E2`, `D1`, `D2`, `D3`
+
+**Ajustes de granularidad de caries** (globales): `secondaryCariesMode` (`simple`/`standard`/`full`, por defecto `standard`), `rootCariesMode` (`simple`/`severity`, por defecto `simple`), `radiographicDepthMode` (`off`/`threeLevel`/`detailed`, por defecto `off`), `cariesDepthEnabled` (booleano, por defecto `true`) — cada uno reduce su escala a una vista de selector más simple sin alterar el valor almacenado
+
+**Indicadores especiales:**
+`crownNeeded`, `crownReplace`, `missingClosed`, `extractionPlan`, `extractionWound`, `bridgePillar`, `fissureSealing`, `contactMesial`, `contactDistal`, `endoResection`, `calculus`, `parapulpalPin`
+
+**Desgaste dental** (`wearEdge`, `wearCervical`; tipo clínico por localización, condicionado a diente natural + sin restauración + sustrato natural; renderizan las capas existentes `tooth-bruxism-wear`/`tooth-bruxism-neck-wear`):
+`wearEdge`: `none`, `attrition`, `erosion` — `wearCervical`: `none`, `abrasion`, `abfraction`, `erosion`
+
+**Decoloración** (`discoloration`; causa por diente, condicionada a un diente natural (permanente o temporal) sin restauración y sustrato natural; tiñe el relleno de la corona natural mostrada — sin SVG nuevo):
+`none`, `tetracycline`, `fluorosis`, `nonvital`, `extrinsic`, `other`
+
+**Defecto de obturación** (`fillingDefect`; por superficie, hallazgo de restauración directa independiente de la caries recurrente — condicionado a las superficies presentes en `fillingSurfaceMaterials`; renderiza la capa de ilustración `defect-{surface}`):
+`none`, `marginal`, `fracture`, `wear`
+
+**Elemento de retención** (`retention` + `retentionSide`; por diente, condicionado por elemento; sin capa gráfica, dibujado en la superposición de la rejilla):
+`none`, `clasp`, `attachment`, `bar-abutment` — `retentionSide`: `none`, `mesial`, `distal`, `both`. Una **telescópica** sigue siendo MATERIAL de corona y se reconoce como retención
+
+**Afectación cervical** (`cervicalSurfaces`; conjunto sobre `buccal`/`lingual`, condicionado a una superficie que lleve una obturación, una lesión de caries o ambas — sin capa gráfica, deliberadamente no dibujada):
+`buccal`, `lingual` — una marca sobre la superficie, nunca una superficie propia: `getFillingSurfaceCount()` no se ve afectado
+
+**Ortodoncia** (`orthoAppliance`, `orthoDrift`, `orthoVertical`, `orthoRotation`; por diente, condicionado a un diente natural presente — permanente o de leche):
+`orthoAppliance`: `none`, `bracket`, `band` — `orthoDrift`: `none`, `mesial`, `distal` — `orthoVertical`: `none`, `extrusion` (glifo de flecha hacia arriba), `intrusion` (glifo de flecha hacia abajo) — `orthoRotation`: booleano
+
+**Ajustes de detalle / notación dental** (ajustes de sesión globales, Ajustes → Detalles del diente): `wearDetailLevel` y `discolorationDetailLevel` (`ToothDetailLevel`: `simple`/`complex`, por defecto `complex` — el modo simple muestra un interruptor sí/no en lugar del menú desplegable completo de tipo/causa, sin alterar el valor almacenado) y `surfaceNotation` (`simple`/`full`, por defecto `full` — controla si las letras/etiquetas de superficie de caries/obturación son sensibles a la posición del diente; ver "Notación de superficie según la posición del diente" arriba)
+
+### ⚙️ Ajustes
+Se abre desde el icono de engranaje de la barra superior; un `dialog` ARIA con foco atrapado y diseño por pestañas (Esc/clic en el fondo para cerrar, flechas para cambiar de pestaña). Todos los ajustes son solo estado de UI a nivel de sesión, salvo que se indique lo contrario — ninguno modifica los datos por diente ni el payload de exportación.
+
+- **General:** sistema de numeración (FDI/Universal/Palmer), idioma, tema claro/oscuro, visibilidad del panel de información dental
+- **Paneles:** muestra/oculta de forma independiente la tarjeta de resumen de Estados de toda la boca y la tarjeta de Ortodoncia (ambas visibles por defecto)
+- **Detalles del diente:** nivel de detalle de desgaste y nivel de detalle de decoloración (simple/complejo, ambos por defecto complejo), notación de superficie (simple/completa, por defecto completa)
+- **Caries:** interruptor de puntuación ICDAS II (`enableIcdas`), interruptor de profundidad de caries (`cariesDepthEnabled`), granularidad de caries radicular (`rootCariesMode`: simple/severidad), granularidad secundaria/CARS (`secondaryCariesMode`: simple/estándar/completa), granularidad de profundidad radiográfica (`radiographicDepthMode`: desactivada/tresNiveles/detallada) — la antigua pestaña separada "Caries secundaria" se fusiona en esta, con el control CARS colocado justo encima de la profundidad radiográfica
+- **Pulpa:** nivel de detalle pulpar (`pulpDetailLevel`: simple/AAE/latín práctico, por defecto AAE) — controla el vocabulario que ofrece el selector "Estado pulpar / endo"; al cambiarlo se actualiza en vivo el resumen de toda la boca y todos los tooltips abiertos
+- **Notas:** activar/desactivar notas por diente (`enableNotes`)
+- **Periodontal:** interruptores de mostrar/ocultar por índice para las 16 filas del gráfico periodontal (`perioRowVisibility`, por defecto todas visibles), agrupados en Bolsa (PD/GM/CAL/BOP) / Higiene (Placa/PI/GI) / Mucogingival (visibilidad de CEJ/Concavidad radicular/KG/GT) / Soporte (Furcación/Movilidad/Clase de Miller) / Periimplantario (mPI/mBI), cada fila con su propia descripción; además de un modo de nombre de índice traducido-vs-canónico (`perioIndexNameMode`: `translated` por defecto / `canonical` — un nombre científico fijo en inglés/latín mostrado en todos los idiomas de la interfaz). Preferencias solo a nivel de aplicación (refleja `perioViewMode`) — nunca se serializa, los tooltips permanecen localizados en ambos modos
+
+### 🖼️ Sistema de plantillas SVG
+
+**Plantillas dentales** (`src/assets/teeth-svgs/`):
+| Plantilla | Dientes que la usan |
+|---|---|
+| **Dientes permanentes** | |
+| `11.svg` | 11, 21 |
+| `12.svg` | 12, 22 |
+| `13.svg` | 13, 23 |
+| `14.svg` / `14_occl.svg` | 14, 24 |
+| `15.svg` / `15_occl.svg` | 15, 25 |
+| `16.svg` / `16_occl.svg` | 16, 26 |
+| `17.svg` / `17_occl.svg` | 17, 27 |
+| `18.svg` / `18_occl.svg` | 18, 28 |
+| `41.svg` | 41, 31 |
+| `42.svg` | 42, 32 |
+| `43.svg` | 43, 33 |
+| `44.svg` / `44_occl.svg` | 44, 34 |
+| `45.svg` / `45_occl.svg` | 45, 35 |
+| `46.svg` / `46_occl.svg` | 46, 36 |
+| `47.svg` / `47_occl.svg` | 47, 37 |
+| `48.svg` / `48_occl.svg` | 48, 38 |
+| **Dientes temporales** | |
+| `51.svg` | 51, 61 |
+| `52.svg` | 52, 62 |
+| `53.svg` | 53, 63 |
+| `54.svg` | 54, 64 |
+| `55.svg` | 55, 65 |
+| `81.svg` | 81, 71 |
+| `82.svg` | 82, 72 |
+| `83.svg` | 83, 73 |
+| `84.svg` | 84, 74 |
+| `85.svg` | 85, 75 |
+
+Un diente registrado como temporal se dibuja a partir de su propia plantilla, montada en lugar de la permanente; las plantillas permanentes se giran 180 grados para el maxilar inferior y se reflejan horizontalmente para el lado izquierdo, y las temporales siguen la misma correspondencia.
+
+**SVGs de iconos** (`src/assets/icon-svgs/`):
+`icon_8.svg` (muela del juicio), `icon_gum.svg` (hueso), `icon_no_selection.svg` (borrar), `icon_occl.svg` (vista oclusal), `icon_pulp.svg` (pulpa)
+
+### 🔢 Sistemas de numeración
+
+**FDI (ISO 3950):** Dientes adultos 11-18, 21-28, 31-38, 41-48. Dientes primarios 51-55, 61-65, 71-75, 81-85.
+
+**Universal (EE.UU.):** Dientes adultos numerados 1-32. Dientes primarios con letras A-T.
+
+**Palmer (Zsigmondy-Palmer):** Formato cuadrante + posición (ej. UR-1, LL-5). Dientes primarios usan letras A-E por cuadrante.
+
+### 🚀 Uso
+Desarrollo:
+```bash
+bun install
+bun run dev
+```
+Build:
+```bash
+bun run build
+```
+Vista previa:
+```bash
+bun run preview
+```
+
+### 🔗 Integración
+El componente se puede integrar en cualquier aplicación React.
+Ejemplo:
+```tsx
+import App from "./App";
+
+export default function Host(){
+  return (
+    <App
+      language="es"
+      onLanguageChange={(lang) => console.log(lang)}
+      numberingSystem="FDI"
+      onNumberingChange={(system) => console.log(system)}
+      darkMode={false}
+      onDarkModeChange={(dark) => console.log(dark)}
+    />
+  );
+}
+```
+
+**Integración del modo oscuro:**
+- **Modo independiente:** Omitir la prop `darkMode` — el componente gestiona su propio estado de tema a través del botón en la barra superior y añade/elimina la clase `.dark` en `<html>`.
+- **Modo controlado:** Pasar `darkMode` y `onDarkModeChange` — la aplicación principal controla el tema. El botón de alternancia sigue apareciendo pero llama a `onDarkModeChange` en lugar de gestionar el estado interno. La aplicación principal es responsable de añadir/eliminar la clase `.dark` en `<html>`.
+
+**Tema personalizado:**
+```tsx
+<App
+  themeConfig={{
+    colors: {
+      accent: '#e74c3c',
+      background: '#fafafa',
+      text: '#222222',
+    },
+  }}
+/>
+```
+
+**Integración de plugins:**
+```tsx
+import App, { type OdontogramPlugin, setPluginState } from "./App";
+
+const myPlugin: OdontogramPlugin = {
+  id: "implant-brand",
+  label: { en: "Implant Brand", hu: "Implantátum márka" },
+  layer: "overlay",
+  renderSvg: (toothNo, _quadrant, state) => {
+    if (!state) return null;
+    return `<text x="16" y="60" font-size="6" fill="#3b7bff">${state}</text>`;
+  },
+};
+
+<App plugins={[myPlugin]} />
+
+// Establecer el estado del plugin para un diente:
+setPluginState(11, "implant-brand", "Straumann");
+```
+
+**Integración controlada — el documento de dominio de interfaz (desde 2.3.0):**
+
+El estado clínico del componente es un **documento de dominio de interfaz**: el mismo
+JSON versionado que `exportStatus()` escribe y `importStatus()` lee. Ese documento — no
+FHIR — es lo que contiene el estado de React y lo que posee la aplicación anfitriona.
+
+Vincule una instancia a una **sesión** aislada para inicializarla y observarla, y para
+mantener independientes dos odontogramas montados:
+
+```tsx
+import App, {
+  createOdontogramSession,
+  type OdontogramDocument, type OdontogramSession,
+} from "./App";
+
+const upper: OdontogramSession = createOdontogramSession(savedUpperDocument);
+const lower: OdontogramSession = createOdontogramSession(savedLowerDocument);
+
+<App session={upper} onDocumentChange={(doc: OdontogramDocument) => save("upper", doc)} />
+<App session={lower} onDocumentChange={(doc: OdontogramDocument) => save("lower", doc)} />
+```
+
+- `session.getDocument()` / `setDocument(doc)` / `subscribe(listener)` es todo el
+  contrato; `createOdontogramSession(initial?)` crea una sesión. HKP hosts read
+  treatment intent from `session.getPlanChanges()`, not the module singleton.
+- Una prop `document` simple en lugar de `session` hace que la instancia cree y posea una
+  sesión privada inicializada a partir de ella.
+- Si no se pasa **ninguna de las dos**, se conserva el comportamiento autónomo histórico:
+  el componente funciona sobre la sesión predeterminada del proceso
+  (`getDefaultOdontogramSession()`) y todos los puntos de entrada del módulo se aplican a
+  ella exactamente igual que antes. **No se requiere ninguna migración.**
+- Solo una sesión está *activa* en el motor DOM a la vez (es un único motor global ligado
+  a una rejilla dental); las demás conservan su propio documento y siguen siendo
+  totalmente legibles y modificables mediante su API de sesión.
+
+**FHIR / Dental Core:**
+
+La conversión FHIR es una proyección opcional y pura del documento de la interfaz. Dental Core `de.cognovis.fhir.dental.core#0.10.0` es el único contrato FHIR; el marcador reconocido `odontogram-dental-core-0.6.0` sigue siendo legible para colecciones antiguas vacías y se rechazan los marcadores de dialecto desconocidos. La importación, exportación y reexportación conservan los once ejes de origen `implantPosition`, `crownFractureType`, `orthoProgressive`, `rootResection`, `papillaLoss`, `orthoBracketSide`, `cantilever`, `endoCanals`, `rootFractureRoot`, `rootResectionRoot` y `apicalRoot`. En los planes, estos ejes usan un `Goal` de estado objetivo referenciado; los campos de plan existentes siguen usando Observations planificadas con perfil. El estado planificado permanece separado del observado y no crea Devices ni Procedures realizadas. Se rechazan las afirmaciones duplicadas, contradictorias, mal formadas, con dirección ambigua o incompatibles con el diente. Los postes siguen siendo independientes mediante `rootPostType`; los valores antiguos `endo-glass-pin` y `endo-metal-pin` migran a `endo-filling` más el material del poste. Desde la 5.0.0, `extractionPlan`, `crownNeeded` y `crownReplace` se escriben como órdenes a nivel de diente de Dental Core 0.8 (SNOMED CT 55162003 / 426222000, con `restoration-renewal` en la colocación de corona); las órdenes escritas con el código local anterior ya no se leen. Desde 5.0.0 (mediante `@cognovis/fhir-sdk` 0.15.6) cada valor de estado dental o de hallazgo del odontograma se escribe y se lee solo como su código Dental Core, sin sistema de códigos local, alternativa ni alias; las URL de sistema provienen de `@cognovis/fhir-sdk/terminology`.
+
+**Modo en vivo con Aidbox (desarrollo, desde 2.50.0):**
+
+La aplicación autónoma (`apps/standalone`) tiene **una sola** página de entrada y elige su modo en tiempo de ejecución: arranca en modo en vivo con `?live`, con `?patient=<id>`, o siempre que haya una configuración de Aidbox en su entorno; en caso contrario sirve el banco de pruebas con datos de ejemplo. En modo en vivo carga la ficha de un paciente directamente desde un servidor Aidbox, la renderiza en la interfaz habitual a través de la API de sesión descrita arriba, y escribe los cambios de vuelta como recursos Dental Core bajo ids deterministas, de modo que un nuevo guardado actualiza en lugar de duplicar.
+
+Copie `apps/standalone/.env.example` a `apps/standalone/.env` y complete un cliente de máquina acotado (vea [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md)) y, desde la raíz del workspace:
+
+```bash
+bun install
+bun run dev                                 # después abra http://localhost:5173/?live
+```
+
+Nunca ponga una credencial de administrador en `VITE_*`.
+
+La mitad HTTP es su propio paquete, [`@cognovis/odontogram-fhir`](../../odontogram-fhir), que contiene el transporte de Aidbox y la fábrica del gateway y es lo único que depende de `@cognovis/fhir-sdk/client`. Este paquete entrega la **SPI** del gateway y los delegados de sesión de carga/guardado/plan de escritura — la mitad sin HTTP — y sigue **sin** incluir `@cognovis/fhir-sdk/client`. El gráfico y el transporte 5.2.6 declaran el peer obligatorio del SDK `^0.22.0 || ^0.23.0` y la versión exacta de desarrollo `0.23.0` (Dental Core 0.10.0). La aplicación ejecutable fija el SDK `0.23.0` y comparte una sola copia sin overrides. La configuración y la mecánica de carga/guardado están en [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+
+**Exámenes fechados, estado de valoración y registro periimplantario (desde 2.4.0):**
+
+Un caso periodontal se reexamina durante años, por lo que un documento puede llevar ahora la
+identidad propia del examen y un archivo de exámenes anteriores:
+
+```ts
+setExaminationContext({
+  id: "exam-2026-06-30", subject: "Patient/123", effectiveDateTime: "2026-06-30",
+  performer: "Practitioner/dr-mueller", encounter: "Encounter/9912",
+});
+
+captureExamination({ effectiveDateTime: "2026-06-30" });
+listExaminations();
+getExamination(id);
+loadExamination(id);
+startExamination({ effectiveDateTime: "2027-01-15" });
+```
+
+- Cada examen archivado es una **instantánea independiente** de los hallazgos de boca completa
+  y del contexto del caso en el momento de capturarlo; las ediciones posteriores nunca vuelven
+  a entrar en él, y capturar de nuevo registra un examen de seguimiento en lugar de sobrescribir
+  la línea base de la que depende la evolución.
+- Estado y plan siguen significando **actual frente a propuesto dentro de un mismo examen**: el
+  plan nunca es historia ni forma parte de una instantánea.
+- Cada campo de identidad es una cadena opaca, propiedad de la aplicación anfitriona, que el
+  componente guarda y devuelve pero nunca interpreta. Los documentos anteriores a la versión de
+  payload 2.21 no llevan nada de esto y se cargan sin cambios.
+- **Lo que el paciente trajo consigo se deriva de ese archivo, nunca se almacena.** El trabajo restaurador presente en la exploración archivada MÁS ANTIGUA se dibuja **rayado**, de modo que una corona con la que llegó el paciente no se confunde con una colocada después. `getBaselineExamination()`, `getPreExistingAxes(toothNo)`, `getChangesSinceBaseline()`, `isToothPreExisting(toothNo)`.
+- El rayado marca **trabajo, nunca el diente ni la enfermedad** — restauraciones, obturaciones directas, obturaciones de conducto y postes, apicectomía, sellado de fisuras. Un resto radicular o un implante es un diente, no trabajo; caries, cálculo y los hallazgos periodontales son enfermedad.
+- La **exploración inicial es corregible**: `beginBaselineCorrection()`, `commitBaselineCorrection()`, `cancelBaselineCorrection()`. Deliberadamente no hay anulación por diente.
+- Un **odontograma importado sin archivo propio se convierte en la exploración inicial** (menú de importación, activado por defecto). Un documento que trae su propio archivo lo conserva.
+
+El registro periodontal guarda hallazgos, no el acto de mirar, así que "sondado, sin sangrado"
+y "nadie lo sondó" resultaban idénticos. Cada eje afectado (PD, GM, BOP, supuración,
+movilidad, furcación, placa, PI, GI, mPI, mBI, KG) ya puede decir cuál de los dos es:
+
+```ts
+setAssessmentStatus(16, "bop", "MB", "assessed");
+setAssessmentStatus(16, "pd", "DB", "unmeasurable");
+getAssessmentStatus(16, "mpi", "buccal");
+perioAxisApplies(16, "gm");
+perioAxisApplies(11, "gm");
+```
+
+"No aplicable" se deriva de lo que el diente realmente es, y una medición real siempre gana a
+un vacío registrado. Al exportar, un valor no disponible se convierte en el propio
+`dataAbsentReason` de FHIR —nunca en un código clínico inventado— y un hallazgo normal se
+convierte en un `false` explícito o en el grado `0`.
+
+**Registro (desde 2.7.0):** un conmutador **Estado de evaluación** en la cabecera de la carta
+periodontal añade una fila acompañante bajo cada fila de índice visible, con un botón cíclico por
+punto de medición: sitio, superficie, entrada de furcación o el diente entero. Las filas están
+desactivadas por defecto. Un punto que ya tiene una medición queda bloqueado (el propio valor es
+la prueba del examen), y una posición no aplicable se deshabilita en vez de ignorarse en
+silencio. Los estados registrados aparecen también en el tooltip del diente y en el resumen
+periodontal de boca completa.
+
+La carta periodontal de boca completa registra ahora también la **supuración** por punto, y una
+columna de implante admite el examen periimplantario: profundidad de sondaje en seis puntos,
+sangrado, supuración, movilidad del implante y anchura de mucosa queratinizada. Allí solo
+quedan inactivos los ejes que necesitan la unión amelocementaria (margen gingival y el CAL
+derivado de él) y los índices de placa del diente natural: mPI y mBI son sus equivalentes
+periimplantarios.
+### 🧪 Pruebas
+```bash
+bun run test           # Ejecutar las 1704 pruebas (1 prueba adicional omitida)
+bun run test:watch     # Modo watch
+bun run test:coverage  # Informe de cobertura
+```
+
+### 📖 Documentación API
+```bash
+bun run docs           # Generar documentación TypeDoc en docs/
+```
+
+### 📡 API pública
+
+**Props del componente:**
+
+| Prop | Tipo | Predeterminado | Descripción |
+|---|---|---|---|
+| `language` | `string` | `'hu'` | Idioma de la UI (hu/en/de/es/it/sk/pl/ru/pt-br/ar/zh/fr) |
+| `onLanguageChange` | `(lang) => void` | — | Callback cuando cambia el idioma |
+| `numberingSystem` | `string` | `'FDI'` | Sistema de numeración (FDI/Universal/Palmer) |
+| `onNumberingChange` | `(system) => void` | — | Callback cuando cambia la numeración |
+| `darkMode` | `boolean` | `undefined` | Estado del modo oscuro. Omitir para modo independiente. |
+| `onDarkModeChange` | `(dark) => void` | — | Callback al alternar modo oscuro. Requerido para modo controlado. |
+| `themeConfig` | `OdontogramThemeConfig` | `undefined` | Personalización de colores mediante CSS custom properties (`--odon-*`). |
+| `plugins` | `OdontogramPlugin[]` | `undefined` | Plugins SVG personalizados para superposiciones visuales y estado personalizado por diente. |
+| `readOnly` | `boolean` | `undefined` | Desactivar todas las interacciones (clic, táctil, teclado). Útil para vistas de impresión/informes. |
+| `enableNotes` | `boolean` | `undefined` | Activar notas por diente. Doble clic en un diente para añadir/editar notas. |
+
+**Funciones exportadas para control externo:**
+
+| Función | Descripción |
+|---|---|
+| `initOdontogram()` | Inicializar el motor y renderizar todos los dientes |
+| `destroyOdontogram()` | Limpiar el motor y eliminar los event listeners |
+| `setNumberingSystem(system)` | Cambiar entre FDI, Universal, Palmer |
+| `clearSelection()` | Deseleccionar todos los dientes |
+| `setOcclusalVisible(on)` | Alternar vista oclusal on/off |
+| `setWisdomVisible(on)` | Mostrar/ocultar muelas del juicio |
+| `setShowBase(on)` | Mostrar/ocultar capa de hueso |
+| `setHealthyPulpVisible(on)` | Mostrar/ocultar pulpa sana |
+| `registerPlugins(plugins)` | Registrar plugins SVG personalizados |
+| `setPluginState(toothNo, pluginId, value)` | Establecer estado personalizado del plugin para un diente |
+| `getPluginState(toothNo, pluginId)` | Obtener estado personalizado del plugin de un diente |
+| `getToothStateSummary(toothNo)` | Obtener resumen localizado de todos los estados activos |
+| `getOdontogramSummary()` | Obtener un resumen de texto estructurado y localizado de todo el odontograma (recuentos, secciones) |
+| `onStateChange(callback)` | Suscribirse a los cambios de estado; devuelve una función para cancelar la suscripción |
+| `setReadOnly(value)` | Activar/desactivar modo solo lectura |
+| `getReadOnly()` | Obtener estado actual de solo lectura |
+| `setNotesEnabled(value)` | Activar/desactivar notas por diente |
+| `getNotesEnabled()` | Obtener estado actual de notas |
+| `setPulpDetailLevel(level)` | Definir el vocabulario del selector de pulpa — `"simple"`, `"aae"` o `"latin"` |
+| `getPulpDetailLevel()` | Obtener el nivel de detalle pulpar actual |
+| `getChartMode()` | Obtener el odontograma actualmente activo — `"status"` o `"plan"` |
+| `setChartMode(mode)` | Cambiar el odontograma activo a `"status"` o `"plan"`; el odontograma de plan se copia del de estado la primera vez que se activa |
+| `getStatusChart()` | Obtener el payload del odontograma de estado (`{version, globals, teeth}`), independientemente de cuál esté activo |
+| `getPlanChart()` | Obtener el payload del odontograma de plan (`{version, globals, teeth}`), independientemente de cuál esté activo |
+| `setPlanChart(payload)` | Reemplazar los dientes del odontograma de plan a partir de un payload (el estado no se modifica); marca el odontograma de plan como inicializado |
+| `getPlanChanges()` | Obtener el diff estructurado estado→plan (`{ toothNo, axis, from, to }[]`) — una entrada por diente y por eje de tratamiento que difiere entre los odontogramas de estado y de plan; vacío cuando no hay plan. También expuesto en `getOdontogramSummary()` como `plannedChanges` |
+| `setPerioSite(toothNo, site, patch)` | Establecer los datos periodontales de uno de los seis sitios (`patch` = `{ pd?, gm?, bop?, sup? }`); `pd` nulo/`<1` descarta el registro del sitio. Valida y limita los valores (PD 1–15, GM −10…+20) |
+| `getToothPerio(toothNo)` | Obtener el registro periodontal por sitio de un diente (solo los sitios registrados) |
+| `getToothCal(toothNo)` | Obtener el CAL derivado por sitio (`pd + margen gingival`) de un diente |
+| `getPerioSummary()` | Agregados periodontales de toda la boca: recuento de sitios registrados, recuento de sangrado, %BOP, peor CAL, PD máxima |
+| `getPerioChart()` | Obtener los registros periodontales por diente del odontograma activo |
+| `PerioChart` | Componente React (exportación con nombre) — la superposición del odontograma periodontal de boca completa (`{ open, onClose }`), montable de forma independiente de `OdontogramShell` para integración con la aplicación anfitriona |
+| `openPerioOverlay()` / `closePerioOverlay()` / `isPerioOverlayOpen()` | Abrir/cerrar/consultar programáticamente la superposición del odontograma periodontal — permite que una aplicación anfitriona invoque el odontograma periodontal por separado del odontograma base (estado de caso compartido) |
+| `getPerioViewMode()` / `setPerioViewMode(mode)` | Obtener/definir cómo se presenta el odontograma periodontal — `"toggle"` (un selector de vista `Odontogram \| Dental Chart`, predeterminado) o `"popup"` (la superposición) |
+| `getPerioOverlayLayer()` / `setPerioOverlayLayer(layer)` | Obtener/definir la superposición de resaltado del odontograma dental — `"none"` (predeterminado) / `"pd"` / `"cal"` / `"gr"` / `"plaque"` / `"bop"` / `"pd5"` / `"pd6"` / `"cairo"`; repinta los dientes según esa medida (solo visualización sobre los datos existentes) |
+| `getToothRecessionType(toothNo)` | Obtener el **tipo de recesión de Cairo** derivado — `"none"` / `"rt1"` / `"rt2"` / `"rt3"` (calculado a partir del CAL interproximal frente al bucal del diente) |
+| `setCejVisibility(toothNo, v)` / `getCejVisibility(toothNo)` | Visibilidad de la CEJ por diente — `"none"` / `"detectable"` / `"not-detectable"` |
+| `setRootConcavity(toothNo, v)` / `getRootConcavity(toothNo)` | Concavidad de la superficie radicular por diente — `"none"` / `"mild"` / `"deep"` |
+| `setPlaqueIndex(toothNo, surface, grade)` / `getPlaqueIndex(toothNo, surface)` | Grado del Índice de Placa de Silness-Löe por superficie — `0`-`3` |
+| `setGingivalIndex(toothNo, surface, grade)` / `getGingivalIndex(toothNo, surface)` | Grado del Índice Gingival de Löe-Silness por superficie — `0`-`3` |
+| `setKeratinizedWidth(toothNo, mm)` / `getKeratinizedWidth(toothNo)` | Ancho de encía queratinizada bucal por diente, en mm — `0`-`15`, o `null` si no está registrado |
+| `setGingivalThickness(toothNo, v)` / `getGingivalThickness(toothNo)` | Fenotipo de grosor gingival por diente — `"unknown"` / `"thin"` / `"medium"` / `"thick"` |
+| `setMillerClass(toothNo, v)` / `getMillerClass(toothNo)` | Clase de recesión de Miller por diente — `"none"` / `"i"` / `"ii"` / `"iii"` / `"iv"` |
+| `setPeriImplantPlaque(toothNo, surface, grade)` / `getPeriImplantPlaque(toothNo, surface)` | Solo implantes — grado del Índice de Placa modificado de Mombelli (mPI) por superficie — `0`-`3`; no hace nada en un diente que no sea implante |
+| `setPeriImplantBleeding(toothNo, surface, grade)` / `getPeriImplantBleeding(toothNo, surface)` | Solo implantes — grado del Índice de Sangrado del Surco modificado de Mombelli (mBI) por superficie — `0`-`3`; no hace nada en un diente que no sea implante |
+| `furcationEntrances(toothNo)` | Las entradas de furca de un diente — `["mesial","distal","buccal"]` (molares superiores), `["buccal","lingual"]` (molares inferiores), `["mesial","distal"]` (primeros premolares superiores), si no `[]` |
+| `setFurcation(toothNo, entrance, grade)` / `getToothFurcation(toothNo)` | Establecer/obtener la afectación de furca por entrada (Glickman `1`–`4`; `null` la borra) |
+| `setPlaque(toothNo, surface, present)` / `getToothPlaque(toothNo)` | Establecer/obtener la presencia de placa de O'Leary por superficie (mesial/distal/bucal/lingual); alimenta el %PI de toda la boca en `getPerioSummary()` |
+| `getCaseMeta()` | Obtener el objeto de metadatos a nivel de caso (`{age, smokingStatus, cigarettesPerDay, diabetesStatus, hba1c, toothLossPerio, maxRblPercent, patientName, patientDob, examDate}`) — un único bloque compartido, no por diente ni de doble estado (refleja la clave `globals` del payload de nivel superior); alimenta la clasificación de estadificación/graduación periodontal |
+| `setPatientName(v)` | Establecer el nombre del paciente del caso (recortado; una cadena vacía o `null` lo borra) — solo identidad, nunca se introduce en la derivación periodontal |
+| `setPatientDob(v)` | Establecer la fecha de nacimiento del paciente del caso (`YYYY-MM-DD`; un valor inválido/vacío la borra)|
+| `setExamDate(v)` | Establecer la fecha de examen del caso (`YYYY-MM-DD`; un valor inválido/vacío lo borra) |
+| `setCaseAge(v)` | Establecer la edad del paciente del caso en años — `0`-`120`, o `null` para borrarla |
+| `setSmokingStatus(v)` | Establecer el estado de tabaquismo del caso — `"unknown"` / `"never"` / `"former"` / `"current"` |
+| `setCigarettesPerDay(v)` | Establecer los cigarrillos/día (solo relevante cuando el estado de tabaquismo es `"current"`) — `0`-`99`, o `null` para borrarlo |
+| `setDiabetesStatus(v)` | Establecer el estado de diabetes del caso — `"unknown"` / `"none"` / `"present"` |
+| `setHba1c(v)` | Establecer el % de HbA1c (solo relevante cuando el estado de diabetes es `"present"`) — `3.0`-`20.0` (un decimal), o `null` para borrarlo |
+| `setToothLossPerio(v)` | Establecer los dientes perdidos por periodontitis — `0`-`32`, o `null` para borrarlo |
+| `setMaxRblPercent(v)` | Establecer el % máximo de pérdida ósea radiográfica — `0`-`100`, o `null` para borrarlo |
+| `resetCaseMeta()` | Restablecer el objeto de metadatos a nivel de caso a sus valores predeterminados vacíos |
+| `getPerioClassification()` | Obtener la clasificación periodontal del World Workshop 2017 (`{diagnosis, stage, grade, extent, derived, overridden}`) — diagnóstico/estadio/grado/extensión derivados de los datos periodontales registrados y los metadatos del caso, cada eje reemplazado por su anulación clínica cuando está definida (`derived` siempre expone los valores calculados sin modificar, `overridden` indica qué ejes fueron anulados) |
+| `setDiagnosisOverride(v)` | Anular el diagnóstico periodontal derivado — `"health"` / `"gingivitis"` / `"periodontitis"`, o `null` para borrarlo (revertir al derivado) |
+| `setStageOverride(v)` | Anular el estadio periodontal derivado — `"I"` / `"II"` / `"III"` / `"IV"`, o `null` para borrarlo (revertir al derivado) |
+| `setGradeOverride(v)` | Anular el grado periodontal derivado — `"A"` / `"B"` / `"C"`, o `null` para borrarlo (revertir al derivado) |
+| `setExtentOverride(v)` | Anular la extensión periodontal derivada — `"localized"` / `"generalized"` / `"molar-incisor"`, o `null` para borrarlo (revertir al derivado) |
+| `exportImage(format)` | Descargar el odontograma como imagen — `"png"` o `"jpg"` |
+| `exportSvg()` | Descargar el odontograma como SVG escalable (vectorial) |
+| `hasAnyPerioData()` | `true` si hay algún eje periodontal registrado en cualquier parte de la boca — determina la omisión automática de la exportación periodontal y desactiva los elementos del menú de exportación periodontal en un odontograma vacío |
+| `startIntroTour()` | Iniciar el tour interactivo de introducción de 12 pasos |
+
+### 💾 Formato de exportación/importación de estado
+La exportación genera un archivo JSON (versión `2.20`; las importaciones también aceptan las versiones heredadas `1.4` y de `2.0` a `2.19`, migrando automáticamente) que contiene:
+
+**Campos globales:**
+- `wisdomVisible` - muelas del juicio visibles
+- `showBase` - capa de hueso visible
+- `occlusalVisible` - vista oclusal activa
+- `showHealthyPulp` - pulpa sana visible
+- `edentulous` - modo edéntulo activo
+
+**Campos por diente (32 dientes):**
+- `toothSelection` - tipo base del diente
+- `toothSubstrate` - sustrato dental (natural/radix/fracturado/preparación de corona), ortogonal a cualquier restauración
+- `restorationType` - tipo de restauración (none/crown/inlay/onlay/veneer/bridge)
+- `restorationMaterial` - material de restauración (emax/gold/gradia/zircon/metal/metal-ceramic/telescope/temporary), emparejado con `restorationType`
+- `prosthesis` - eje removible/de anclaje (none/healing-abutment/locator/locator-denture/bar/bar-denture/removable-partial/removable-full), mutuamente excluyente con un `restorationType` fijo de corona/puente
+- `crownLeakage` - indicador de filtración marginal de corona, significativo solo cuando `restorationType` es corona o puente
+- `endo` - estado endodóntico; mutuamente excluyente con `pulpDx` (mostrados juntos mediante un único selector combinado "Estado pulpar / endo" — tratar un diente normaliza `pulpDx` a `normal`)
+- `rootPostType` - material del poste radicular (`none`, `glass-fiber`, `metal`), independiente de `endo`
+- `mods` - array de modificaciones (inflammation, parodontal); `inflammation` se retira de la UI en dientes presentes (allí el glifo lo determina `apicalDx`) pero sigue aplicándose a dientes ausentes/alvéolo de extracción
+- `caries` - superficies con caries activa
+- `cariesActiveDepth` - el valor de profundidad ICDAS preparado por el selector de profundidad de caries al aplicar una nueva superficie (no es un valor almacenado por superficie; ver `cariesSeverity` para el campo almacenado por superficie)
+- `rootCaries` - severidad de la caries radicular (none/active/arrested/active-cavitated)
+- `cariesSeverity` - severidad unificada por superficie (0-6): profundidad ICDAS en una superficie primaria (sin obturar), puntuación CARS en una superficie recurrente (obturada)
+- `radiographicDepth` - profundidad radiográfica de caries por superficie (none/E1/E2/D1/D2/D3), independiente de la escala visual ICDAS/CARS
+- `fillingMaterial` - material de obturación
+- `fillingSurfaces` - superficies obturadas
+- `fillingSurfaceMaterials` - material de obturación por superficie (obturaciones mixtas, p. ej. bucal amalgama + distal composite)
+- `retention` - qué sujeta una prótesis removible a este diente (none/clasp/attachment/bar-abutment)
+- `retentionSide` - el lado en que engrana el elemento de retención (none/mesial/distal/both)
+- `fillingDefect` - defecto de obturación por superficie (none/marginal/fracture/wear), condicionado a superficie obturada, independiente de la caries recurrente
+- `cervicalSurfaces` - las superficies cuya obturación o lesión de caries se extiende a la región cervical (buccal/lingual); una marca sobre la superficie en lugar de una sexta superficie
+- `pulpDx` - diagnóstico pulpar AAE (normal/reversible-pulpitis/irreversible-pulpitis/necrosis); pulpitis reversible renderiza un glifo reducido
+- `pulpLatin` - subtipo pulpar en latín práctico (el selector de pulpa solo lo muestra cuando `pulpDetailLevel` es `latin`)
+- `apicalDx` - diagnóstico apical que determina el glifo periapical
+- `periapicalType` - subtipo de lesión periapical (none/granuloma/cyst), solo se muestra bajo periodontitis apical sintomática/asintomática; el valor heredado `abscess` sigue aceptándose al importar
+- `resorptionType` - tipo de reabsorción radicular (none/internal/external-cervical)
+- `periImplant` - estado periimplantario, solo implantes (none/mucositis/peri-implantitis-mild/-moderate/-severe), clasificación del World Workshop 2018
+- `endoResection` - indicador de apicectomía
+- `fissureSealing` - indicador de sellado de fisuras
+- `calculus` - indicador de cálculo
+- `contactMesial` - pérdida de punto de contacto mesial
+- `contactDistal` - pérdida de punto de contacto distal
+- `wearEdge` - tipo de desgaste incisal/oclusal (none/attrition/erosion)
+- `wearCervical` - tipo de desgaste cervical (none/abrasion/abfraction/erosion)
+- `discoloration` - causa de decoloración por diente (none/tetracycline/fluorosis/nonvital/extrinsic/other), tiñe el relleno de la corona natural en un diente con sustrato natural/de leche sin restauración
+- `orthoAppliance` - aparato de ortodoncia (none/bracket/band)
+- `orthoDrift` - desplazamiento ortodóntico (none/mesial/distal)
+- `orthoVertical` - movimiento vertical ortodóntico (none/extrusion/intrusion)
+- `orthoRotation` - indicador de rotación ortodóntica
+- `brokenMesial`, `brokenIncisal`, `brokenDistal` - ubicaciones de fractura
+- `extractionWound` - herida post-extracción
+- `extractionPlan` - extracción planificada
+- `parapulpalPin` - indicador de pin parapulpar
+- `bridgePillar` - diente pilar de puente
+- `mobility` - grado de movilidad (none/m1/m2/m3)
+- `crownNeeded` - indicador de corona necesaria
+- `crownReplace` - indicador de reemplazo de corona necesario
+- `missingClosed` - espacio cerrado tras extracción
+- `customStates` - estados personalizados de plugins (objeto, indexado por ID de plugin)
+- `note` - nota de texto por diente (cadena, opcional — presente solo cuando no está vacía)
+
+**Campo de nivel superior `plan` (versión 2.11+):**
+- `plan` - objeto opcional, con la misma forma que `teeth` (campos por diente arriba), que contiene el odontograma de **plan** (tratamiento propuesto). Presente solo cuando el odontograma de plan se ha inicializado (se ha activado el selector `Estado | Plan` a Plan al menos una vez) Y su contenido difiere del odontograma de estado — una exportación solo de estado lo omite por completo y se mantiene idéntica byte a byte a una exportación anterior a 2.11 salvo por el número de versión. Al importar, la ausencia de `plan` limpia/desinicializa el odontograma de plan (nunca resucita un plan obsoleto de una importación anterior); si `plan` está presente, restaura el odontograma de plan junto con el de estado. El odontograma de plan también puede leerse/escribirse de forma independiente a la importación/exportación mediante `getPlanChart()`/`setPlanChart()` (ver API pública arriba), y `getStatusChart()` siempre devuelve el payload de estado, sin importar cuál odontograma esté activo.
+
+**Objeto de nivel superior `case` (versión 2.17+, ampliado en 2.18, 2.19 y 2.20):**
+- `case` - objeto opcional de metadatos a nivel de caso — NO es por diente ni de doble estado (el mismo objeto se comparte entre los odontogramas de estado y de plan, reflejando la clave `globals` de nivel superior). Contiene la edad del paciente (`age`, 0-120), el estado de tabaquismo (`smokingStatus`: unknown/never/former/current, con `cigarettesPerDay` 0-99), el estado de diabetes (`diabetesStatus`: unknown/none/present, con `hba1c` 3.0-20.0), dos estadísticas resumen del resultado periodontal (`toothLossPerio` 0-32 y `maxRblPercent` 0-100), las anulaciones clínicas de la clasificación periodontal 2017 (`diagnosisOverride`/`stageOverride`/`gradeOverride`/`extentOverride`), y tres campos de identidad del caso — `patientName` (cadena recortada o `null`), `patientDob` (`AAAA-MM-DD` o `null`) y `examDate` (`AAAA-MM-DD` o `null`); ninguno de los tres forma parte de la exportación FHIR. Se serializa omitiendo los campos vacíos, y el objeto `case` completo está ausente cuando todos sus campos están en su valor predeterminado. Se gestiona mediante `getCaseMeta()`/`resetCaseMeta()` y los setters individuales (ver API pública arriba).
+
+### 🖨️ Exportación
+Además de la propia exportación de Estado JSON / FHIR / PNG / JPG / SVG del odontograma, el **gráfico periodontal** cuenta con su propia vía de exportación:
+- El nombre del paciente, la fecha de nacimiento y la fecha de examen son solo metadatos de identidad del caso (payload `2.20`, aditivo) — **no** forman parte de la exportación FHIR.
+
+### 📁 Estructura de carpetas
+- `src/App.tsx` - UI principal, controles de barra superior, selector de idioma/numeración/modo oscuro/tema/plugins
+- `src/odontogram.ts` - motor de capas SVG, gestión de estado dental, interacciones táctiles, superposiciones de plugins, cableado UI
+- `src/plugin.ts` - tipo `OdontogramPlugin`, `PluginLayer`, `getQuadrant()`, prioridades Z `LAYER_Z`
+- `src/theme.ts` - tipo `OdontogramThemeConfig` y función `applyThemeConfig()`
+- `src/status_extras.ts` - 34 plantillas de restauración predefinidas (puentes, prótesis, construcciones con barra)
+- `src/i18n/` - traducciones (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR) y hook i18n
+- `src/utils/numbering.ts` - conversión de numeración FDI, Universal, Palmer
+- `src/registry/` - registro declarativo de ejes clínicos y UI: metadatos de ejes, activación SVG, matriz tipo×material de restauración, catálogo de valores y listas de opciones; los mapeos FHIR pertenecen a `src/fhir/`
+- `src/fhir/` - única interfaz Dental Core para HL7 FHIR R4: códec `toFhirDentalCore.ts`/`fromFhirDentalCore.ts` sobre `@cognovis/fhir-sdk`, `dentalCoreContract.ts` y ayudas de `dentalCoreLocalCoding.ts`
+- `src/bridgeOverlay.ts` - superposición de conector de tramo de puente multidiente (geometría de silla adaptada a la arcada)
+- `src/SettingsModal.tsx` - diálogo de Ajustes por pestañas (General/Paneles/Detalles del diente/Caries/Pulpa/Notas/Periodontal)
+- `src/__tests__/` + `src/registry/__tests__/` - suite de pruebas Vitest (1704 pruebas superadas, 1 omitida, en 163 archivos)
+- `src/assets/teeth-svgs/` - plantillas SVG dentales (6 archivos: incisivos, caninos, premolares, molares + vistas oclusales)
+- `src/assets/icon-svgs/` - SVGs de iconos de barra de herramientas (5 archivos)
+
+### ⚙️ Stack tecnológico
+- React 18 + Vite + TypeScript
+- Tailwind CSS para estilos de UI
+- Capas SVG mediante manipulación del DOM (no React state por rendimiento)
+- Sistema i18n propio ligero
+- Vitest + Testing Library para pruebas automatizadas
+- TypeDoc para documentación de API
+- Alias de ruta Vite: `@` mapeado a `./src`
+
+### 📝 Notas
+- Las plantillas SVG se cargan desde `src/assets/teeth-svgs` y `src/assets/icon-svgs`, por lo que el hosting estático debe servir la carpeta pública.
+- El motor del odontograma usa su propio estado interno (no el estado de React) por rendimiento y simplicidad.
+- Los dientes de leche tienen un conjunto reducido de materiales disponibles (sin obturaciones de amalgama, sin endodoncia con pines).
+- Los dientes con implante tienen un conjunto diferente de opciones de corona/pilar que los dientes naturales.
+
+### 📖 Cómo citar
+
+Si utilizas este módulo en tu trabajo, por favor cítalo.
+
+**Esta versión (v1.49.0):**
+> Dul, Z. (2026). *React Advanced Odontogram* (v1.49.0). Zenodo. https://doi.org/10.5281/zenodo.21156787
+
+**Todas las versiones (DOI de concepto):** https://doi.org/10.5281/zenodo.21156787
+
+> El DOI de concepto de todas las versiones anterior siempre resuelve a la versión
+> archivada más reciente; se emite un DOI específico de versión por cada lanzamiento
+> cuando se archiva en Zenodo. Hasta que la v1.49.0 sea archivada, cítala mediante
+> el DOI de concepto.
+
+Los metadatos de citación legibles por máquina están en [`CITATION.cff`](../../../CITATION.cff).
+
+## 📄 License
+
+Created with ❤️ by Zoltan Dul (2026)
+Released under the MIT License.

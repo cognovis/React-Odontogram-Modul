@@ -1,0 +1,43 @@
+{
+  "name": "@cognovis/odontogram-fhir",
+  "version": "5.2.6",
+  "license": "MIT",
+  "type": "module",
+  "description": "Aidbox HTTP transport for @cognovis/odontogram: the one @cognovis/fhir-sdk/client factory behind the chart SDK's HTTP-free session gateway.",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/odontogram-fhir.js",
+  "module": "./dist/odontogram-fhir.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/odontogram-fhir.js"
+    }
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "vite build --config vite.lib.config.ts",
+    "build:lib": "vite build --config vite.lib.config.ts",
+    "test": "vitest run",
+    "prepublishOnly": "bun run build:lib"
+  },
+  "dependencies": {
+    "@cognovis/odontogram": "workspace:*"
+  },
+  "devDependencies": {
+    "@cognovis/fhir-sdk": "0.23.0",
+    "@microsoft/api-extractor": "^7.58.12",
+    "@types/node": "^22.20.2",
+    "typescript": "^5.5.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "@cognovis/fhir-sdk": "^0.22.0 || ^0.23.0"
+  }
+}

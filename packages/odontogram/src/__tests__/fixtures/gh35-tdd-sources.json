@@ -1,0 +1,20 @@
+{"expected_values": [
+  {
+    "name": "catalog implant",
+    "value": "implant-in-tooth-position",
+    "source_kind": "generated_fixture",
+    "source": "cognovis/fhir-dental-core commit ee9c7a1",
+    "fixture_path": "src/__tests__/fixtures/odontogram-value-coverage-ee9c7a1.json",
+    "selector": "entries[group=toothSelection,value=implant]",
+    "test_path": "packages/odontogram/src/__tests__/gh35-dental-core-codes.test.ts"
+  },
+  {
+    "name": "authored third-party tooth state",
+    "value": "implant-in-tooth-position",
+    "source_kind": "generated_fixture",
+    "source": "src/__tests__/fixtures/gh35-external-tooth-state.json",
+    "fixture_path": "src/__tests__/fixtures/gh35-external-tooth-state.json",
+    "selector": "entry[0].resource.component[0]",
+    "test_path": "packages/odontogram/src/__tests__/gh35-dental-core-codes.test.ts"
+  }
+]}

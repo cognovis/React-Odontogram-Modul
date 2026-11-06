@@ -1,0 +1,884 @@
+# 🦷 React Advanced Odontogram
+
+[![Download](https://img.shields.io/badge/Download-React--Odontogram--Modul-blue?style=for-the-badge&logo=github)](https://github.com/ZoliQua/React-Odontogram-Modul/releases)
+[![Version](https://img.shields.io/badge/version-5.2.6-green?style=for-the-badge)](https://github.com/ZoliQua/React-Odontogram-Modul)
+[![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)](https://github.com/ZoliQua/React-Odontogram-Modul/blob/main/LICENSE)
+[![DOI](../src/assets/zenodo.21156787.svg)](https://doi.org/10.5281/zenodo.21156787)
+
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+
+---
+
+> 🌐 **Languages:**  🇬🇧 [English](README-en.md) | 🇪🇸 [Español](README-es.md) | 🇩🇪 [Deutsch](README-de.md) | 🇭🇺 [Magyar](README-hu.md) | 🇮🇹 [Italiano](README-it.md) | 🇸🇰 [Slovenčina](README-sk.md) | 🇵🇱 [Polski](README-pl.md) | 🇷🇺 [Русский](README-ru.md) | 🇧🇷 [Português (BR)](README-pt-br.md) | 🇸🇦 [العربية](README-ar.md) | 🇨🇳 [简体中文](README-zh.md) | 🇫🇷 [Français](README-fr.md)
+
+---
+
+## 🇬🇧 English
+
+### 📋 Overview
+This project is an interactive, browser-based odontogram editor that supports fast dental charting with a clean UI. It renders layered SVG tooth templates to represent restorations, caries, endodontic status, mobility, and other clinical details, while providing multi-select, selection filters, and predefined status presets. Every tooth position has its own drawing — sixteen permanent side views, twenty occlusal views and the primary dentition — and the anterior top view is what makes a palatal finding on an incisor chartable at all, which a side view cannot show.
+
+---
+![Odontogram editor — English preview](screenshot_en_odontogram.png)
+
+🔗 **Test URL:** https://react-odontogram-modul.vercel.app/
+
+---
+
+### 📦 Use as an npm package
+
+The odontogram ships as a self-contained React component library on npm:
+`@cognovis/odontogram`.
+
+#### Requirements
+- **React 18 or 19** (declared as a peer dependency — provided by your app).
+- A **bundler** that understands the `exports` field and ESM: Vite, webpack 5, Next.js, Rollup, esbuild, Parcel. The package is **ESM-only**.
+- Node **≥ 18** for tooling.
+
+#### Installation
+
+```bash
+bun add @cognovis/odontogram react react-dom
+```
+
+#### Basic usage
+
+Render `OdontogramShell` and import the stylesheet **once** anywhere in your app:
+
+```tsx
+import { OdontogramShell } from "@cognovis/odontogram";
+import "@cognovis/odontogram/style.css";
+
+export function Chart() {
+  return (
+    <OdontogramShell
+      language="en"          // hu | en | de | es | it | sk | pl | ru | pt-br | ar | zh | fr
+      numberingSystem="FDI"  // FDI | Universal | Palmer
+      darkMode={false}
+    />
+  );
+}
+```
+
+#### Component props
+
+`OdontogramShell` is a controlled component. The most common props:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `language` | `Language` | `"hu"` | UI language (`hu`/`en`/`de`/`es`/`it`/`sk`/`pl`/`ru`/`pt-br`/`ar`/`zh`). |
+| `numberingSystem` | `"FDI" \| "Universal" \| "Palmer"` | `"FDI"` | Tooth numbering system. |
+| `darkMode` | `boolean` | `false` | Dark theme toggle. |
+| `readOnly` | `boolean` | `false` | Disable all editing (view-only). |
+| `themeConfig` | `OdontogramThemeConfig` | — | Override theme CSS variables (`--odon-*`). |
+| `plugins` | `OdontogramPlugin[]` | — | Register custom state plugins / extra layers. |
+| `enableNotes` | `boolean` | `false` | Enable per-tooth notes. |
+| `enableIcdas` | `boolean` | `false` | Enable ICDAS II caries scoring. |
+| `onLanguageChange` / `onNumberingChange` / `onDarkModeChange` | `(value) => void` | — | Fire when the user changes the setting from the UI. |
+
+Finer-grained detail-level props (`pulpDetailLevel`, `secondaryCariesMode`, `rootCariesMode`, `radiographicDepthMode`, `wearDetailLevel`, `discolorationDetailLevel`, `surfaceNotation`, `showStatusCard`, `showOrthoCard`) are also accepted — see the shipped `.d.ts` types for the full, typed list.
+
+#### Public API (named exports)
+
+`OdontogramShell` is both the default export and a named export. The imperative state API, the standalone `PerioChart` component, the guided tour, and all public types are named exports from the same entry point:
+
+```ts
+import {
+  OdontogramShell,           // also the default export
+  PerioChart,                // standalone periodontal chart component
+  // read state
+  getOdontogramSummary,
+  getToothStateSummary,
+  onStateChange,             // subscribe to state changes
+  // export / import
+  exportSvg, exportImage,    // vector / raster chart export
+  // control
+  setReadOnly, getReadOnly,
+  clearSelection,
+  registerPlugins, setPluginState, getPluginState,
+  startIntroTour,            // launch the onboarding tour
+  // …and many more setX/getX settings functions
+} from "@cognovis/odontogram";
+```
+
+The full surface (≈ 44 functions + types such as `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) is fully typed in the bundled declarations.
+
+#### Using it with Next.js (App Router)
+
+The component is client-only, so render it from a Client Component:
+
+```tsx
+"use client";
+import { OdontogramShell } from "@cognovis/odontogram";
+import "@cognovis/odontogram/style.css";
+
+export default function OdontogramClient() {
+  return <OdontogramShell language="en" numberingSystem="FDI" />;
+}
+```
+
+Or load it with a client-only dynamic import: `dynamic(() => import("./OdontogramClient"), { ssr: false })`.
+
+#### Important notes & current limitations
+- **ESM-only** — the package publishes a main ES module (`dist/odontogram.js`), with matching type declarations (`dist/index.d.ts`). It targets bundler module resolution; there is no CommonJS build.
+- **The stylesheet is separate** — you **must** import `@cognovis/odontogram/style.css` once; it is not injected automatically. Styling is global CSS scoped under `.odontogram-root` and driven by `--odon-*` CSS variables. In the unreleased version it sets nothing on `:root`, `html` or `body`: the host's page background, font and own tokens stay untouched; surfaces appended to `<body>` (tour, popovers) carry `.odontogram-portal`.
+- **SSR / client-only** — the component reads the DOM on mount (`document`), so it must run in the browser. In SSR frameworks, render it in a Client Component (`"use client"`) or via a client-only dynamic import.
+- **Assets are self-contained** — the tooth and icon SVGs are inlined into the JavaScript bundle at build time; there is **no runtime asset fetch** to configure and nothing extra to copy to your public folder.
+- **Multiple instances, one live editor** — each mounted `<OdontogramShell>` can hold its own clinical state through an isolated session (`createOdontogramSession()`), and two sessions never share data. The interactive DOM editor is still a single global engine, so exactly one mounted instance drives it at a time: that instance renders the chart, the others render an inactive placeholder and stay fully readable and writable through their session API. Ownership passes to a waiting instance when the current one unmounts.
+
+---
+
+### ✨ Key Features
+- 🖱️ Fast selection and multi-select (CMD/CTRL + click)
+- 🦷 Tooth types: permanent, primary (milk), implant, subgingival, missing
+- 🍼 The primary dentition has anatomy of its own: eight generated templates cover all twenty deciduous teeth with their own measured root fractions, lengths and widths, a relatively larger pulp and roots splayed around the permanent germ. Charting a tooth as a milk tooth mounts the deciduous drawing in place of its successor's. In FHIR the tooth is identified as **51–85**, because in FDI the number itself says which dentition it belongs to; on import that number decides, and only presence is overruled
+- 🦷 Tooth substrate (orthogonal to any restoration): natural, radix (root remnant), broken, prepared for crown
+- 👑 Restorations by type × material: crown / inlay / onlay / veneer / bridge in e.max, gold, gradia, zirconia, metal, metal-ceramic, telescope or temporary (onlay is occlusal-view only) — chosen from one combined low-click "Crown – …" picker; legacy `metal` crowns migrate to `metal-ceramic` (PFM); implants use the same type × material model, composed with an implant connector layer. The picker is scoped by tooth kind: an implant offers only crown/bridge (plus its five attachment options, below); a missing/gap tooth offers only a bridge pontic (plus removable-partial/-full); a `radix` substrate hides the restoration control entirely (no restoration can be authored on a root remnant)
+- 🦿 Removable/attachment prosthetics on the dedicated `prosthesis` axis ("Kivehető:" entries in the combined picker): implant healing abutment, locator, locator with overdenture, bar, bar with overdenture; tooth-supported removable partial or full denture
+- 🌉 Bridge teeth render both the crown cap and the saddle connector; a multi-tooth bridge-span overlay renders one continuous, arch-aware connector across consecutive bridge teeth (pontics + abutments) and the inter-tooth gaps between them (upper vs. lower arch use mirrored saddle geometry, keeping the connector aligned on both arches), included in PNG/JPG/SVG export; applying a bridge via a Statuses preset recomputes the overlay immediately
+- 🔍 Caries charting on 6 surfaces: mesial, distal, buccal, lingual, occlusal, subcrown
+- 🪥 Filling materials per surface: amalgam, composite, GIC, temporary
+- 🏥 One merged "Pulp / Endo status" selector (grouped: vital pulp vs. treated/endo) for medicinal, complete, or incomplete root filling, plus an independent root-post material selector: endodontic treatment and AAE pulp diagnosis (`pulpDx`: normal / reversible / irreversible pulpitis / necrosis) are mutually exclusive — a root-treated tooth (`endo` set) cannot also carry a vital pulp diagnosis; on treatment, `pulpDx` is normalized to `normal` and the diseased-pulp glyph is suppressed. Reversible pulpitis renders a reduced pulp glyph. An optional 3-level pulp detail setting (`pulpDetailLevel`: simple / AAE / practical-Latin) surfaces 9 practical-Latin pulp subtypes (pulpa sana … gangraena pulpae) via `pulpLatin`; resection and parapulpal pin remain separate special indicators
+- 🦴 Apical diagnosis (`apicalDx`: symptomatic/asymptomatic apical periodontitis, acute/chronic apical abscess, condensing osteitis) drives the periapical glyph directly; a granuloma/cyst lesion-subtype qualifier is shown only under symptomatic/asymptomatic apical periodontitis (the redundant "abscess" subtype was dropped — it's already covered by the apical diagnosis)
+- 🩹 Merged "Root and periodontium" card (single collapsible section for root/periapical and periodontal findings)
+- ⚕️ Modifications: periapical inflammation (shown only on missing/extraction-socket teeth; hidden on present teeth, where `apicalDx` alone drives the periapical glyph, and on implants, where `periImplant` covers it), periodontal disease, mobility grades (M1/M2/M3, hidden on implants)
+- 🦷🔩 Peri-implant status (`periImplant`: none / mucositis / peri-implantitis-mild / -moderate / -severe) — 2018 World Workshop staging, shown as a dedicated selector on implants; mucositis reuses the periodontal gum glyph, peri-implantitis adds a graded `peri-implant-bone-loss` layer (opacity 0.4/0.7/1.0). Implants no longer render the periapical lesion glyph — their inflammation is expressed through this axis instead — and the periodontal-modifier checkboxes are hidden on implants (the ad-hoc "Peri-implantitis" checkbox relabel is retired)
+- 🏷️ Special indicators: crown needed, crown replacement needed, missing closed gap, extraction plan, fissure sealing, contact point loss
+- 👁️ Occlusal view, wisdom teeth, bone and pulp visibility toggles
+- 🔢 12 selection filters (all, present, permanent, milk, implants, missing, upper/lower, front/molars)
+- 📊 Predefined status presets (reset, primary dentition, mixed dentition, edentulous)
+- 📦 34 predefined restoration templates (bridges, removable dentures, bar dentures with implants)
+- 💾 Status export/import in JSON (version 2.20; imports still accept legacy 1.4 and 2.0 through 2.19 and migrate automatically, with plugin custom states and per-tooth notes)
+- 🧭 **Orthodontics is the third clinical view** (`odontogram-c51`): an `Odontogram | Periodontal Status | Orthodontics` switcher (`#appViewToggle`) houses the model-analysis card below. The odontogram is never unmounted, only hidden, so a change of view cannot disturb the chart. The orthodontic view has no dialog housing of its own and therefore stays a segment of the switcher even where the periodontal chart is configured as a popup — only the periodontal segment goes.
+- 📐 **Model analysis** (`odontogram-c51.1`): Tonn and Bolton from the mesiodistal crown widths, with the target incisor sum, the tooth-size discrepancy and which arch carries the surplus. Widths are entered on an arch or as a list — two views of one record. A tooth that is not on the model (not erupted, lost, under the gum) borrows its contralateral partner's width, visibly marked as an assumption. Plus overjet, overbite and the dental midline deviation per arch
+- 🔗 Aidbox Dental Core via `@cognovis/fhir-sdk`: hosts inject a gateway; the session loads and saves. JSON status export/import with migrations
+- ✚ Cross/plus surface selection UI (B/M/O/D/L) for caries and fillings
+- 🧱 Per-surface restoration materials (mixed fillings, e.g. buccal amalgam + distal composite)
+- 🖼️ PNG/JPG/SVG image export of the chart (downloadable; PNG/JPG rasterized from vector SVG)
+- 🦷 Caries/subcaries is a per-surface state machine: a caried surface with no filling renders as primary caries (ICDAS-tiered opacity); once a filling is present on that surface it renders as recurrent caries instead (the `subcaries-{surface}` layer, CARS-scored) — the two are never both active on the same surface
+- 🎯 Unified per-surface severity (`cariesSeverity`, 0–6, replacing the old separate ICDAS-depth + CARS fields): read as ICDAS depth on a primary surface, as a named CARS score (Sound … Extensive cavity) on a recurrent one, via a contextual popup that shows only the scale relevant to the surface's current state
+- 🌱 Root caries (`rootCaries`: none / active / arrested / active-cavitated), wiring the dedicated root-caries artwork layer at a severity-driven opacity (active 0.5 / arrested 0.7 / active-cavitated full)
+- 📡 Radiographic caries depth (`radiographicDepth`: none / E1 / E2 / D1 / D2 / D3 per surface), independent of the visual ICDAS/CARS severity scale and surfaced as a badge
+- 🎚️ Three caries granularity settings (`secondaryCariesMode`, `rootCariesMode`, `radiographicDepthMode`) plus a `cariesDepthEnabled` toggle, collapsing each scale to a simpler picker view without losing the stored value
+- 🩹 Fillings-panel subcaries summary line: lists any selected tooth with recurrent caries and its surfaces below the filling controls (e.g. "36 (O) has subcaries set on its filling.")
+- 🪛 Per-surface filling defects (`fillingDefect`: none / marginal / fracture / wear) on direct restorations, independent of recurrent caries — authored via a per-surface indicator on the Fillings card (mirroring the caries-depth indicator, its option list stacked vertically), rendered on the chart, and shown in the tooltip and the whole-mouth fillings summary with an explicit label (e.g. "36 (O) – Filling defect: O: marginal"), the same way recurrent caries is labeled on the Caries line; the Fillings card also shows a hint note for any selected tooth with a recorded filling defect (e.g. "36 has a filling defect recorded."), parallel to the existing subcaries hint note
+- 🔗 Retention elements that hold a removable denture to a natural tooth (`retention`: none / clasp / attachment / bar-abutment, plus `retentionSide`) — three anchorings, not one axis: a **clasp** needs only the tooth to be there (crowned or not), an **attachment** and a **bar abutment** need a crown to be built into. ONE value per tooth, never a set, so choosing one replaces the other and combinations that do not occur need no rule to forbid them. The clasp is DRAWN as a quarter-arc arm on the crown (belly toward the gingiva, one end at the height of contour, the other at the interdental space, mirrored per arch); the attachment and bar carry charly's own marks `( G )` and `ste`. A **bar span is derived**, never stored — abutments are connected across the edentulous space they exist to span, and one bar may rest on implant and natural abutments together
+- 🎨 **Restoration colours are choosable** (Settings → Colours). Every restoration fill in the assets is a CSS variable with the shipped colour as its fallback, so an unconfigured chart is byte-identical and picking a colour repaints through the cascade with no render-path JavaScript. e.max and metal-ceramic paint from a nine-stop ramp: picking re-hues it and KEEPS its lightness sweep, so ceramic still reads as ceramic. A practice preference, not part of the document — a case opened elsewhere renders in that practice's colours (`getRestorationPalette`/`setRestorationPalette` let a host persist it). The temporary's shipped default is a tooth shade (`#c8b392`, VITA classical A3): white was not a material colour but the absence of one — on a white ground a provisional bridge connector was reduced to its outline.
+- 🔩 An **empty implant product is a gap only where the practice placed the implant** (`isImplantProductGap`) — one the patient arrived with is a complete record, since not every patient carries an implant passport. Derived from the initial examination, never stored, and silent whenever no examination is archived: with no baseline there is no provenance to judge against.
+- 🦷🔻 Cervical involvement of a filling or a caries lesion (`cervicalSurfaces`: a membership set over the vestibular and oral surfaces) — the cervical region is **not** a sixth surface but a marker on an existing one (BEMA writes it as the suffix "vz"/"lz"), so it never changes the surface count a position tier reads (`getFillingSurfaceCount()`); authored in the same per-surface popup the caries and filling crosses open, badged on the surface cell with the suffix letter, and shown in the tooltip and on the whole-mouth line of the finding it qualifies. Deliberately not drawn on the chart — the side view has no lingual layer at all, so a marker available for one surface and structurally impossible for the other would read as "no oral involvement"
+- 🦷💥 Tooth wear typed by clinical cause and location (`wearEdge`: none / attrition / erosion, incisal/occlusal; `wearCervical`: none / abrasion / abfraction / erosion, cervical) — replacing the two on/off bruxism-wear flags; authored via two dropdowns on the wear row, reuses the existing wear artwork, and shown in the tooltip and a new whole-mouth "Wear" summary section
+- 🎨 Tooth discoloration by cause (`discoloration`: none / tetracycline / fluorosis / nonvital / extrinsic / other) on permanent and milk teeth — tints the shown natural crown a representative colour when the tooth has no restoration and natural substrate; shown in the tooltip and a new whole-mouth "Discoloration" summary section; completes the surface & structural conditions set alongside filling defects and wear
+- ✏️ Anterior teeth (incisors/canines) label their occlusal surface "incisal" throughout the UI (picker, popup, summaries); the stored surface key stays `occlusal`
+- 🔤 Position-aware surface notation (Settings → Tooth details → "Surface notation", simple/full, default full): in full mode the caries/filling surface letter and label follow tooth anatomy — occlusal → I/incisal on anterior teeth, buccal → L/labial on anterior teeth, lingual → P/palatal on upper teeth and L/lingual on lower teeth (mesial/distal/subcrown are unaffected); simple mode always uses the generic B/M/O/D/L/SC set regardless of tooth position. Applies to the whole-mouth summary and to both the caries and filling-defect surface pickers (letter + caption); the stored surface key is unaffected
+- 🦷↕️ Per-tooth orthodontic charting (`orthoAppliance`: none / bracket / band; `orthoDrift`: none / mesial / distal; `orthoVertical`: none / extrusion / intrusion; `orthoRotation`: boolean) on a present natural tooth (permanent or milk) — reuses the dormant v2.5.0 ortho artwork (no new SVG); shown on the chart, in the tooltip, and a new whole-mouth "Orthodontics" summary section
+- 🪨 Calculus, and root resorption typed as internal or external-cervical (`resorptionType`)
+- 📏 Per-surface caries depth (superficial / dentin / deep), or optional ICDAS II scoring (0–6) via `enableIcdas`
+- 🩹 Crown marginal-leakage toggle, shown only for a crown or bridge restoration
+- 🧰 Unified topbar icon row with a tabbed Settings modal (General / Panels / Tooth details / Caries / Pulpa / Notes / Periodontal — numbering, notes, panel visibility, ICDAS, caries-depth toggle, root/radiographic caries granularity, pulp detail level, tooth wear/discoloration detail level, tooth information)
+- 🗂️ Settings → "Panels" tab: independently show/hide the Statuses and Orthodontics whole-mouth summary panels
+- 🦷🩺 Settings → "Periodontal" tab: 16 per-index show/hide toggles for the perio-chart rows (grouped pocket/hygiene/mucogingival/support/peri-implant — PD/GM/CAL/BOP, plaque, PI, GI, CEJ visibility, root concavity, KG, GT, furcation, mobility, Miller class, mPI, mBI), each with a description, plus a translated-vs-canonical index-name display option (canonical = a fixed English/Latin scientific name in every UI language; tooltips always stay localized regardless of this setting). Both are app-level preferences (like `perioViewMode`) — never part of the export payload
+- 🩹 Secondary-caries (CARS) settings control merged into the Caries settings tab, positioned above Radiographic depth (the separate "Secondary caries" tab is retired)
+- 🎚️ Tooth details detail level (Settings → Tooth details): a simple/complex setting for tooth wear and for discoloration. Simple mode shows a yes/no toggle per finding (wear on → attrition/abrasion, discoloration on → other); complex mode (default) keeps the type/cause dropdowns, and the stored value is preserved when switching levels
+- 📋 Tooth information panel: live text summary of the whole chart (tooth counts, present/missing lists, caries incl. secondary, fillings, root canals, prosthetics, implants, periodontal status) — shown by default, toggleable in Settings
+- 🗂️ Consolidated Export dropdown (Status JSON / PNG / JPG)
+- 📥 Import dropdown (Status JSON)
+- ⏳ Progress overlay during image export
+- 🎓 12-step interactive intro tour
+- 🔢 Three numbering systems (FDI, Universal, Palmer)
+- 🌐 I18n — 12 UI languages (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR) with a language switcher; Arabic renders the UI right-to-left with the dental/perio charts pinned left-to-right (machine-translated, native-speaker review pending for AR/ZH/FR)
+- 🌗 Dark mode support with toggle button (standalone or controlled by parent app)
+- 🎨 Custom theme configuration (`themeConfig` prop) with CSS custom properties (`--odon-*`)
+- 📱 Mobile touch UX: tap-to-zoom popover, long-press context menu, pinch-to-zoom, WCAG 44px touch targets, arch toggle navigation
+- 🔌 Custom SVG plugin system: inject visual overlays, per-tooth custom state, JSON export/import support
+- ⚠️ State validation warnings for incompatible tooth state combinations
+- 🏷️ Automatic state tooltip on tooth tiles (shows all active states)
+- 🩺 Modernized per-tooth tooltip and whole-mouth summary panel: both surface the full set of clinical findings (pulp/apical diagnosis + lesion subtype, root resorption, peri-implant status, graded root caries, calculus, crown marginal leakage, fracture, contact loss, typed edge/cervical wear), with a dedicated "Diagnoses" section in the panel, a dedicated "Wear" section, and a coarse caries-severity qualifier (superficial/moderate/deep)
+- ♿ Keyboard accessibility (WCAG): ARIA listbox/option roles, Enter/Space selection, arrow key navigation, focus-visible outlines
+- 🔒 Read-only mode: disable all interactions for print/report/view use cases
+- ✨ Selection animations: pulsing dashed border and glowing drop-shadow on selected teeth (with prefers-reduced-motion support)
+- 📝 Per-tooth notes: double-click to add/edit notes, note icon next to tooth number, hover tooltip with note text, an "Individual notes" line in the whole-mouth summary panel, JSON export/import
+- 🔀 Status ↔ Plan chart split: a `Status | Plan` toggle in the chart header switches between a current-**status** chart and a **plan** (intended post-treatment) chart, each with its own tooth states; the plan chart starts as a copy of status the first time you switch to it, and edits in one chart never affect the other. Export/import (`exportStatus`/file import) always target the status chart; the plan chart is read/written separately via its own API (see Public API below) and — when it differs from status — is included as an additive `plan` section in the JSON export
+- 📝 "What changes" box: whenever the plan differs from the current status, a box under the Tooth-information panel lists every difference per tooth and per treatment axis (presence, substrate, restoration, prosthesis, planned crown, orthodontics, pulp/endo, apical) as a `tooth: axis  from → to` line; also available programmatically via `getPlanChanges()`
+
+![Full-mouth periodontal chart — English](screenshot_en_perio.png)
+
+- 🅿️ Proposed styling: in Plan mode, findings the plan **adds** vs the current status (planned crown, extraction, orthodontic movement, prosthesis, …) render with a distinct **dashed, tinted "proposed" outline** so the plan reads as intent, not fact — with a "dashed = proposed" legend in the chart card. Status-mode rendering is byte-identical; the treatment is plan-only and fully reset on switching back
+- 🚦 Plan-mode gating: the Plan chart shows only what a dentist can *do* — the base picker offers only Missing / Permanent / Implant, and status-only findings (caries, tooth wear, discoloration, and the whole periodontal block — mobility, six-site probing grid, inflammation/parodontal mods, calculus, peri-implant status) are hidden; the pulp/endo control keeps endodontic **treatment** (root canal / post / apicoectomy / parapulpal pin) while hiding pulp/apical **diagnosis** and root resorption. Restoration, prosthesis, orthodontics, crown-need/replace and extraction-plan stay plannable
+- 🧪 1746 automated tests passing (1 additional test skipped) (Vitest) across 164 test files (165 total) covering numbering, translations, presets, i18n, App component, theme, touch, plugins, accessibility, and clinical-axis/diagnosis parity
+- 📖 TypeDoc API documentation with JSDoc comments on all public exports (`bun run docs`)
+
+### 📦 Modules
+- 🦷 Odontogram grid and tooth tile UI
+- 🎛️ Controls and status panel
+- 🎨 SVG layering engine and templates
+- 🔢 Tooth numbering and label mapping (FDI/Universal/Palmer)
+- 🌐 Localization — 12 UI languages (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR), including Arabic (RTL)
+- 💾 Status export/import
+- 📋 Status extras: predefined restoration templates
+- 🎨 Theme configuration: customizable color palette via `--odon-*` CSS properties
+- 📱 Mobile touch interactions (tap-to-zoom, long-press, pinch-to-zoom, arch toggle)
+- 🔌 Custom SVG plugin system
+- ⚠️ State validation and tooltip system
+- ♿ Keyboard accessibility and ARIA support
+- 🔒 Read-only mode
+- ✨ Selection animations
+- 📝 Per-tooth notes system
+- 🧪 Automated test suite (Vitest + Testing Library)
+
+### 🛠️ UI Controls
+
+**🔝 Topbar:**
+- Language switcher (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR dropdown)
+- Dark mode toggle button (sun/moon icon, switches between light and dark theme)
+- Numbering system switcher (FDI/Universal/Palmer dropdown)
+- Export Status / Import Status buttons
+
+**📊 Chart header:**
+- Occlusal view toggle
+- Wisdom teeth visibility toggle
+- Bone visibility toggle
+- Pulp visibility toggle
+- Clear selection button
+
+**🔍 Selection filters:**
+- Select All / All Present / Permanent / Milk / Implants / All Missing
+- Select Upper / Upper Front 6 / Upper Molars
+- Select Lower / Lower Front 6 / Lower Molars
+
+**📋 Status presets:**
+- Reset All (reset mouth)
+- Primary Dentition
+- Mixed Dentition
+- Edentulous toggle
+
+**📦 Status extras dropdown:**
+- Upper/Lower zircon bridges (12-22, 13-23, 16-26, full arch)
+- Upper/Lower metal bridges (12-22, 13-23, 16-26, full arch)
+- Upper/Lower partial removable dentures
+- Upper/Lower full removable dentures
+- Upper/Lower bar dentures with implants
+
+**🦷 Tooth editor panel** (for the selected tooth/teeth, grouped into collapsible cards):
+- **Base row:** tooth selection (base type incl. broken-crown variants) and tooth substrate (natural/radix/broken/crownprep)
+- **Restoration row:** the combined restoration dropdown, grouped by kind (Crown / Bridge / Inlay / Onlay / Veneer / "Kivehető:") with every line naming its own type and material (`restorationType`×`restorationMaterial` fixed options plus the `prosthesis` attachment/removable options, gated by tooth kind); crown marginal-leakage checkbox (crown/bridge only); broken-crown location checkboxes; crown needed / crown replacement needed toggles
+- **Wear & discoloration row:** incisal/occlusal wear type dropdown, cervical wear type dropdown, discoloration cause dropdown (each swaps to a simple yes/no toggle under Settings → Tooth details → simple mode)
+- **Orthodontics card:** appliance, mesial/distal drift, vertical movement (extrusion/intrusion), rotation toggle — shown on a present natural tooth
+- **Caries card:** caries-depth mode dropdown, subcrown caries checkbox, root-caries severity dropdown, and the B/M/O/D/L per-surface caries picker with a contextual ICDAS-depth/CARS popup and a radiographic-depth badge
+- **Fillings card:** filling-material dropdown, per-surface filling picker (with per-surface material), per-surface filling-defect indicator (marginal/fracture/wear), subcaries and filling-defect hint notes
+- **Root and periodontium card:** merged "Pulp / Endo status" selector, independent root-post material selector, apical diagnosis selector, periapical lesion subtype selector (symptomatic/asymptomatic apical periodontitis only), root resorption type selector, mobility grade selector, peri-implant status selector (implants only)
+- **Special indicators:** extraction plan/wound, missing-closed, fissure sealing, contact-point loss, calculus, parapulpal pin, endo resection, bridge pillar
+
+### ⌨️ Charting by shorthand
+
+Findings are taken in seconds, often dictated. With 46 axes and 129 values the number of click
+paths is the bottleneck, so the chart can be filled the way a practitioner already types
+(`odontogram-t8y`):
+
+```
+mark 13–23        drag across the teeth, Shift + arrow, or Shift + click
+E                 material mode: ceramic — it stays set
+k                 six crowns, one keystroke
+```
+
+**The material comes first and stays**, as a mode rather than an afterthought. One material key
+has two readings, because a filling and a restoration draw on different value sets: `K mo` is a
+composite filling on two surfaces, `K k` a crown in Gradia. Where a reading does not exist, none
+is invented.
+
+**Tab steps to the next tooth**, Shift+Tab back, starting at 18 and running around the mouth
+(18–28, then 38–48) with a wrap. It moves the selection, not merely the focus, so the tooth you
+are standing on is highlighted. The arrow keys are unchanged.
+
+```
+G k    Tab    b          gold crown, then a pontic on the neighbour
+A  mod Tab               one amalgam filling over three surfaces
+c mod K3                 caries on three surfaces, at a severity
+```
+
+A key that is a finding on its own applies at once; what waits is only what cannot be complete
+yet. The mapping lives in `src/shorthand.ts`, DOM-free and independent of the engine, because the
+same finding set has to be reachable three ways: keystrokes, a FHIR query against a practice
+system, and speech.
+
+The shorthand is transcribed from the finding keypad of *charly* (solutio), not invented. Seven of its keys are understood and have no axis here
+yet; they are reported as such rather than silently ignored.
+
+A span follows the **arch**, not the geometry (`odontogram-apn`): across the midline (13 to 23)
+yes, across the jaw never.
+
+### 🦷 Tooth Types and States
+
+**Tooth selection (base type):**
+| Value | Description |
+|---|---|
+| `none` | Missing tooth |
+| `tooth-base` | Permanent tooth |
+| `milktooth` | Primary (deciduous) tooth |
+| `implant` | Dental implant |
+| `tooth-under-gum` | Subgingival (unerupted) tooth |
+
+**Broken tooth variants:**
+`tooth-broken-inicisal`, `tooth-broken-distal-inicisal`, `tooth-broken-distal`, `tooth-broken-mesial-distal-inicisal`, `tooth-broken-mesial-distal`, `tooth-broken-mesial-inicisal`, `tooth-broken-mesial`, `no-tooth-after-extraction`
+
+**Tooth substrate (permanent teeth):**
+`natural` (default), `radix` (root remnant), `broken`, `crownprep` (prepared for crown)
+
+**Restoration type (permanent teeth):**
+`none`, `crown`, `inlay`, `onlay` (occlusal view only), `veneer`, `bridge`
+
+**Restoration material (permanent teeth):**
+`none`, `emax`, `gold`, `gradia`, `zircon`, `metal`, `metal-ceramic` (legacy `metal` crowns migrate here), `telescope`, `temporary`
+
+**Restoration options are gated by tooth kind** (`restorationOptions()` in `src/registry/restorations.ts`): an implant offers only `crown`/`bridge` restoration types (composed with an implant connector layer) plus the five `prosthesis` attachment entries below; a missing/gap tooth offers only a `bridge` pontic plus the two removable-denture `prosthesis` entries; a `radix` substrate hides the restoration control entirely. The legacy flat `crownMaterial`/`bridgeUnit` fields (pre-v1.14 implant/bridge attachment values) are retired from the live model — only accepted as a read-only migration path for old payloads.
+
+**Prosthesis** (`prosthesis`; orthogonal removable/attachment axis, surfaced as "Kivehető:" entries in the combined restoration dropdown):
+`none`, `healing-abutment`, `locator`, `locator-denture`, `bar`, `bar-denture` (implant attachments, with or without an overdenture), `removable-partial`, `removable-full` (tooth-supported dentures on a missing/gap tooth). A tooth has either a fixed restoration or a prosthesis, never both — setting one clears the other.
+
+**Crown marginal leakage** (`crownLeakage`; boolean): shown only when `restorationType` is `crown` or `bridge`; activates the `crown-leakage` artwork layer.
+
+**Endodontic options (permanent teeth):**
+`none`, `endo-medical-filling`, `endo-filling`, `endo-filling-incomplete`
+
+**Root-post material (present teeth, independent from `endo`):**
+`none`, `glass-fiber`, `metal`
+
+**Endodontic options (milk teeth):**
+`none`, `endo-medical-filling`
+
+`endo` and `pulpDx` are surfaced through one merged "Pulp / Endo status" `<select>` (grouped: vital pulp vs. treated/endo) and are mutually exclusive — choosing a treated (`endo != none`) option resets `pulpDx` to `normal` and choosing a pulp diagnosis resets `endo` to `none`.
+
+**Filling materials (permanent teeth):**
+`amalgam`, `composite`, `gic`, `temporary`
+
+**Filling materials (milk teeth):**
+`composite`, `gic`, `temporary`
+
+**Filling/caries surfaces:**
+`mesial`, `distal`, `buccal`, `lingual`, `occlusal`, `subcrown` (caries only)
+
+**Modifications:**
+`inflammation` (periapical), `parodontal` (periodontal), `mobility` (M1/M2/M3)
+
+**Periapical lesion type** (`periapicalType`; qualifies the periapical glyph, shown only under symptomatic/asymptomatic apical periodontitis):
+`none`, `granuloma`, `cyst` — authoring options; the legacy `abscess` value is still accepted/stored but no longer offered in the picker, since it duplicates the apical diagnosis. On import it is dropped: folded into `apicalDx` when the tooth carries the inflammation modifier, otherwise cleared to `none`
+
+**Pulp diagnosis** (AAE terminology; `pulpDx`):
+`normal`, `reversible-pulpitis` (renders a reduced pulp glyph), `irreversible-pulpitis`, `necrosis` — mutually exclusive with `endo`; normalized to `normal` on a root-treated tooth
+
+**Pulp diagnosis, practical Latin** (`pulpLatin`; shown by the pulp picker only when `pulpDetailLevel` is `latin`):
+`none`, `pulpa-sana`, `hyperaemia-pulpae`, `pulpitis-acuta-serosa`, `pulpitis-acuta-purulenta`, `pulpitis-chronica-clausa`, `pulpitis-chronica-ulcerosa`, `pulpitis-chronica-hyperplastica`, `necrosis-pulpae`, `gangraena-pulpae`
+
+**Pulp detail level** (`pulpDetailLevel`, global setting): `simple`, `aae` (default), `latin` — controls which pulp vocabulary the picker offers
+
+**Apical diagnosis** (`apicalDx`; drives the periapical glyph):
+`normal`, `symptomatic-apical-periodontitis`, `asymptomatic-apical-periodontitis`, `acute-apical-abscess`, `chronic-apical-abscess`, `condensing-osteitis`
+
+**Root resorption type** (`resorptionType`):
+`none`, `internal`, `external-cervical`
+
+**Peri-implant status** (`periImplant`; implant-only, 2018 World Workshop staging): `mucositis` reuses the periodontal gum glyph; `peri-implantitis-*` adds the `peri-implant-bone-loss` layer at severity-scaled opacity (mild 0.4 / moderate 0.7 / severe 1.0). Implants no longer render the periapical lesion glyph (their inflammation is expressed via this axis instead), and the `mods` inflammation/parodontal checkboxes are hidden on implants:
+`none`, `mucositis`, `peri-implantitis-mild`, `peri-implantitis-moderate`, `peri-implantitis-severe`
+
+**Caries severity** (`cariesSeverity`; unified per-surface field, `0`–`6`): on a surface with no filling it is read as the ICDAS caries-depth scale (`superficial` / `dentin` / `deep`, or the raw ICDAS II codes `0–6` when `enableIcdas` is set) and renders the primary `caries-{surface}` layer; on a surface with a filling it is read as a named CARS score (`0` sound … `6` extensive cavity) and renders the `subcaries-{surface}` (recurrent-caries) layer instead — a surface is never both primary and recurrent at once
+
+**Root caries** (`rootCaries`; wires the `caries-root` artwork layer on a present tooth, opacity driven by severity — `active` 0.5 / `arrested` 0.7 / `active-cavitated` full):
+`none`, `active`, `arrested`, `active-cavitated`
+
+**Radiographic caries depth** (`radiographicDepth`; per surface, independent of the visual ICDAS/CARS `cariesSeverity` scale):
+`none`, `E1`, `E2`, `D1`, `D2`, `D3`
+
+**Caries granularity settings** (global): `secondaryCariesMode` (`simple`/`standard`/`full`, default `standard`), `rootCariesMode` (`simple`/`severity`, default `simple`), `radiographicDepthMode` (`off`/`threeLevel`/`detailed`, default `off`), `cariesDepthEnabled` (boolean, default `true`) — each collapses its scale to a simpler picker view without altering the stored value
+
+**Special indicators:**
+`crownNeeded`, `crownReplace`, `missingClosed`, `extractionPlan`, `extractionWound`, `bridgePillar`, `fissureSealing`, `contactMesial`, `contactDistal`, `endoResection`, `calculus`, `parapulpalPin`
+
+**Tooth wear** (`wearEdge`, `wearCervical`; per-location clinical type, gated on tooth-base + no restoration + natural substrate; render the existing `tooth-bruxism-wear`/`tooth-bruxism-neck-wear` layers):
+`wearEdge`: `none`, `attrition`, `erosion` — `wearCervical`: `none`, `abrasion`, `abfraction`, `erosion`
+
+**Discoloration** (`discoloration`; per-tooth cause, gated on a natural tooth-base or milk tooth + no restoration + natural substrate; tints the shown natural crown's fill — no new SVG):
+`none`, `tetracycline`, `fluorosis`, `nonvital`, `extrinsic`, `other`
+
+**Filling defect** (`fillingDefect`; per surface, direct-restoration finding independent of recurrent caries — gated to surfaces present in `fillingSurfaceMaterials`; renders the `defect-{surface}` artwork layer):
+`none`, `marginal`, `fracture`, `wear`
+
+**Retention element** (`retention` + `retentionSide`; per tooth, gated per element — a clasp needs a present tooth, an attachment and a bar need a crown; no artwork layer, drawn in the grid overlay):
+`none`, `clasp`, `attachment`, `bar-abutment` — `retentionSide`: `none`, `mesial`, `distal`, `both`. A **telescope** stays a crown MATERIAL and is recognised as retention rather than stored twice
+
+**Cervical involvement** (`cervicalSurfaces`; a membership set over `buccal`/`lingual`, gated to a surface that carries a filling, a caries lesion, or both — no artwork layer, deliberately not drawn):
+`buccal`, `lingual` — a marker on the surface, never a surface of its own: `getFillingSurfaceCount()` is untouched by it
+
+**Orthodontics** (`orthoAppliance`, `orthoDrift`, `orthoVertical`, `orthoRotation`; per-tooth, gated on a present natural tooth — permanent or milk):
+`orthoAppliance`: `none`, `bracket`, `band` — `orthoDrift`: `none`, `mesial`, `distal` — `orthoVertical`: `none`, `extrusion` (arrow-up glyph), `intrusion` (arrow-down glyph) — `orthoRotation`: boolean
+
+**Tooth detail / notation settings** (global session settings, Settings → Tooth details): `wearDetailLevel` and `discolorationDetailLevel` (`ToothDetailLevel`: `simple`/`complex`, default `complex` — simple mode shows a yes/no toggle instead of the full type/cause dropdown, without mutating the stored value) and `surfaceNotation` (`simple`/`full`, default `full` — controls whether caries/filling surface letters/labels are position-aware; see "Position-aware surface notation" above)
+
+### ⚙️ Settings
+Opened from the topbar gear icon; a focus-trapped, ARIA `dialog` with a tabbed layout (Esc/backdrop-click to close, arrow keys to switch tabs). All settings are session-level UI state only, unless noted — none of them mutate per-tooth data or the export payload.
+
+- **General:** numbering system (FDI/Universal/Palmer), language, dark/light theme, tooth-information panel visibility
+- **Panels:** independently show/hide the whole-mouth Statuses card and the Orthodontics card (both default visible)
+- **Tooth details:** wear detail level and discoloration detail level (simple/complex, each default complex), surface notation (simple/full, default full)
+- **Caries:** ICDAS II scoring toggle (`enableIcdas`), caries-depth toggle (`cariesDepthEnabled`), root-caries granularity (`rootCariesMode`: simple/severity), secondary/CARS granularity (`secondaryCariesMode`: simple/standard/full), radiographic-depth granularity (`radiographicDepthMode`: off/threeLevel/detailed) — the former separate "Secondary caries" tab is merged into this one, with the CARS control positioned directly above radiographic depth
+- **Pulpa:** pulp detail level (`pulpDetailLevel`: simple/AAE/practical-Latin, default AAE) — controls which vocabulary the "Pulp / Endo status" picker offers; changing it live-refreshes the whole-mouth summary and every open tooltip
+- **Notes:** enable/disable per-tooth notes (`enableNotes`)
+- **Periodontal:** per-index show/hide toggles for all 16 perio-chart rows (`perioRowVisibility`, default all visible), grouped Pocket (PD/GM/CAL/BOP) / Hygiene (Plaque/PI/GI) / Mucogingival (CEJ visibility/Root concavity/KG/GT) / Support (Furcation/Mobility/Miller class) / Peri-implant (mPI/mBI), each row with its own description; plus a translated-vs-canonical index-name mode (`perioIndexNameMode`: `translated` default / `canonical` — a fixed English/Latin scientific name shown in every UI language). App-level preferences only (mirrors `perioViewMode`) — never serialized, tooltips stay localized in either mode
+
+### 🖼️ SVG Template System
+
+**Tooth templates** (in `src/assets/teeth-svgs/`):
+| Template | Teeth using it |
+|---|---|
+| **Permanent teeth** | |
+| `11.svg` | 11, 21 |
+| `12.svg` | 12, 22 |
+| `13.svg` | 13, 23 |
+| `14.svg` / `14_occl.svg` | 14, 24 |
+| `15.svg` / `15_occl.svg` | 15, 25 |
+| `16.svg` / `16_occl.svg` | 16, 26 |
+| `17.svg` / `17_occl.svg` | 17, 27 |
+| `18.svg` / `18_occl.svg` | 18, 28 |
+| `41.svg` | 41, 31 |
+| `42.svg` | 42, 32 |
+| `43.svg` | 43, 33 |
+| `44.svg` / `44_occl.svg` | 44, 34 |
+| `45.svg` / `45_occl.svg` | 45, 35 |
+| `46.svg` / `46_occl.svg` | 46, 36 |
+| `47.svg` / `47_occl.svg` | 47, 37 |
+| `48.svg` / `48_occl.svg` | 48, 38 |
+| **Primary teeth** | |
+| `51.svg` | 51, 61 |
+| `52.svg` | 52, 62 |
+| `53.svg` | 53, 63 |
+| `54.svg` | 54, 64 |
+| `55.svg` | 55, 65 |
+| `81.svg` | 81, 71 |
+| `82.svg` | 82, 72 |
+| `83.svg` | 83, 73 |
+| `84.svg` | 84, 74 |
+| `85.svg` | 85, 75 |
+
+A tooth charted as a milk tooth is drawn from its own template, mounted in place of the permanent one; the permanent templates are rotated 180 degrees for the lower jaw and mirrored horizontally for the left side, and the primary ones follow the same mapping.
+
+**Icon SVGs** (in `src/assets/icon-svgs/`):
+`icon_8.svg` (wisdom), `icon_gum.svg` (bone), `icon_no_selection.svg` (clear), `icon_occl.svg` (occlusal view), `icon_pulp.svg` (pulp)
+
+### 🔢 Numbering Systems
+
+**FDI (ISO 3950):** Adult teeth 11-18, 21-28, 31-38, 41-48. Primary teeth 51-55, 61-65, 71-75, 81-85.
+
+**Universal (USA):** Adult teeth numbered 1-32. Primary teeth lettered A-T.
+
+**Palmer (Zsigmondy-Palmer):** Quadrant + position format (e.g. UR-1, LL-5). Primary teeth use letters A-E per quadrant.
+
+### 🚀 Usage
+
+The repository is a bun workspace: this package is the published chart SDK,
+`packages/odontogram-fhir` is the Aidbox transport, and `apps/standalone` is the
+app that consumes both. Run these from the **workspace root**:
+
+Development (serves the standalone app):
+```bash
+bun install
+bun run dev
+```
+Build the publishable libraries, then the app:
+```bash
+bun run build:lib
+bun run build
+```
+Preview the built app:
+```bash
+bun run --filter @cognovis/odontogram-standalone preview
+```
+
+### 🔗 Integration
+The component can be embedded in any React app.
+Example:
+```tsx
+import App from "./App";
+
+export default function Host(){
+  return (
+    <App
+      language="en"
+      onLanguageChange={(lang) => console.log(lang)}
+      numberingSystem="FDI"
+      onNumberingChange={(system) => console.log(system)}
+      darkMode={false}
+      onDarkModeChange={(dark) => console.log(dark)}
+    />
+  );
+}
+```
+
+**Dark mode integration:**
+- **Standalone mode:** Omit `darkMode` prop — the component manages its own theme state via the topbar toggle button and adds/removes the `.dark` class on `<html>`.
+- **Controlled mode:** Pass `darkMode` and `onDarkModeChange` — the parent app controls the theme. The toggle button still appears but calls `onDarkModeChange` instead of managing internal state. The parent is responsible for adding/removing the `.dark` class on `<html>`.
+
+**Custom theme:**
+```tsx
+<App
+  themeConfig={{
+    colors: {
+      accent: '#e74c3c',
+      background: '#fafafa',
+      text: '#222222',
+    },
+  }}
+/>
+```
+
+**Plugin integration:**
+```tsx
+import App, { type OdontogramPlugin, setPluginState } from "./App";
+
+const myPlugin: OdontogramPlugin = {
+  id: "implant-brand",
+  label: { en: "Implant Brand", hu: "Implantátum márka" },
+  layer: "overlay",
+  renderSvg: (toothNo, _quadrant, state) => {
+    if (!state) return null;
+    return `<text x="16" y="60" font-size="6" fill="#3b7bff">${state}</text>`;
+  },
+};
+
+<App plugins={[myPlugin]} />
+
+// Set plugin state for a tooth:
+setPluginState(11, "implant-brand", "Straumann");
+```
+
+**Controlled integration — the UI-domain document (since 2.3.0):**
+
+The component's clinical state is a **UI-domain document**: the same versioned
+JSON `exportStatus()` writes and `importStatus()` reads. That document — not
+FHIR — is what React state holds and what a host owns.
+
+Bind an instance to an isolated **session** to initialize and observe it, and to
+keep two mounted odontograms independent:
+
+```tsx
+import App, {
+  createOdontogramSession,
+  type OdontogramDocument, type OdontogramSession,
+} from "./App";
+
+const upper: OdontogramSession = createOdontogramSession(savedUpperDocument);
+const lower: OdontogramSession = createOdontogramSession(savedLowerDocument);
+
+<App session={upper} onDocumentChange={(doc: OdontogramDocument) => save("upper", doc)} />
+<App session={lower} onDocumentChange={(doc: OdontogramDocument) => save("lower", doc)} />
+```
+
+- `session.getDocument()` / `setDocument(doc)` / `subscribe(listener)` is the
+  document contract; `createOdontogramSession(initial?)` creates one. Hosts
+  derive treatment intent from `session.getPlanChanges()` (and may call
+  `session.getPlanChart()` / `getChartMode()` / `setChartMode()`). Module-level
+  `getPlanChanges` / `getPlanChart` / `getChartMode` / `setChartMode` are
+  shell-internal and bind to whichever session currently owns the engine. HKP
+  host applications should use the session methods, not the
+  singleton. A Dental Core export of a document with `plan` already emits
+  `CarePlan/plan` and per-tooth `ServiceRequest`s. The eleven source-preservation
+  axes documented below use referenced target-chart `Goal`s; established plan
+  fields continue to use profiled planned Observations.
+- A plain `document` prop instead of `session` makes the instance create and own
+  a private session seeded from it.
+- Passing **neither** keeps the historical standalone behaviour: the component
+  runs on the process-wide default session (`getDefaultOdontogramSession()`) and
+  every module-level entry point applies to it exactly as before. **No migration
+  is required.**
+- Only one session is *live* in the DOM engine at a time (it is a single global
+  engine bound to one tooth grid); the others keep their own document and stay
+  fully readable and writable through their session API.
+
+**FHIR / Dental Core:**
+
+FHIR conversion is a pure optional projection of the UI-domain document. Dental Core `de.cognovis.fhir.dental.core#0.10.0` is the sole FHIR contract; the recognized `odontogram-dental-core-0.6.0` marker remains readable for empty legacy collections, while unknown dialect markers are rejected. Version 4.0.0 maps through `@cognovis/fhir-sdk` only: there is no public `./fhir` JSON-bundle API and no local codegen. Live load/save go through Aidbox. Import, export, and re-export preserve the eleven source axes `implantPosition`, `crownFractureType`, `orthoProgressive`, `rootResection`, `papillaLoss`, `orthoBracketSide`, `cantilever`, `endoCanals`, `rootFractureRoot`, `rootResectionRoot`, and `apicalRoot`. For plans, those axes use a referenced target-chart `Goal`, while established plan fields continue to use profiled planned Observations; planned state stays separate from observed state and does not fabricate Devices or performed Procedures. Duplicate, conflicting, malformed, ambiguously addressed, or tooth-incompatible assertions are rejected. Root posts remain independent through `rootPostType`; legacy JSON and older `endo-glass-pin` / `endo-metal-pin` values migrate to `endo-filling` plus the post material. A clinical write requires a caller-provided or examination-context effective date and refuses writes that would lose populated clinical state. Since 5.0.0, `extractionPlan`, `crownNeeded` and `crownReplace` are written as Dental Core 0.8 tooth-level orders (SNOMED CT 55162003 / 426222000, with `restoration-renewal` on the crown fitting); orders written with the former local code are not read. Since 5.0.0 (via `@cognovis/fhir-sdk` 0.15.6) every tooth-state and chart-finding value is written and read only as its Dental Core code, with no local code system, fallback or alias; system URLs come from `@cognovis/fhir-sdk/terminology`.
+
+**Aidbox live mode (development, from 2.50.0):**
+
+The standalone app (`apps/standalone`) boots in live mode — on `?live`, on `?patient=<id>`, or whenever an Aidbox configuration is present in its environment — and then loads one patient's chart straight from an Aidbox server, renders it in the ordinary shell through the session API above, and writes changes back as Dental Core resources under deterministic ids, so a re-save updates instead of duplicating. Copy `apps/standalone/.env.example` to `apps/standalone/.env` and fill in a scoped machine client; see [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md). Never put an admin credential in `VITE_*`.
+
+The HTTP half is its own package, `@cognovis/odontogram-fhir`, which holds the Aidbox transport and gateway factory and depends on `@cognovis/fhir-sdk/client`. This package ships the Aidbox gateway **SPI** and the session load/save/write-plan delegates — the HTTP-free half, under `src/live` — and does **not** include `@cognovis/fhir-sdk/client`. The chart and transport 5.2.6 declare the required SDK peer `^0.22.0 || ^0.23.0` and exact dev pin `0.23.0` (Dental Core 0.10.0). The executable host pins SDK `0.23.0` and shares one copy without an override. Setup and the load/save mechanics are in [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+
+**Dated examinations, assessment status and peri-implant capture (from 2.4.0):**
+
+A periodontal case is re-examined over years, so a document can now carry the examination's
+own identity and an archive of earlier examinations:
+
+```ts
+setExaminationContext({
+  id: "exam-2026-06-30", subject: "Patient/123", effectiveDateTime: "2026-06-30",
+  performer: "Practitioner/dr-mueller", encounter: "Encounter/9912",
+});
+
+captureExamination({ effectiveDateTime: "2026-06-30" });
+listExaminations();
+getExamination(id);
+loadExamination(id);
+startExamination({ effectiveDateTime: "2027-01-15" });
+```
+
+- Each archived examination is an **independent snapshot** of the whole-mouth findings and case
+  context at capture time; later edits never reach into it, and capturing again files a
+  follow-up instead of overwriting the baseline a trend depends on.
+- Status and plan keep meaning **current versus proposed within one examination** — the plan
+  chart is never history and is never part of a snapshot.
+- Every identity field is an opaque, host-owned string that the component stores and
+  round-trips but never interprets. Documents written before payload 2.21 carry none of this
+  and hydrate unchanged.
+- **What the patient arrived with is derived from that archive, never stored.** Restorative work present at the EARLIEST archived examination is drawn **hatched**, so a crown the patient came with cannot be confused with one placed since. Nothing new is serialized: no payload bump, no FHIR mapping, no second record that could drift out of agreement with the archive. `getBaselineExamination()`, `getPreExistingAxes(toothNo)`, `getChangesSinceBaseline()`, `isToothPreExisting(toothNo)`.
+- The hatch marks **work, never the tooth and never the disease** — restorations, direct fillings, endodontic fillings and pins, apicoectomy, fissure sealing. A radix or an implant is a tooth, not work; caries, calculus and the periodontal findings are disease. The derivation stays broader than the drawing, so the tooltip and summary still report presence, substrate and caries.
+- The **initial examination is correctable**: `beginBaselineCorrection()` stashes today's findings and loads the baseline, `commitBaselineCorrection()` re-archives it under its own id and date, `cancelBaselineCorrection()` discards the correction. There is deliberately no per-tooth override — one account of what the patient arrived with, not a second note beside it.
+- An **imported chart with no archive of its own becomes the initial examination** (import menu, "This is the initial examination", default on), because that is the normal way a foreign chart enters the program. A document that brought its own archive keeps it, so a re-import is never re-dated over the patient's real intake date.
+
+Periodontal charting stores findings, not the act of looking, so "probed, did not bleed" and
+"nobody probed" used to look identical. Every axis in scope (PD, GM, BOP, suppuration,
+mobility, furcation, plaque, PI, GI, mPI, mBI, KG) can now say which it is:
+
+```ts
+setAssessmentStatus(16, "bop", "MB", "assessed");
+setAssessmentStatus(16, "pd", "DB", "unmeasurable");
+getAssessmentStatus(16, "mpi", "buccal");
+perioAxisApplies(16, "gm");
+perioAxisApplies(11, "gm");
+```
+
+Not-applicable is derived from what the tooth actually is, and a real measurement always wins
+over a recorded gap. On export an unavailable value becomes FHIR's own `dataAbsentReason` —
+never a renderer-invented clinical code — and assessed-normal becomes an explicit `false` or
+grade `0`.
+
+**Authoring (from 2.7.0):** an **Assessment status** toggle in the periodontal chart header
+adds a companion row under every visible index row, with one cycle button per measurement point
+— site, surface, furcation entrance, or the whole tooth. The rows are off by default. A point
+that already holds a measurement is locked (the value is its own evidence of examination), and an
+inapplicable position is disabled rather than silently ignored. Recorded statuses also appear in
+the tooth tooltip and the whole-mouth periodontal summary.
+
+The full-mouth periodontal chart now also captures **suppuration** per site, and an implant
+column supports the peri-implant examination: six-site probing depth, bleeding, suppuration,
+implant mobility and keratinized-tissue width. Only the axes that need a CEJ (gingival margin
+and the CAL derived from it) and the natural-tooth plaque indices stay inactive there — mPI
+and mBI are their peri-implant equivalents.
+### 🧪 Testing
+```bash
+bun run test           # Run all 1704 tests (1 additional test skipped)
+bun run test:watch     # Watch mode
+bun run test:coverage  # Coverage report
+```
+
+### 📖 API Documentation
+```bash
+bun run docs           # Generate TypeDoc docs in docs/
+```
+
+### 📡 Public API
+
+**Component props:**
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `language` | `string` | `'hu'` | UI language (hu/en/de/es/it/sk/pl/ru/pt-br/ar/zh/fr) |
+| `onLanguageChange` | `(lang) => void` | — | Callback when language changes |
+| `numberingSystem` | `string` | `'FDI'` | Numbering system (FDI/Universal/Palmer) |
+| `onNumberingChange` | `(system) => void` | — | Callback when numbering changes |
+| `darkMode` | `boolean` | `undefined` | Dark mode state. Omit for standalone mode. |
+| `onDarkModeChange` | `(dark) => void` | — | Callback when dark mode toggles. Required for controlled mode. |
+| `themeConfig` | `OdontogramThemeConfig` | `undefined` | Custom color overrides via CSS custom properties (`--odon-*`). |
+| `plugins` | `OdontogramPlugin[]` | `undefined` | Custom SVG plugins for visual overlays and per-tooth custom state. |
+| `readOnly` | `boolean` | `undefined` | Disable all interactions (click, touch, keyboard). Useful for print/report views. |
+| `enableNotes` | `boolean` | `undefined` | Enable per-tooth notes. Double-click a tooth to add/edit notes. |
+
+**Exported functions for external control:**
+
+| Function | Description |
+|---|---|
+| `initOdontogram()` | Initialize the engine and render all teeth |
+| `destroyOdontogram()` | Clean up the engine and remove event listeners |
+| `setNumberingSystem(system)` | Switch between FDI, Universal, Palmer |
+| `clearSelection()` | Deselect all teeth |
+| `setOcclusalVisible(on)` | Toggle occlusal view on/off |
+| `setWisdomVisible(on)` | Show/hide wisdom teeth |
+| `setShowBase(on)` | Show/hide bone layer |
+| `setHealthyPulpVisible(on)` | Show/hide healthy pulp |
+| `registerPlugins(plugins)` | Register custom SVG plugins |
+| `setPluginState(toothNo, pluginId, value)` | Set a plugin's custom state for a tooth |
+| `getPluginState(toothNo, pluginId)` | Get a plugin's custom state for a tooth |
+| `getToothStateSummary(toothNo)` | Get localized summary of all active states |
+| `getOdontogramSummary()` | Get a structured, localized text summary of the whole chart (counts, sections) |
+| `onStateChange(callback)` | Subscribe to state changes; returns an unsubscribe function |
+| `setReadOnly(value)` | Enable/disable read-only mode |
+| `getReadOnly()` | Get current read-only state |
+| `setNotesEnabled(value)` | Enable/disable per-tooth notes |
+| `getNotesEnabled()` | Get current notes-enabled state |
+| `setPulpDetailLevel(level)` | Set the pulp picker's vocabulary — `"simple"`, `"aae"`, or `"latin"` |
+| `getPulpDetailLevel()` | Get the current pulp detail level |
+| `getChartMode()` | Get the currently active chart — `"status"` or `"plan"` |
+| `setChartMode(mode)` | Switch the active chart to `"status"` or `"plan"`; the plan chart is deep-copied from status the first time it's entered |
+| `getStatusChart()` | Get the status chart's payload (`{version, globals, teeth}`), independent of which chart is currently active |
+| `getPlanChart()` | Get the plan chart's payload (`{version, globals, teeth}`), independent of which chart is currently active |
+| `setPlanChart(payload)` | Replace the plan chart's teeth from a payload (status is left untouched); marks the plan chart initialized |
+| `getPlanChanges()` | Get the structured status→plan diff (`{ toothNo, axis, from, to }[]`) — one entry per tooth per treatment axis that differs between the status and plan charts; empty when no plan exists. Also surfaced on `getOdontogramSummary()` as `plannedChanges` |
+| `setPerioSite(toothNo, site, patch)` | Set periodontal data for one of the six sites (`patch` = `{ pd?, gm?, bop?, sup? }`); `pd` null/`<1` un-charts the site. Validates + clamps (PD 1–15, GM −10…+20) |
+| `getToothPerio(toothNo)` | Get a tooth's per-site periodontal record (charted sites only) |
+| `getToothCal(toothNo)` | Get derived per-site CAL (`pd + gingival margin`) for a tooth |
+| `getPerioSummary()` | Whole-mouth periodontal aggregates: charted-site count, bleeding count, %BOP, worst CAL, max PD |
+| `getPerioChart()` | Get the active chart's per-tooth periodontal records |
+| `PerioChart` | React component (named export) — the full-mouth perio-chart overlay (`{ open, onClose }`), mountable independently of `OdontogramShell` for host integration |
+| `openPerioOverlay()` / `closePerioOverlay()` / `isPerioOverlayOpen()` | Programmatically open/close/query the perio-chart overlay — lets a host call up the periodontal chart separately from the base odontogram (shared case state) |
+| `getPerioViewMode()` / `setPerioViewMode(mode)` | Get/set how the perio chart is surfaced — `"toggle"` (an `Odontogram \| Dental Chart` view toggle, default) or `"popup"` (the overlay) |
+| `getPerioOverlayLayer()` / `setPerioOverlayLayer(layer)` | Get/set the Dental Chart highlight overlay — `"none"` (default) / `"pd"` / `"cal"` / `"gr"` / `"plaque"` / `"bop"` / `"pd5"` / `"pd6"` / `"cairo"`; repaints the teeth by that measure (display-only over existing data) |
+| `getToothRecessionType(toothNo)` | Get the derived **Cairo recession type** — `"none"` / `"rt1"` / `"rt2"` / `"rt3"` (computed from the tooth's interproximal vs buccal CAL) |
+| `setCejVisibility(toothNo, v)` / `getCejVisibility(toothNo)` | Per-tooth CEJ visibility — `"none"` / `"detectable"` / `"not-detectable"` |
+| `setRootConcavity(toothNo, v)` / `getRootConcavity(toothNo)` | Per-tooth root-surface concavity — `"none"` / `"mild"` / `"deep"` |
+| `setPlaqueIndex(toothNo, surface, grade)` / `getPlaqueIndex(toothNo, surface)` | Per-surface Silness-Löe Plaque Index grade — `0`-`3` |
+| `setGingivalIndex(toothNo, surface, grade)` / `getGingivalIndex(toothNo, surface)` | Per-surface Löe-Silness Gingival Index grade — `0`-`3` |
+| `setKeratinizedWidth(toothNo, mm)` / `getKeratinizedWidth(toothNo)` | Per-tooth buccal keratinized gingiva width in mm — `0`-`15`, or `null` if not charted |
+| `setGingivalThickness(toothNo, v)` / `getGingivalThickness(toothNo)` | Per-tooth gingival thickness phenotype — `"unknown"` / `"thin"` / `"medium"` / `"thick"` |
+| `setMillerClass(toothNo, v)` / `getMillerClass(toothNo)` | Per-tooth Miller recession class — `"none"` / `"i"` / `"ii"` / `"iii"` / `"iv"` |
+| `setPeriImplantPlaque(toothNo, surface, grade)` / `getPeriImplantPlaque(toothNo, surface)` | Implant-only — per-surface Mombelli modified Plaque Index (mPI) grade — `0`-`3`; no-op on a non-implant tooth |
+| `setPeriImplantBleeding(toothNo, surface, grade)` / `getPeriImplantBleeding(toothNo, surface)` | Implant-only — per-surface Mombelli modified Sulcus Bleeding Index (mBI) grade — `0`-`3`; no-op on a non-implant tooth |
+| `furcationEntrances(toothNo)` | The furcation entrances for a tooth — `["mesial","distal","buccal"]` (upper molars), `["buccal","lingual"]` (lower molars), `["mesial","distal"]` (upper first premolars), else `[]` |
+| `setFurcation(toothNo, entrance, grade)` / `getToothFurcation(toothNo)` | Set/get per-entrance furcation involvement (Glickman `1`–`4`; `null` clears) |
+| `setPlaque(toothNo, surface, present)` / `getToothPlaque(toothNo)` | Set/get O'Leary plaque presence per surface (mesial/distal/buccal/lingual); feeds the whole-mouth PI% in `getPerioSummary()` |
+| `getCaseMeta()` | Get the case-level metadata object (`{age, smokingStatus, cigarettesPerDay, diabetesStatus, hba1c, toothLossPerio, maxRblPercent, patientName, patientDob, examDate}`) — a single shared block, not per-tooth/dual-state (mirrors the top-level `globals` payload key); feeds the periodontal staging/grading classification |
+| `setPatientName(v)` | Set the case's patient name (trimmed; empty string or `null` clears it) — identity-only, never fed into the periodontal derivation |
+| `setPatientDob(v)` | Set the case's patient date of birth (`YYYY-MM-DD`; invalid/empty clears it)|
+| `setExamDate(v)` | Set the case's exam date (`YYYY-MM-DD`; invalid/empty clears it) |
+| `setCaseAge(v)` | Set the case's patient age in years — `0`-`120`, or `null` to clear |
+| `setSmokingStatus(v)` | Set the case's smoking status — `"unknown"` / `"never"` / `"former"` / `"current"` |
+| `setCigarettesPerDay(v)` | Set cigarettes/day (only meaningful when smoking status is `"current"`) — `0`-`99`, or `null` to clear |
+| `setDiabetesStatus(v)` | Set the case's diabetes status — `"unknown"` / `"none"` / `"present"` |
+| `setHba1c(v)` | Set HbA1c % (only meaningful when diabetes status is `"present"`) — `3.0`-`20.0` (one decimal), or `null` to clear |
+| `setToothLossPerio(v)` | Set teeth lost to periodontitis — `0`-`32`, or `null` to clear |
+| `setMaxRblPercent(v)` | Set max radiographic bone loss % — `0`-`100`, or `null` to clear |
+| `resetCaseMeta()` | Reset the case-level metadata object to its empty defaults |
+| `getPerioClassification()` | Get the 2017 World Workshop periodontal classification (`{diagnosis, stage, grade, extent, derived, overridden}`) — diagnosis/stage/grade/extent derived from the charted perio data and case metadata, each axis replaced by its clinician override when set (`derived` always exposes the untouched computed values, `overridden` flags which axes were overridden) |
+| `setDiagnosisOverride(v)` | Override the derived periodontal diagnosis — `"health"` / `"gingivitis"` / `"periodontitis"`, or `null` to clear (revert to derived) |
+| `setStageOverride(v)` | Override the derived periodontal stage — `"I"` / `"II"` / `"III"` / `"IV"`, or `null` to clear (revert to derived) |
+| `setGradeOverride(v)` | Override the derived periodontal grade — `"A"` / `"B"` / `"C"`, or `null` to clear (revert to derived) |
+| `setExtentOverride(v)` | Override the derived periodontal extent — `"localized"` / `"generalized"` / `"molar-incisor"`, or `null` to clear (revert to derived) |
+| `exportImage(format)` | Download the chart as an image — `"png"` or `"jpg"` |
+| `exportSvg()` | Download the chart as a scalable SVG (vector) |
+| `hasAnyPerioData()` | `true` iff any periodontal axis is charted anywhere in the mouth — drives the perio export auto-skip and disables the perio export-menu items on a blank chart |
+| `startIntroTour()` | Launch the 12-step interactive intro tour |
+
+### 💾 Status Export/Import Format
+The export creates a JSON file (version `2.20`; imports also accept legacy `1.4` and `2.0` through `2.19` and migrate automatically) containing:
+
+**Global fields:**
+- `wisdomVisible` - wisdom teeth visible
+- `showBase` - bone layer visible
+- `occlusalVisible` - occlusal view active
+- `showHealthyPulp` - healthy pulp visible
+- `edentulous` - edentulous mode active
+
+**Per-tooth fields (32 teeth):**
+- `toothSelection` - base tooth type
+- `toothSubstrate` - tooth substrate (natural/radix/broken/crownprep), orthogonal to any restoration
+- `restorationType` - restoration type (none/crown/inlay/onlay/veneer/bridge)
+- `restorationMaterial` - restoration material (emax/gold/gradia/zircon/metal/metal-ceramic/telescope/temporary), paired with `restorationType`
+- `prosthesis` - removable/attachment axis (none/healing-abutment/locator/locator-denture/bar/bar-denture/removable-partial/removable-full), mutually exclusive with a fixed `restorationType` of crown/bridge
+- `crownLeakage` - crown marginal-leakage flag, meaningful only when `restorationType` is crown or bridge
+- `endo` - endodontic filling state; mutually exclusive with `pulpDx` (surfaced together via one merged "Pulp / Endo status" picker — treating a tooth normalizes `pulpDx` to `normal`)
+- `rootPostType` - root-post material (`none`, `glass-fiber`, `metal`), independent from `endo`
+- `mods` - modifications array (inflammation, parodontal); `inflammation` is retired from the UI on present teeth (`apicalDx` drives the glyph there) but still applies to missing/extraction-socket teeth
+- `caries` - active caries surfaces
+- `cariesActiveDepth` - the ICDAS depth value staged by the caries-depth picker when a new surface is applied (not a per-surface stored value; see `cariesSeverity` for the stored per-surface field)
+- `rootCaries` - root caries severity (none/active/arrested/active-cavitated)
+- `cariesSeverity` - unified per-surface severity (0-6): ICDAS depth on a primary (unfilled) surface, CARS score on a recurrent (filled) surface
+- `radiographicDepth` - per-surface radiographic caries depth (none/E1/E2/D1/D2/D3), independent of the visual ICDAS/CARS scale
+- `fillingMaterial` - filling material
+- `fillingSurfaces` - filled surfaces
+- `fillingSurfaceMaterials` - per-surface filling material (mixed fillings, e.g. buccal amalgam + distal composite)
+- `retention` - what holds a removable denture to this tooth (none/clasp/attachment/bar-abutment); one value, never a set
+- `retentionSide` - the side the retention element engages (none/mesial/distal/both), as charly records it
+- `fillingDefect` - per-surface filling defect (none/marginal/fracture/wear), filled-surface-gated, independent of recurrent caries
+- `cervicalSurfaces` - the surfaces whose filling or caries lesion extends into the cervical region (buccal/lingual); a marker on the surface rather than a sixth surface
+- `pulpDx` - AAE pulp diagnosis (normal/reversible-pulpitis/irreversible-pulpitis/necrosis); reversible-pulpitis renders a reduced glyph
+- `pulpLatin` - practical-Latin pulp subtype (shown by the pulp picker only when `pulpDetailLevel` is `latin`)
+- `apicalDx` - apical diagnosis driving the periapical glyph
+- `periapicalType` - periapical lesion subtype (none/granuloma/cyst), shown only under symptomatic/asymptomatic apical periodontitis; legacy `abscess` still accepted on import
+- `resorptionType` - root resorption type (none/internal/external-cervical)
+- `periImplant` - implant-only peri-implant status (none/mucositis/peri-implantitis-mild/-moderate/-severe), 2018 World Workshop staging
+- `endoResection` - apicoectomy flag
+- `fissureSealing` - fissure sealant flag
+- `calculus` - calculus flag
+- `contactMesial` - mesial contact point loss
+- `contactDistal` - distal contact point loss
+- `wearEdge` - incisal/occlusal wear type (none/attrition/erosion)
+- `wearCervical` - cervical wear type (none/abrasion/abfraction/erosion)
+- `discoloration` - per-tooth discoloration cause (none/tetracycline/fluorosis/nonvital/extrinsic/other), tints the natural crown fill on a natural tooth-base/milk tooth with no restoration
+- `orthoAppliance` - orthodontic appliance (none/bracket/band)
+- `orthoDrift` - orthodontic drift (none/mesial/distal)
+- `orthoVertical` - orthodontic vertical movement (none/extrusion/intrusion)
+- `orthoRotation` - orthodontic rotation flag
+- `brokenMesial`, `brokenIncisal`, `brokenDistal` - fracture locations
+- `extractionWound` - post-extraction wound
+- `extractionPlan` - planned extraction
+- `parapulpalPin` - parapulpal pin flag
+- `bridgePillar` - bridge abutment tooth
+- `mobility` - mobility grade (none/m1/m2/m3)
+- `crownNeeded` - crown needed indicator
+- `crownReplace` - crown replacement needed indicator
+- `missingClosed` - gap closed after extraction
+- `customStates` - plugin custom states (object, keyed by plugin ID)
+- `note` - per-tooth text note (string, optional — only present when non-empty)
+
+**Top-level `plan` field (version 2.11+):**
+- `plan` - optional object, same shape as `teeth` (per-tooth fields above), holding the **plan** (intended post-treatment) chart. Present only when the plan chart has been initialized (the `Status | Plan` toggle has been switched to Plan at least once) AND its content differs from the status chart — a status-only export omits it entirely and stays byte-identical to a pre-2.11 export apart from the version number. On import, an absent `plan` clears/uninitializes the plan chart (it never resurrects a stale plan left over from before the import); a present `plan` restores the plan chart alongside status. The plan chart can also be read/written independently of import/export via `getPlanChart()`/`setPlanChart()` (see Public API above), and `getStatusChart()` always returns the status-primary payload regardless of the active chart mode.
+
+**Top-level `case` field (version 2.17+, extended in 2.18, 2.19 and 2.20):**
+- `case` - optional object holding case-level (not per-tooth) metadata, shared by both the status and plan charts (mirrors the top-level `globals` key). Omit-when-empty: absent entirely when every field is at its default, so a case-less export stays byte-identical apart from the version number. Fields (each omitted when at its default): `age`; `smokingStatus` (+ `cigarettesPerDay`); `diabetesStatus` (+ `hba1c`); `toothLossPerio`; `maxRblPercent`; the four 2017-classification per-axis clinician overrides `diagnosisOverride` / `stageOverride` / `gradeOverride` / `extentOverride`; (version 2.19) `patientName` / `examDate`; and (version 2.20) `patientDob`. It feeds the periodontal staging/grading classification; read/written via `getCaseMeta()` and the `setCase*` setters (see Public API above). Patient name, date of birth and exam date are chart-identity metadata only — they are **not** part of the FHIR export.
+
+### 🖨️ Export
+Beyond the odontogram's own Status JSON / PNG / JPG / SVG export, the **periodontal chart** has its own export path:
+- Patient name, date of birth and exam date are chart-identity metadata only (payload `2.20`, additive) — they are **not** part of the FHIR export.
+
+### 📁 Folder Structure
+- `src/App.tsx` - shell UI, topbar controls, language/numbering/dark mode/theme/plugin switcher
+- `src/odontogram.ts` - SVG layering engine, tooth state management, touch interactions, plugin overlays, UI wiring
+- `src/plugin.ts` - `OdontogramPlugin` type, `PluginLayer`, `getQuadrant()`, `LAYER_Z` z-index priorities
+- `src/theme.ts` - `OdontogramThemeConfig` type and `applyThemeConfig()` utility
+- `src/status_extras.ts` - 34 predefined restoration templates (bridges, dentures, bar constructions)
+- `src/i18n/` - translations (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR/AR/ZH/FR) and i18n hook
+- `src/utils/numbering.ts` - FDI, Universal, Palmer numbering conversion
+- `src/registry/` - declarative clinical-axis and UI registry: axis metadata, SVG activation, restoration type×material matrix, value catalogue, and option lists; FHIR mappings are owned by `src/fhir/`
+- `src/fhir/` - sole Dental Core HL7 FHIR R4 seam: `toFhirDentalCore.ts`/`fromFhirDentalCore.ts` codec over `@cognovis/fhir-sdk`, `dentalCoreContract.ts`, and `dentalCoreLocalCoding.ts` helpers
+- `src/bridgeOverlay.ts` - multi-tooth bridge-span connector overlay (arch-aware saddle geometry)
+- `src/SettingsModal.tsx` - tabbed Settings dialog (General/Panels/Tooth details/Caries/Pulpa/Notes/Periodontal)
+- `src/__tests__/` + `src/registry/__tests__/` - Vitest test suite (1721 tests passing, 1 skipped, across 163 files, 164 total)
+- `src/assets/teeth-svgs/` - SVG tooth templates (40 files: one per position - 16 permanent side views, 10 deciduous, 14 occlusal)
+- `src/assets/icon-svgs/` - toolbar icon SVGs (5 files)
+
+### ⚙️ Tech Stack
+- React 18 + Vite + TypeScript
+- Tailwind CSS for UI styling
+- SVG layering via DOM manipulation (non-React state for performance)
+- Lightweight custom i18n system
+- Vitest + Testing Library for automated tests
+- TypeDoc for API documentation
+- Vite path alias: `@` mapped to `./src`
+
+### 📝 Notes
+- SVG templates are loaded from `src/assets/teeth-svgs` and `src/assets/icon-svgs`, so static hosting must serve the public folder.
+- The odontogram engine uses its own internal state (not React state) for performance and simplicity.
+- Milk teeth have a reduced set of available materials (no amalgam fillings, no pin-based endo).
+- Implant teeth have a different set of crown/abutment options than natural teeth.
+
+### 📖 How to cite
+
+If you use this module in your work, please cite it.
+
+**This version (v1.49.0):**
+> Dul, Z. (2026). *React Advanced Odontogram* (v1.49.0). Zenodo. https://doi.org/10.5281/zenodo.21156787
+
+**All versions (concept DOI):** https://doi.org/10.5281/zenodo.21156787
+
+> The all-versions concept DOI above always resolves to the most recent archived
+> release; a version-specific DOI is minted per release when it is archived on
+> Zenodo. Until v1.49.0 is archived, cite it via the concept DOI.
+
+Machine-readable citation metadata is in [`CITATION.cff`](../../../CITATION.cff).

@@ -1,0 +1,3887 @@
+/* GitHub cognovis/odontogram#44: a host imports this stylesheet globally, so
+   nothing here may style its page. The chart's tokens live on the chart root
+   and on `.odontogram-portal`, the class every surface the package appends to
+   <body> (tour, popovers, context menu, overlays) carries — those sit outside
+   .odontogram-root and would otherwise lose the tokens. No :root, html, body
+   or * rule: the page itself belongs to the host (apps/standalone styles its
+   own page in src/page.css).
+   When themeConfig is applied via JS, --odon-* properties are set on .odontogram-root.
+   Re-resolve the shorthand variables so children pick up the overrides. */
+.odontogram-root,
+.odontogram-portal{
+  --bg: var(--odon-bg, #f3f6fb);
+  --panel: var(--odon-panel, #ffffff);
+  --card: var(--odon-card, #ffffff);
+  --muted: var(--odon-muted, #5b6b7d);
+  --text: var(--odon-text, #1e2a3a);
+  --line: var(--odon-line, #d7e0ec);
+  --accent: var(--odon-accent, #3b7bff);
+  --accent2: var(--odon-accent2, #12b981);
+  color: var(--text);
+}
+.dark .odontogram-root,
+.dark .odontogram-portal{
+  --bg: var(--odon-bg, #0f172a);
+  --panel: var(--odon-panel, #1e293b);
+  --card: var(--odon-card, #1e293b);
+  --muted: var(--odon-muted, #94a3b8);
+  --text: var(--odon-text, #f1f5f9);
+  --line: var(--odon-line, #334155);
+}
+.odontogram-root,
+.odontogram-root *,
+.odontogram-portal,
+.odontogram-portal *{box-sizing:border-box}
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px;
+  border-bottom:1px solid var(--line);
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(10px);
+  position:sticky; top:0; z-index:10;
+}
+.brand{display:flex; gap:12px; align-items:center}
+.dot{width:10px;height:10px;border-radius:999px;background:var(--accent2); box-shadow:0 0 0 6px rgba(18,185,129,.12);}
+.title{font-weight:700; letter-spacing:.2px}
+.subtitle{font-size:12px; color:var(--muted); margin-top:2px}
+.topbar-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.topbar-group{display:flex; align-items:center; gap:8px}
+.segmented{display:flex; gap:6px}
+.btn{
+  border:1px solid var(--line);
+  color:var(--text);
+  background:rgba(59,123,255,.12);
+  padding:8px 12px; border-radius:12px;
+  cursor:pointer; font-weight:600;
+}
+.btn-sm{
+  padding:6px 10px;
+  font-size:12px;
+}
+.btn:hover{background:rgba(59,123,255,.18)}
+.btn-ghost{background:rgba(0,0,0,.04)}
+.btn-ghost:hover{background:rgba(0,0,0,.08)}
+.btn-danger{
+  background: rgba(217,69,69,.12);
+  border-color: rgba(217,69,69,.4);
+  color:#b83a3a;
+}
+.btn-danger:hover{background: rgba(217,69,69,.2)}
+.btn-toggle[aria-pressed="true"]{
+  background: rgb(100 15 235 / 20%);
+  border-color: rgba(18,185,129,.5);
+}
+.btn-toggle[aria-pressed="false"]{
+  background: rgba(0,0,0,.04);
+}
+
+.dropdown{position:relative}
+.dropdown-menu{
+  position:absolute;
+  right:0;
+  top:100%;
+  margin-top:6px;
+  background: #fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow: 0 12px 24px rgba(30,42,58,.12);
+  padding:6px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:180px;
+  z-index:20;
+}
+.dropdown-item{
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.04);
+  color: var(--text);
+  padding:8px 10px;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+  text-align:start;
+}
+.dropdown-item:hover{background: rgba(0,0,0,.08)}
+.dropdown-item:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+.dropdown-item:disabled:hover{background: rgba(0,0,0,.04)}
+.dropdown-item[aria-checked="true"]{
+  background: rgba(59,123,255,.18);
+  border-color: rgba(59,123,255,.45);
+}
+
+.odontogram-root select,
+.odontogram-portal select{
+  appearance: none;
+  border:1px solid var(--line);
+  background:rgba(59,123,255,.12);
+  color:var(--text);
+  padding:8px 34px 8px 12px;
+  border-radius:12px;
+  font-weight:600;
+  min-width:220px;
+  cursor:pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text) 50%),
+    linear-gradient(135deg, var(--text) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 52%,
+    calc(100% - 12px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat:no-repeat;
+}
+.odontogram-root select:focus,
+.odontogram-portal select:focus{
+  outline:none;
+  box-shadow: 0 0 0 3px rgba(59,123,255,.18);
+}
+
+.layout{
+  display:grid;
+  grid-template-columns: 1fr 360px;
+  gap:14px;
+  padding:14px;
+}
+/* P2 Task 1: slim bar at the top of <main class="layout">, spanning both grid
+   columns, holding the "open Perio overlay" button. Separate from the topbar
+   and from .chart-actions — the overlay is invocable independently of any
+   specific tooth/chart UI. */
+.perio-launch-bar{
+  grid-column: 1 / -1;
+  /* Seit odontogram-c51 stehen hier zwei Dinge nebeneinander, sobald der
+     Parodontalstatus als Dialog eingestellt ist: der Ansichtsumschalter
+     (Odontogram | KFO) und der Knopf, der den Dialog oeffnet. Ohne Abstand
+     stossen sie aneinander. */
+  display:flex; justify-content:flex-end; align-items:center; gap:10px;
+}
+.chart{
+  background: rgba(255,255,255,.9);
+  border:1px solid var(--line);
+  border-radius:18px;
+  overflow:hidden;
+  /* Nie unter den eigenen Inhalt schrumpfen.
+     `.chart-column` ist ein Rasterfeld und wird auf die Zeilenhoehe gedehnt,
+     die das rechte Bedienfeld vorgibt; darin ist diese Karte ein Flex-Element.
+     Ein Flex-Element schrumpft normalerweise nicht unter seinen Inhalt - aber
+     `overflow:hidden` schaltet genau diese automatische Mindestgroesse ab. Die
+     Karte wurde dadurch kuerzer als der Bogen und schnitt ihn oben und unten
+     ab: Dirk, 19.08.2026, "die Wurzeln werden abgeschnitten". Es traf auch die
+     bleibenden Zaehne, nur faellt es an den langen Milchzahnwurzeln zuerst auf.
+     Das `overflow:hidden` bleibt - es haelt die abgerundeten Ecken sauber. */
+  flex-shrink:0;
+}
+.chart-header{
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.chart-title{font-weight:700}
+.chart-hint{font-size:12px;color:var(--muted); margin-top:4px}
+.chart-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* R2-A Task 3: Status | Plan chart-mode toggle, in the chart card's own
+   header — deliberately separate from `.chart-actions` (tooth-type icons),
+   the app topbar, and the right Controls panel. */
+.chart-mode-toggle{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background: rgba(0,0,0,.03);
+}
+.chart-mode-btn{
+  border:none;
+  background:transparent;
+  color:var(--text);
+  padding:6px 14px;
+  border-radius:999px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+}
+.chart-mode-btn:hover{background: rgba(59,123,255,.14)}
+.chart-mode-btn.is-active{
+  background: var(--accent);
+  color:#fff;
+}
+.chart-mode-btn.is-active:hover{background: var(--accent)}
+/* Planalternativen: the chooser between named plan alternatives, beside the
+   Status | Plan toggle. One pill per alternative in the toggle's own idiom
+   (same radius, same accent for the active one); "+" adds, "x" on the active
+   pill deletes. Rendered only in plan mode (PlanSelector returns null
+   otherwise), so status mode shows no row at all. */
+.plan-selector{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  margin-top:8px;
+}
+.plan-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  border-radius:999px;
+  border:1px solid rgba(59,123,255,.35);
+  background: rgba(59,123,255,.08);
+  padding:0 2px 0 0;
+}
+.plan-chip-name{
+  border:none;
+  background:transparent;
+  color:var(--text);
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:600;
+  font-size:12px;
+  cursor:pointer;
+  max-width:16ch;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.plan-chip-name:hover{background: rgba(59,123,255,.14)}
+.plan-chip.is-active{
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.plan-chip.is-active .plan-chip-name{color:#fff}
+.plan-chip.is-active .plan-chip-name:hover{background: var(--accent)}
+.plan-chip-delete{
+  border:none;
+  background:transparent;
+  color:#fff;
+  font-size:14px;
+  line-height:1;
+  padding:2px 6px 3px 2px;
+  border-radius:999px;
+  cursor:pointer;
+  opacity:.8;
+}
+.plan-chip-delete:hover{opacity:1; background: rgba(0,0,0,.15)}
+.plan-chip-input{
+  border:1px solid var(--accent);
+  border-radius:999px;
+  padding:3px 9px;
+  font-size:12px;
+  font-weight:600;
+  background: var(--panel, #fff);
+  color:var(--text);
+  width:14ch;
+  outline:none;
+}
+.plan-chip-add{
+  border-style:dashed;
+  background:transparent;
+  color:var(--accent);
+  padding:4px 10px;
+  font-weight:600;
+  font-size:12px;
+  cursor:pointer;
+}
+.plan-chip-add:hover{background: rgba(59,123,255,.10)}
+/* Plan-mode visual cue on the chart card itself, so it's always obvious
+   which chart (status vs. plan) is being edited. */
+.chart.plan-mode{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(59,123,255,.18);
+}
+
+/* R2-C Task 2: "dashed = proposed" legend. Always in the DOM (see App.tsx);
+   visibility is pure CSS, gated on the SAME `.plan-mode` cue the chart card
+   already carries — no separate JS toggle. */
+.proposed-legend{
+  display:none;
+  align-items:center;
+  gap:6px;
+  margin-top:4px;
+  font-size:12px;
+  color: var(--muted);
+}
+.chart.plan-mode .proposed-legend{
+  display:flex;
+}
+.proposed-legend-swatch{
+  display:inline-block;
+  width:18px;
+  height:0;
+  border-top:2px dashed var(--accent);
+}
+
+/* Task 4 (Arabic+Chinese sub-project): RTL UI (Arabic) keeps the chrome RTL,
+   but the dental & perio charts are diagrams read 18->28 left-to-right in
+   every locale — pin them LTR so the grid never auto-reverses and per-tooth
+   mesial/distal stays anatomical. Defensive/belt-and-suspenders on top of the
+   `dir="ltr"` JSX attributes on #toothGrid/.dental-chart-column (App.tsx):
+   this also covers nested geometry (e.g. [data-perio-arch] SVG cells) that
+   isn't itself a JSX dir-attribute target. */
+.tooth-grid,
+.chart-column,
+.dental-chart-column,
+.ma-arch,
+.perio-fullgrid-scroll,
+[data-perio-arch]{
+  direction: ltr;
+}
+
+/* Column widths follow the TOOTH, not the grid (odontogram-377).
+   `repeat(16, 1fr)` stretched every tile to the same width around drawings that
+   are not the same width - the molar is drawn 65.5 px wide and the lateral
+   incisor 31.6 px - so the empty space piled up toward the midline and adjacent
+   teeth stood 21 to 45 px apart, loosest exactly where contacts matter.
+   Each column is now the widest tooth it has to hold plus 6 px, which puts a
+   uniform ~10-16 px between neighbours instead. A column is never narrower than
+   44 px so the lateral-incisor tile stays a usable touch target, and the
+   minmax() lower bound keeps the old behaviour of shrinking under a narrow
+   container rather than overflowing it.
+   The two arches USED to share one column list, so that a tooth and its
+   antagonist stood in one column. They no longer can, and they no longer need
+   to: EVERY column below is its own tooth plus 6 px, in both arches, emitted
+   from the same mesiodistal crown widths the drawings are scaled to
+   (`ToothSpec.col_px`, checked by verify.py). One rule, no hand-set values.
+   Every contact is therefore 10 px, and the Class I canine relationship falls
+   out of it rather than being arranged: half a column plus half a gap adds the
+   same slack on both sides of every contact, so the slack cancels and what is
+   left between 13 and 43 is the anatomical difference - the lower six front
+   teeth are 10 mm narrower than the upper six, which is 31 px per side at this
+   scale. The tip of 43/33 lands in the embrasure between the upper lateral and
+   the upper canine because the teeth are the widths they are.
+   The 44 px touch-target floor is gone for the lower incisors, which stand in
+   40 px. At a full row tall that is still well over the 24 px WCAG 2.5.8 asks
+   for, and a lower incisor that is not 40 px wide is not a lower incisor. */
+.tooth-grid{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:10px;
+  position:relative;
+}
+.tooth-arch{
+  display:grid;
+  justify-content:center;
+  gap:4px;
+}
+.upper-arch{
+  grid-template-columns:
+    minmax(28px, 54px) minmax(28px, 58px) minmax(28px, 62px)
+    minmax(28px, 35px) minmax(28px, 39px) minmax(28px, 39px)
+    minmax(28px, 36px) minmax(28px, 39px) minmax(28px, 39px)
+    minmax(28px, 36px) minmax(28px, 39px) minmax(28px, 39px)
+    minmax(28px, 35px) minmax(28px, 62px) minmax(28px, 58px)
+    minmax(28px, 54px);
+}
+.lower-arch{
+  grid-template-columns:
+    minmax(28px, 58px) minmax(28px, 61px) minmax(28px, 66px)
+    minmax(28px, 41px) minmax(28px, 34px) minmax(28px, 37px)
+    minmax(28px, 32px) minmax(28px, 28px) minmax(28px, 28px)
+    minmax(28px, 32px) minmax(28px, 37px) minmax(28px, 34px)
+    minmax(28px, 41px) minmax(28px, 66px) minmax(28px, 61px)
+    minmax(28px, 58px);
+}
+/* Engine-owned multi-tooth bridge-span overlay. Absolutely positioned so it does
+   not consume a grid cell; sits above the tiles but never intercepts pointer
+   events (per-tooth clicks stay on the tiles below). */
+/* Bead odontogram-9nb: Zahnfleisch und Knochen als EINE Lage hinter dem ganzen
+   Raster. Jede Zeichnung ist breiter als ihre Spalte - absichtlich, sonst ergibt
+   die Gingiva keine durchgehende Linie -, und weil die Kacheln in Bogenreihen-
+   folge gemalt werden, deckte das undurchsichtige Band des Nachbarn die mesiale
+   Flanke des vorherigen Zahns zu. Ohne z-index und als erstes Kind liegt diese
+   Auflage hinter allen Zeichnungen, die auf z-index 1 stehen. */
+.tooth-grid > svg.gum-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+/* Bead odontogram-aja: der Zahnfleischton (Dirks Wahl, einen Hauch dunkler als
+   die gesunde Pulpa, damit beide sich abheben). Das Band liegt HINTER dem
+   Raster, unter dem 70%-Weiss des Kachelhintergrunds (und des Luecken-Ausgleichs
+   `luecken_aufhellen`) - also kommen nur 30% der Fuellfarbe durch. Die Fuellung
+   ist deshalb vorkompensiert: #c31703 erscheint unter dem 70%-Weiss als rund
+   (237,183,179). Damit ist die Farbe eine ENTSCHEIDUNG statt eines Nebenprodukts
+   (Bead-Weg 2), und weil die Aufhellung ueber Kachel und Luecke jetzt gleich
+   ist, ueberall derselbe Ton. Dunkler geht mit dem 70%-Weiss nicht - der
+   duennste durchkommende Kanal steht dann schon am Boden. `!important` schlaegt
+   das inline `style="fill:#f79f9a"` des Templates; der Fingerabdruck kennt
+   `fill` nicht, also parity-frei. Aendert sich der Kachelhintergrund (.7), muss
+   diese Zahl nach. */
+.tooth-grid > svg.gum-overlay [id="gum-base"]{ fill: #c31703 !important; }
+/* Die Baender bleiben im Template - der Generator, die Zustandslogik und die
+   Parity-Fingerprints fassen sie unveraendert an -, sie werden hier nur nicht
+   mehr GEMALT. Gezeigt wird der Klon in der Auflage darueber. */
+.tooth-tile .tooth-svg svg [id="bone-base"],
+.tooth-tile .tooth-svg svg [id="gum-base"]{
+  display:none;
+}
+.tooth-grid > svg.bridge-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+}
+/* Bead odontogram-5hm: der Kronenrand ist im Template fuer JEDES Material das
+   gleiche kraeftige Rot (#b3261e) - eine reine Umrisslinie, kein Befund. Dirk,
+   23.08.2026: "Warum hat die Krone einen roten Rand?" Auf einen dezenten,
+   zahnfarbenen Ton gesetzt. Nur der Stroke; fill/Fingerabdruck unberuehrt.
+   Das Veneer trug im Template den Gradia-Gruenrand (#1b3f1c) fuer JEDES
+   Material - derselbe Fall, derselbe Ton (Dirk, 23.08.2026). */
+.tooth-grid .tooth-tile.side-view svg [id$="-crown"]{ stroke: #a2937e !important; }
+/* Das Veneer in BEIDEN Ansichten (die Kauflaeche traegt den Rand nach
+   vestibulaer); die Kauflaechen-Vorlage gab ihm einen schwarzen Rand. */
+.tooth-grid .tooth-tile svg [id$="-veneer"]{ stroke: #a2937e !important; }
+/* Die per-Zahn-Sattelebene (`{material}-bridge-connector`) ist ueberfluessig,
+   seit die Bruecken-Auflage den Verbinder in Endkoordinaten zeichnet - sie
+   hinterliess am Glied einen gewarpten Farbrest ("warp Reste", Dirk). Parity-
+   frei: collectActiveLayers liest data-active, nicht computed display. */
+.tooth-grid .tooth-tile.side-view svg [id$="-bridge-connector"]{ display:none !important; }
+/* Bead odontogram-5hm: das Brueckenglied (data-pontic) ist ein SCHWEBENDES
+   Stueck, keine praeparierte Krone. Dirk, 23.08.2026: die alte Krone darunter
+   ausblenden und ein Stueck als Glied einsetzen, mit einem schmalen Streifen
+   Zahnfleisch darunter. Umgesetzt als Clip: die zervikale Partie der Krone wird
+   abgeschnitten, sodass zwischen Zahnfleischband und Glied ein Streifen Gingiva
+   frei bleibt und die Krone (samt Farbverlauf und Rand) als schwebendes Stueck
+   liest. Der Clip rechnet im EIGENEN Rahmen der Ebene, also VOR der 180°-Drehung
+   der Unterkiefer-Kachel (wie der Onlay-Clip `data-onlay`) - `inset` von OBEN
+   schneidet damit in beiden Kiefern die zervikale (gingivale) Seite ab. */
+.tooth-grid .tooth-tile[data-pontic].side-view svg [id$="-crown"]{ clip-path: inset(12% 0 0 0); }
+.tooth-label-row{
+  display:contents;
+}
+.tooth-label-cell{
+  text-align:center;
+  font-size:11px;
+  color:rgba(30,42,58,.8);
+  padding:2px 0 4px;
+  font-weight:600;
+  cursor:pointer;
+}
+.tooth-label-cell:hover{color:rgba(30,42,58,1)}
+.tooth-tile{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background: rgba(255,255,255,.7);
+  padding:2px;
+  cursor:pointer;
+  transition: transform .05s ease, border-color .12s ease, background .12s ease;
+  /* Tracks the .tooth-svg height (the tallest template) plus border/padding.
+     Keeping the old value while the teeth change height would preserve the
+     old row height and defeat the template-specific sizing. */
+  min-height:157px;
+}
+.tooth-tile.occl-view{
+  min-height:78px;
+}
+.tooth-tile.placeholder{
+  cursor:default;
+  background: rgba(255,255,255,.3);
+}
+.tooth-tile.placeholder .tooth-svg svg{
+  opacity:0;
+}
+/* Der Auswahl-/Hover-Tint liegt UEBER dem 70%-Weiss der Kachel, ersetzt es nicht.
+   Das Zahnfleischband (svg.gum-overlay, #c31703) liegt HINTER dem Raster und
+   erscheint nur durch das 70%-Weiss der Kachel als Blassrosa (aja-Vorkompensation).
+   Ein Tint, der das Weiss ERSETZT, liess das rohe #c31703 als Dunkelrot durch -
+   sichtbar an jedem AUSGEWAEHLTEN Zahn (Dirk, 23.08.2026, am Implantat bemerkt,
+   betrifft aber jeden). Als Gradient-Ebene ueber der weissen Grundfarbe bleibt
+   die Aufhellung erhalten und der Auswahlton sitzt zusaetzlich darauf. */
+.tooth-tile:hover{background: linear-gradient(rgba(59,123,255,.08),rgba(59,123,255,.08)), rgba(255,255,255,.7)}
+.tooth-tile:active{transform: scale(.99)}
+
+/* ── Selection animation ─────────────────────── */
+@keyframes odon-dash-pulse{
+  0%, 100%{ border-color: rgba(59,123,255,.5); }
+  50%{ border-color: rgba(59,123,255,.9); }
+}
+@keyframes odon-glow-pulse{
+  0%, 100%{ filter: drop-shadow(0 0 3px rgba(59,123,255,.2)); }
+  50%{ filter: drop-shadow(0 0 7px rgba(59,123,255,.45)); }
+}
+.tooth-tile::after{
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 15px;
+  border: 2px dashed transparent;
+  pointer-events: none;
+  transition: border-color .25s ease;
+}
+.tooth-tile .tooth-svg svg{
+  transition: filter .25s ease;
+}
+.tooth-tile.active{
+  border-color: rgba(59,123,255,.7);
+  /* Tint UEBER dem 70%-Weiss (siehe :hover) - sonst zeigt das ausgewaehlte
+     Kachelband das rohe #c31703 als Dunkelrot. */
+  background: linear-gradient(rgba(59,123,255,.06),rgba(59,123,255,.06)), rgba(255,255,255,.7);
+  transition: border-color .2s ease, background .2s ease;
+}
+.tooth-tile.active::after{
+  border-color: rgba(59,123,255,.55);
+  animation: odon-dash-pulse 1.6s ease-in-out infinite;
+}
+.tooth-tile.active .tooth-svg svg{
+  filter: drop-shadow(0 0 4px rgba(59,123,255,.3));
+  animation: odon-glow-pulse 2.5s ease-in-out infinite;
+}
+
+/* ── Focus-visible (keyboard a11y) ───────────── */
+.tooth-tile:focus{outline:none}
+.tooth-tile:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(59,123,255,.25);
+  z-index: 1;
+}
+
+/* ── Read-only mode ──────────────────────────── */
+.tooth-grid.read-only .tooth-tile{
+  cursor: default;
+  pointer-events: none;
+}
+.tooth-grid.read-only .tooth-tile:hover{
+  background: inherit;
+}
+.tooth-grid.read-only .tooth-label-cell{
+  cursor: default;
+  pointer-events: none;
+}
+.panel.read-only{
+  pointer-events: none;
+  opacity: 0.5;
+  user-select: none;
+}
+/* Deferred fix (perio P2 follow-up, Task 1): setReadOnly() now also toggles
+   `.read-only` on whichever perio container is mounted (`#perioOverlay`
+   popup chrome or `#perioInlinePanel` inline housing) — see setReadOnly()
+   in odontogram.ts. Mirrors .panel.read-only above so the lock is visually
+   and functionally consistent with the rest of the read-only UI. The
+   overlay backdrop itself is only made non-interactive (no dim), so its own
+   Esc-to-close keyboard handling still works while read-only; only the
+   inner panel content is dimmed. */
+.perio-overlay.read-only{
+  pointer-events: none;
+}
+.perio-overlay.read-only .perio-overlay-panel{
+  opacity: 0.5;
+}
+.perio-inline-panel.read-only{
+  pointer-events: none;
+  opacity: 0.5;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .tooth-tile.active::after{
+    animation: none;
+    border-color: rgba(59,123,255,.7);
+  }
+  .tooth-tile.active .tooth-svg svg{
+    animation: none;
+    filter: drop-shadow(0 0 4px rgba(59,123,255,.35));
+  }
+}
+/* Tooth tiles.
+   Template heights differ because the canine has the longest root and the
+   lower incisor the shortest. Every pixel dimension below is derived from its
+   viewBox with the same PX_PER_UNIT factor the tooth generator uses, so all
+   teeth retain one common scale. Upper teeth align to the bottom: every
+   template has the same distance from its occlusal edge to the viewBox bottom,
+   which keeps the occlusal plane continuous across the arch. The displayed
+   roots use spec.ROOT_DISPLAY_SCALE, so this container follows the tallest
+   generated template and must change with that factor. */
+.tooth-svg{
+  width:100%;
+  height:147px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+/* Never shrink to the tile. The SVG canvas is wider than the tooth it holds -
+   gum and bone are drawn wider than the crown, and on an incisor the tooth is
+   only about 59 % of its own canvas - so once columns follow the TOOTH width
+   (odontogram-377) the canvas is wider than its column. Letting it shrink as a
+   flex item scales the whole drawing down, which makes teeth smaller instead of
+   closer. It overflows instead, and neighbouring gum overlaps, which is what
+   gum does. */
+/* `overflow:visible` on the SVG itself, because the browser's own stylesheet
+   clips an <svg> at its viewBox and the wrapper's overflow does not reach
+   inside it. The molar tiles stand 7 px further apart than their graphic is
+   wide, so the gum band CANNOT close that gap from inside the viewBox - it is
+   drawn past its own edge and relies on the neighbour overlapping it. The
+   layers already drawn past the edge on purpose (gum, bone, bridge and bar
+   connectors, all of which reach for the neighbouring tooth) stop being cut
+   off at the same time. */
+.tooth-svg svg{width:72px;height:122px; pointer-events:none; flex:0 0 auto; overflow:visible}
+/* Drawings paint as ONE layer above ALL tile backgrounds. Tiles are siblings
+   with a translucent white background, so once a canvas overflows its column
+   the NEXT tile's background paints over the overflow and punches a white notch
+   through the gum band. `position:relative; z-index:1` here does not create a
+   per-tile stacking context (the tiles set `position:relative` without a
+   z-index), so every drawing lifts into the grid's own stacking context and
+   lands above every tile's chrome, while the tile keeps its border, hover and
+   selection ring. */
+.tooth-svg{overflow:visible; position:relative; z-index:1}
+.tooth-tile{overflow:visible}
+/* Lower teeth are rendered after a 180-degree rotation. Their occlusal edge
+   therefore has the fixed margin at the viewBox top. Top alignment keeps that
+   plane continuous; bottom alignment would align root tips instead and offset
+   the lower incisor and canine by their 36 px height difference. */
+.tooth-tile.lower-row.side-view .tooth-svg{align-items:flex-start}
+.tooth-tile.occl-view .tooth-svg{height:80px; align-items:center}
+/* Die Kauflaeche folgt ihrer SPALTE, nicht einem festen Mass.
+   Sie stand auf 64 px, was ging, solange jede Spalte um die 50 bis 75 px breit
+   war. Seit die Spalten aus den gezeichneten Kronenbreiten kommen (20 bis
+   58 px, damit sich die Nachbarn an den Kontaktpunkten beruehren), schoben sich
+   die Kauflaechen uebereinander und ihre undurchsichtigen Baender malten ueber
+   den Nachbarn - die beiden Kauflaechen-Reihen zerfielen. Die Seitenansicht
+   darf ueberstehen, weil sie ausserhalb der Krone leer ist; eine Kauflaeche ist
+   das nicht. */
+/* Alle Kauflaechen gleich breit, und zwar so breit, dass zwei benachbarte
+   Seitenzaehne einander nie ueberlappen.
+   Dirk, 17.08.2026: "Skaliere sie so, dass sie gut passen. Die Kauflaechen
+   duerfen ruhig alle gleich gross sein."
+   41 px ist der engste Abstand zweier benachbarter Seitenzaehne im Bogen
+   (zwischen 15/14) - eine Regel, kein geschaetzter Wert. Der Rahmen ist beim
+   Erzeugen auf die gezeichnete Kauflaeche zugeschnitten, also ist die Hoehe die
+   des jeweiligen Zahns; gleich gross heisst gleich BREIT, nicht in eine Form
+   gepresst. Drei Anlaeufe vorher gingen schief, weil ich an der Groesse
+   geschraubt habe statt am Rahmen: 79 px breite Rahmen in 27 px breiten Spalten
+   malten mit ihren undurchsichtigen Baendern ueber beide Nachbarn. */
+/* SEIT DEN FRONTZAEHNEN: die Kauflaeche folgt ihrer SPALTE, nicht mehr einer
+   festen Hoehe. Dirks Wunsch vom 17.08. - "die Kauflaechen duerfen ruhig alle
+   gleich gross sein" - liess sich halten, solange nur Seitenzaehne eine hatten;
+   ihre Spalten liegen zwischen 41 und 58 px. Ein unterer Einser misst 12,9
+   gegen 38,2 Einheiten beim unteren Sechser, und bei fester Hoehe stand seine
+   Draufsicht 50 px breit in einer 19 px breiten Spalte. Dirk, 18.08.2026: "Im
+   Moment stehen sie alle zu eng, unten mehr als oben."
+   Die 6 px sind der Zuschlag, den JEDE Spalte auf ihre Kronenbreite bekommt
+   (siehe grid-template-columns) - sie abzuziehen macht die Draufsicht genau so
+   breit wie die Krone. Damit stimmen Draufsicht und Seitenansicht desselben
+   Zahns ueberein, was seit der Normalisierung in `draufsicht.py` auch fuer die
+   Zeichnung gilt: beide messen mesiodistal dasselbe. */
+.tooth-tile.occl-view .tooth-svg svg{width:calc(100% - 1px);height:auto;max-height:100%;flex:0 0 auto;overflow:hidden}
+/* 1 px statt der vollen 6 px Spaltenzuschlag. Dirk, 18.08.2026: "Kann man die
+   Praemolaren und Schneidezaehne ein bisschen groesser machen?" - Bei echten
+   Verhaeltnissen (Draufsicht = Kronenbreite) steht ein unterer Einser mit 12,9
+   px neben einem Sechser mit 38,2. Die Spalte ist die Decke: mehr als sie kann
+   die Draufsicht nicht werden, ohne den Nachbarn zu ueberdecken. Sie voll
+   auszunutzen gibt jedem Zahn dieselben 5 px dazu, was den kleinen 39 % bringt
+   und den grossen 13 % - die Spreizung wird also kleiner, ohne dass die
+   Zuordnung Spalte = Zahn aufgegeben wird. Ein Pixel bleibt als Fuge stehen,
+   damit zwei Nachbarn sich beruehren und nicht ineinanderlaufen. */
+/* `overflow:hidden` NUR auf der Kauflaeche, gegen die Regel eine Zeile weiter
+   oben - und das ist der Punkt, an dem sich die beiden Ansichten unterscheiden.
+   In der Seitenansicht MUSS das Zahnfleisch ueber den Rahmen hinausreichen,
+   sonst laeuft die Gingiva nicht als eine Linie durch den Bogen und die Papille
+   trifft das Gelenk nicht; deshalb steht dort `overflow:visible`. Eine
+   Kauflaeche hat keine Papille und muss nichts zum Nachbarn hinueberreichen.
+   Ihr Rahmen ist beim Erzeugen auf die gezeichnete Kauflaeche zugeschnitten,
+   also schneidet der Browser das gelbe Band genau auf deren Breite zu und der
+   Nachbarzahn wird nicht mehr verdeckt.
+   Dirk, 17.08.2026: "Wenn du die gelbe Flaeche um die Kauflaechen auf die
+   Breite der Kauflaechen reduzierst, wird der Nachbarzahn nicht mehr davon
+   ueberdeckt." */
+/* Emitted by the tooth generator — do not round these to whole pixels.
+   Every template is drawn at the SAME scale (1.62 px per unit), and that is
+   what puts the occlusal plane, the bone level and the gingival crest of
+   sixteen different graphics on one line. Rounding the two sides independently
+   gives each template a slightly different scale, `preserveAspectRatio` centres
+   the shortfall, and every shared line across the arch steps at every tile. */
+.tooth-tile.tpl-11 .tooth-svg svg{width:64.31px;height:131.38px}
+.tooth-tile.tpl-12 .tooth-svg svg{width:64.31px;height:132.95px}
+.tooth-tile.tpl-13 .tooth-svg svg{width:65.29px;height:141.57px}
+.tooth-tile.tpl-14 .tooth-svg svg{width:64.48px;height:145.62px}
+.tooth-tile.tpl-15 .tooth-svg svg{width:64.48px;height:134.06px}
+.tooth-tile.tpl-16 .tooth-svg svg{width:69.50px;height:147.79px}
+.tooth-tile.tpl-17 .tooth-svg svg{width:69.50px;height:143.76px}
+.tooth-tile.tpl-18 .tooth-svg svg{width:69.50px;height:141.59px}
+.tooth-tile.tpl-41 .tooth-svg svg{width:64.31px;height:124.74px}
+.tooth-tile.tpl-42 .tooth-svg svg{width:64.31px;height:130.26px}
+.tooth-tile.tpl-43 .tooth-svg svg{width:65.29px;height:139.64px}
+.tooth-tile.tpl-44 .tooth-svg svg{width:64.48px;height:134.93px}
+.tooth-tile.tpl-45 .tooth-svg svg{width:64.48px;height:131.17px}
+.tooth-tile.tpl-46 .tooth-svg svg{width:69.50px;height:147.40px}
+.tooth-tile.tpl-47 .tooth-svg svg{width:69.50px;height:137.36px}
+.tooth-tile.tpl-48 .tooth-svg svg{width:69.50px;height:135.14px}
+/* primary dentition — mounted in place of the successor's template while a
+   tooth is charted as a milk tooth (PRIMARY_TEMPLATE in odontogram.ts) */
+.tooth-tile.tpl-51 .tooth-svg svg{width:64.31px;height:114.16px}
+.tooth-tile.tpl-52 .tooth-svg svg{width:64.31px;height:102.17px}
+.tooth-tile.tpl-53 .tooth-svg svg{width:65.29px;height:120.24px}
+.tooth-tile.tpl-54 .tooth-svg svg{width:64.48px;height:111.00px}
+.tooth-tile.tpl-55 .tooth-svg svg{width:69.50px;height:111.33px}
+.tooth-tile.tpl-81 .tooth-svg svg{width:64.31px;height:105.14px}
+.tooth-tile.tpl-82 .tooth-svg svg{width:64.31px;height:104.62px}
+.tooth-tile.tpl-83 .tooth-svg svg{width:65.29px;height:119.60px}
+.tooth-tile.tpl-84 .tooth-svg svg{width:69.50px;height:109.04px}
+.tooth-tile.tpl-85 .tooth-svg svg{width:69.50px;height:120.80px}
+/* The lower primary canine used to be template 53 shown a tenth smaller — one
+   drawing standing in for both arches. Dirk drew 83 himself on 2026-08-17, so
+   the scale rule that stood here is gone: it would now shrink his drawing on
+   top of the size it was drawn at. */
+.tooth-tile.wisdom-hidden{opacity:.45; pointer-events:none}
+.tooth-tile.wisdom-hidden .tooth-svg svg{opacity:0}
+.tooth-tile.occl-hidden{display:none !important}
+.tooth-svg [data-active="0"]{display:none !important}
+
+.panel{
+  /* "Dental Chart" graphical redesign, Task 1: pin the right Controls panel
+     explicitly to grid column 2. Needed because .chart-column can now be
+     `display:none` (never unmounted — see .chart-column below) while the
+     Dental Chart view is active; without an explicit column, CSS grid's
+     default auto-placement would skip the hidden item and reflow .panel into
+     column 1, breaking the two-column layout. */
+  grid-column: 2;
+  background: rgba(255,255,255,.95);
+  border:1px solid var(--line);
+  border-radius:18px;
+  overflow:hidden;
+}
+.panel-header{
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
+}
+.select-actions{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:8px;
+}
+.select-actions-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.status-actions{
+  flex-wrap:wrap;
+  gap:6px;
+}
+.status-extra-row{
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.status-extra-row select{
+  min-width: 220px;
+}
+.btn-icon{
+  padding:9px 15px;
+  font-size:12px;
+}
+.btn-icon .icon,
+.btn-icon .icon-img,
+.btn-icon svg{
+  width:32px;
+  height:32px;
+  display:block;
+}
+.fade-toggle{
+  transition: opacity 160ms ease, max-width 160ms ease, padding 160ms ease, margin 160ms ease, border-width 160ms ease, transform 160ms ease;
+  max-width: 200px;
+}
+.fade-toggle.is-hidden{
+  opacity:0;
+  pointer-events:none;
+  max-width:0;
+  padding-left:0;
+  padding-right:0;
+  margin:0;
+  border-width:0;
+  transform:scale(0.96);
+}
+.panel-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.panel-title-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.panel-title{font-weight:800}
+.panel-subtitle{font-size:12px;color:var(--muted); margin-top:4px}
+.pill{
+  display:inline-block;
+  background: rgba(18,185,129,.14);
+  border:1px solid rgba(18,185,129,.25);
+  padding:2px 8px;
+  border-radius:999px;
+  font-weight:700;
+  color: var(--text);
+}
+.warnings{margin-top:10px; display:flex; flex-direction:column; gap:8px}
+.warning{
+  font-size:12px; color:#8a5b1a;
+  border:1px solid rgba(255,198,116,.45);
+  background: rgba(255,198,116,.22);
+  padding:8px 10px; border-radius:12px;
+}
+.panel-body{padding:14px; display:flex; flex-direction:column; gap:12px; max-height: calc(100vh - 110px); overflow:auto}
+.card{
+  background: rgba(255,255,255,.9);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+}
+.card-title{font-weight:800; margin-bottom:8px}
+.card-title-row{display:flex; align-items:center; justify-content:space-between; gap:8px}
+.card.collapsed .card-title{margin-bottom:0}
+/* Hide every direct child except the title row, so collapse works regardless of
+   the content element's class (e.g. the class-less #cariesChecks cross div). */
+.card.collapsed > :not(.card-title-row){display:none}
+.icon-btn{
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.7);
+  color: var(--text);
+  border-radius:999px;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:700;
+  line-height:1;
+}
+.icon-btn .icon{width:16px;height:16px}
+.icon-btn:hover{background: rgba(59,123,255,.12)}
+.icon-btn-danger{
+  color:#d94545;
+  border-color: rgba(217,69,69,.4);
+  background: rgba(217,69,69,.08);
+}
+.icon-btn-danger:hover{background: rgba(217,69,69,.15)}
+.card-subtitle{font-weight:700; margin:6px 0}
+.hint{font-size:12px;color:var(--muted); margin:6px 0 10px}
+.row{display:flex; gap:10px; align-items:center; font-size:13px; padding:6px 2px}
+.contact-row{margin-bottom:6px}
+.bruxism-row{margin-top:6px; gap:8px}
+.wear-stack{ display:flex; flex-direction:column; gap:6px; }
+.wear-stack .row{ margin-top:0; }
+.fissure-row{margin-top:10px; justify-content:center; text-align:center}
+#crownReplaceRow,#crownNeededRow,#missingClosedRow{margin-top:8px}
+.bridge-pillar-row{margin-top:10px}
+.inline-checks{padding:0}
+.inline-checks + .inline-checks{margin-top:8px}
+/* Calculus row always needs a gap above it (its preceding sibling is the
+   periapical-type .row, not an .inline-checks, so the rule above never matches). */
+#calculusRow{margin-top:8px}
+.inline-checks label{display:flex; gap:10px; align-items:center; font-size:13px; padding:6px 10px; border-radius:12px; border:1px solid var(--line); background: rgba(0,0,0,.02); cursor:pointer}
+.inline-checks label:hover{background: rgba(59,123,255,.06)}
+.inline-checks input[type="checkbox"]{display:none}
+.inline-checks label:has(input[type="checkbox"]:checked){
+  background: rgba(18,185,129,.18);
+  border-color: rgba(18,185,129,.5);
+}
+.check-grid{display:grid; grid-template-columns: 1fr 1fr; gap:8px}
+.check-grid label{display:flex; gap:10px; align-items:center; font-size:13px; padding:6px 8px; border-radius:12px; border:1px solid var(--line); background: rgba(0,0,0,.02); cursor:pointer}
+.check-grid label:hover{background: rgba(59,123,255,.06)}
+.check-grid input[type="checkbox"]{display:none}
+.check-grid label:has(input[type="checkbox"]:checked){
+  background: rgba(18,185,129,.18);
+  border-color: rgba(18,185,129,.5);
+}
+.surface-cross{display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,auto); gap:8px; max-width:340px; margin:4px auto}
+.surface-cross .surface-cell{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; text-align:center; padding:10px 6px; border-radius:14px; border:1px solid var(--line); background:rgba(0,0,0,.02); cursor:pointer}
+.surface-cross .surface-cell:hover{background:rgba(59,123,255,.06)}
+.surface-cross .surface-cell input[type="checkbox"]{display:none}
+.surface-cross .surface-cell .surf-letter{font-weight:700; font-size:18px; line-height:1}
+.surface-cross .surface-cell .surf-name{font-size:11px; color:var(--muted)}
+.surface-cross .surface-cell:has(input[type="checkbox"]:checked){background:rgba(18,185,129,.18); border-color:rgba(18,185,129,.5)}
+.surface-cross .pos-buccal{grid-column:2; grid-row:1}
+.surface-cross .pos-mesial{grid-column:1; grid-row:2}
+.surface-cross .pos-occlusal{grid-column:2; grid-row:2}
+.surface-cross .pos-distal{grid-column:3; grid-row:2}
+.surface-cross .pos-lingual{grid-column:2; grid-row:3}
+.subcrown-row{margin-top:8px}
+.surface-cross .surface-cell[data-material="amalgam"]{box-shadow:inset 0 0 0 2px #7a7f87}
+.surface-cross .surface-cell[data-material="composite"]{box-shadow:inset 0 0 0 2px #d9a441}
+.surface-cross .surface-cell[data-material="gic"]{box-shadow:inset 0 0 0 2px #4aa3df}
+.surface-cross .surface-cell[data-material="temporary"]{box-shadow:inset 0 0 0 2px #b07ad9}
+/* Per-surface caries depth indicator: 3 stacked bars inside the active cell.
+   1 filled = superficial, 2 = dentin, 3 = deep. Click opens the depth popup. */
+.surface-cross .surface-cell{position:relative}
+.surf-depth{position:absolute; top:5px; right:5px; display:none; flex-direction:column; gap:1.5px; padding:2px; cursor:pointer; border-radius:4px}
+.surface-cross .surface-cell:has(input[type="checkbox"]:checked) .surf-depth{display:flex}
+.surf-depth:hover{background:rgba(0,0,0,.06)}
+.surf-depth i{display:block; width:11px; height:3px; border-radius:1px; background:rgba(179,38,30,.22)}
+.surf-depth[data-depth="surface"] i:nth-child(1){background:#b3261e}
+.surf-depth[data-depth="dentin"] i:nth-child(-n+2){background:#b3261e}
+.surf-depth[data-depth="deep"] i{background:#b3261e}
+
+/* SP6 Task 2: recurrent (secondary) caries indicator on a FILLING-surface cell.
+   The dark border signposts that a filled surface also carries caries
+   (`caries ∩ fillingSurfaceMaterials` → `subcaries-{surface}`). It sits on the
+   same `.surf-depth` element, so it composes with both the 3-bar and the
+   `.icdas` circular badge variants. */
+.surf-depth.has-subcaries{border:2px solid #1f2937; padding:1px}
+.surf-depth.icdas.has-subcaries{border:2px solid #1f2937; box-shadow:0 0 0 1px #fff}
+
+/* SP5 Task 4: radiographic-depth badge hook (`data-radio`, set on the same
+   `.surf-depth` indicator, independent of the ICDAS `data-icdas` badge above —
+   no crosswalk between the two scales). `.radio-badge` is the future display
+   gate Task 5 wires up behind the `radiographicDepthMode` setting; it is never
+   toggled yet, so this rule is INERT today — no visual change. */
+.surf-depth.radio-badge[data-radio]{display:flex}
+
+/* SP10 Task 3: LEFT-side structural filling-defect indicator on a
+   FILLING-surface cell, mirroring the RIGHT-side `.surf-depth` indicator
+   above but positioned opposite it and shown only while the filling
+   checkbox is checked. `.has-defect` (dark border, distinct defect palette)
+   toggles in syncFillingDefectIndicator when the surface actually carries a
+   defect (`none` renders as a neutral affordance). */
+.surf-defect{position:absolute; top:5px; left:5px; display:none; align-items:center; justify-content:center; padding:2px; cursor:pointer; border-radius:4px}
+.surface-cross .surface-cell:has(input[type="checkbox"]:checked) .surf-defect{display:flex}
+.surf-defect:hover{background:rgba(0,0,0,.06)}
+.surf-defect i{display:block; width:9px; height:9px; border-radius:50%; background:rgba(46,49,146,.25)}
+.surf-defect.has-defect{border:2px solid #2e3192; padding:1px}
+.surf-defect.has-defect i{background:#f5ff15; box-shadow:0 0 0 1px #2e3192}
+
+/* Bead odontogram-wxt: cervical involvement. A suffix letter on the surface,
+   never a cell of its own — the badge sits in the cell's bottom-right corner
+   the way BEMA writes "vz"/"lz" after the surface, so it reads as qualifying
+   the surface rather than as a sixth one. Purely a panel affordance: the
+   marker is deliberately not drawn on the chart (see the bead's render
+   decision), and this lives outside the SVG fingerprint entirely. */
+.surface-cross .surface-cell[data-cervical]::after{
+  content:attr(data-cervical); position:absolute; right:5px; bottom:4px;
+  font-size:10px; font-weight:700; line-height:1; font-style:italic;
+  color:#2e3192; opacity:.85; pointer-events:none;
+}
+
+/* Caries depth popup */
+.odon-depth-popup{position:fixed; z-index:130; background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:0 12px 24px rgba(30,42,58,.18); padding:6px; display:flex; flex-direction:column; gap:4px; min-width:150px}
+/* SP16 Task 1: the filling-defect popup's option buttons live in a plain
+   `.odon-depth-group` wrapper div inside `.odon-depth-popup` — without this
+   rule they default to block flow but the <button>s themselves are
+   inline-block, so they wrap left-to-right instead of stacking. Stack them
+   vertically like every other option group in this popup family. */
+.odon-depth-group{display:flex; flex-direction:column; gap:4px}
+.odon-depth-option{border:1px solid var(--line); background:rgba(0,0,0,.04); color:var(--text); padding:8px 10px; border-radius:10px; font-weight:600; cursor:pointer; text-align:start; font-size:13px}
+.odon-depth-option:hover{background:rgba(59,123,255,.12)}
+.odon-depth-option.is-active{border-color:var(--accent,#3b7bff); background:rgba(59,123,255,.16)}
+.odon-depth-group-label{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted,#7b8794); padding:6px 4px 2px}
+.odon-depth-group-label:first-child{padding-top:2px}
+.odon-depth-title{font-size:12px; font-weight:800; color:var(--text); padding:2px 4px 6px; border-bottom:1px solid var(--line); margin-bottom:2px}
+.row input[type="checkbox"]{display:none}
+.row:has(input[type="checkbox"]){
+  border-radius:12px;
+  border:1px solid var(--line);
+  padding:6px 10px;
+  background: rgba(0,0,0,.02);
+  cursor:pointer;
+}
+.inline-checks:has(input[type="checkbox"]){
+  border:0;
+  background:none;
+  padding:0;
+}
+.row:has(input[type="checkbox"]:checked){
+  background: rgba(18,185,129,.18);
+  border-color: rgba(18,185,129,.5);
+}
+.inline-checks:has(input[type="checkbox"]:checked){
+  background:none;
+  border:0;
+}
+/* SP13: each wear-stack sub-row wraps a (usually hidden) toggle checkbox beside
+   its select, so the generic .row:has(checkbox) pill box must not style the row
+   itself — the visible simple-mode toggle-label keeps its own pill via
+   .inline-checks label. Higher-specificity/later so it wins in light and dark. */
+.wear-stack .row:has(input[type="checkbox"]),
+.wear-stack .row:has(input[type="checkbox"]:checked),
+.dark .wear-stack .row:has(input[type="checkbox"]){
+  border:0;
+  background:none;
+  padding:6px 2px;
+  border-radius:0;
+  cursor:default;
+}
+.radio-list{display:flex; flex-direction:column; gap:8px}
+.radio-list label{display:flex; gap:10px; align-items:center; font-size:13px; padding:6px 8px; border-radius:12px; border:1px solid var(--line); background: rgba(0,0,0,.02)}
+.radio-list label:hover{background: rgba(59,123,255,.06)}
+.divider{height:1px;background:var(--line); margin:10px 0}
+
+/* SP-perio P1 Task 2: minimal, deliberately plain 6-site PD/GM/BOP/SUP grid
+   (the polished clinical perio chart is a later sub-project). Two site-group
+   rows (buccal MB/B/DB, then lingual/palatal ML/L/DL); each site is a small
+   bordered cell with a PD + GM number input and BOP/SUP checkboxes. Reuses
+   the existing --line/--card/--text/--muted variables, which already flip
+   under .dark — no separate dark-mode block needed. */
+.perio-block{margin-top:10px}
+.perio-block-title{font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text)}
+.perio-grid{display:flex; flex-direction:column; gap:6px}
+.perio-site-row{display:grid; grid-template-columns:repeat(3,1fr); gap:6px}
+.perio-site-cell{display:flex; flex-direction:column; gap:3px; padding:6px; border:1px solid var(--line); border-radius:8px; background:rgba(0,0,0,.02)}
+.perio-site-label{font-weight:700; text-align:center; font-size:12px; margin-bottom:2px; color:var(--text)}
+.perio-field{display:flex; justify-content:space-between; align-items:center; gap:4px; font-size:11px}
+.perio-field span{color:var(--muted)}
+.perio-field input[type="number"]{width:46px; font-size:11px; padding:2px 4px; border:1px solid var(--line); border-radius:4px; background:var(--card); color:var(--text)}
+.perio-check{display:flex; align-items:center; gap:4px; font-size:11px}
+.perio-check span{color:var(--muted)}
+.perio-readout{margin-top:4px; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size:11px}
+.hidden{display:none !important}
+
+@media (max-width: 1100px){
+  .layout{grid-template-columns:1fr}
+  /* Single-column layout: reset the explicit column pin (Task 1) so .panel
+     stacks below .chart-column/.dental-chart-column via `order` instead of
+     forming a second implicit grid column. */
+  .chart-column, .dental-chart-column, .ortho-column{grid-column:auto}
+  .panel{grid-column:auto; order:2}
+}
+
+/* ── Dark mode ────────────────────────────────── */
+/* The dark tokens are set by `.dark .odontogram-root, .dark .odontogram-portal`
+   at the top of this file, not on `.dark` itself: the host owns the class and
+   the element it sits on (gh#44). */
+.dark .topbar{
+  background: rgba(15,23,42,.92);
+  backdrop-filter: blur(10px);
+}
+.dark .btn{
+  background: rgba(96,165,250,.15);
+}
+.dark .btn:hover{background: rgba(96,165,250,.25)}
+.dark .btn-ghost{background: rgba(255,255,255,.06)}
+.dark .btn-ghost:hover{background: rgba(255,255,255,.12)}
+.dark .btn-danger{
+  background: rgba(248,113,113,.12);
+  border-color: rgba(248,113,113,.3);
+  color:#f87171;
+}
+.dark .btn-danger:hover{background: rgba(248,113,113,.22)}
+.dark .btn-toggle[aria-pressed="false"]{background: rgba(255,255,255,.06)}
+.dark .dropdown-menu{
+  background:#1e293b;
+  box-shadow: 0 12px 24px rgba(0,0,0,.45);
+}
+.dark .dropdown-item{background: rgba(255,255,255,.06)}
+.dark .dropdown-item:hover{background: rgba(255,255,255,.12)}
+.dark .dropdown-item[aria-checked="true"]{
+  background: rgba(96,165,250,.2);
+  border-color: rgba(96,165,250,.45);
+}
+.dark .odontogram-root select,
+.dark .odontogram-portal select{
+  background: rgba(96,165,250,.15);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text) 50%),
+    linear-gradient(135deg, var(--text) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 52%,
+    calc(100% - 12px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat:no-repeat;
+}
+.dark .chart{background: rgba(30,41,59,.9)}
+.dark .chart-mode-toggle{
+  background: rgba(255,255,255,.06);
+  border-color: var(--line);
+}
+.dark .chart-mode-btn{color: var(--text)}
+.dark .chart-mode-btn:hover{background: rgba(96,165,250,.18)}
+/* The keypad (anatomical Befund-Dock) had no dark variant: a
+   light panel with the page's light text on it — its title was unreadable
+   (found in the 25.09.2026 review). */
+.dark .schematic-keypad{background: rgba(30,41,59,.92); border-color: var(--line)}
+.dark .keypad-group{border-color: var(--line)}
+.dark .keypad-btn{background: rgba(255,255,255,.05); color: var(--text); border-color: var(--line)}
+.dark .keypad-btn:active:not(:disabled){background: rgba(96,165,250,.18)}
+.dark .keypad-mat.is-active{background:#3b7bff; color:#fff; border-color:#3b7bff}
+.dark .keypad-caries{color:#f28b82}
+.dark .keypad-caries.is-active{background:#c62828; color:#fff; border-color:#c62828}
+.dark .keypad-readout{background: rgba(96,165,250,.16); color:#bfd7ff}
+.dark .keypad-readout.is-notice{background: rgba(242,139,130,.14); color:#f6b8b1}
+.dark .plan-chip{border-color: rgba(96,165,250,.4); background: rgba(96,165,250,.10)}
+.dark .plan-chip-name{color: var(--text)}
+.dark .plan-chip-name:hover{background: rgba(96,165,250,.18)}
+.dark .plan-chip.is-active{background: rgba(96,165,250,.45); border-color: rgba(96,165,250,.6)}
+.dark .plan-chip-input{background: rgba(255,255,255,.06); color: var(--text)}
+.dark .plan-chip-add{color: rgba(147,197,253,1)}
+.dark .chart-mode-btn.is-active{
+  background: rgba(96,165,250,.45);
+  color:#fff;
+}
+.dark .chart-mode-btn.is-active:hover{background: rgba(96,165,250,.45)}
+.dark .chart.plan-mode{
+  border-color: rgba(96,165,250,.6);
+  box-shadow: 0 0 0 2px rgba(96,165,250,.28);
+}
+.dark .proposed-legend{color: var(--text)}
+.dark .proposed-legend-swatch{border-top-color: rgba(96,165,250,.85)}
+.dark .tooth-label-cell{color: rgba(241,245,249,.6)}
+.dark .tooth-label-cell:hover{color: rgba(241,245,249,1)}
+.dark .tooth-tile{background: rgba(30,41,59,.7)}
+.dark .tooth-tile.placeholder{background: rgba(30,41,59,.3)}
+.dark .tooth-tile:hover{background: rgba(96,165,250,.12)}
+/* Dark selection animation */
+@keyframes odon-dash-pulse-dark{
+  0%, 100%{ border-color: rgba(96,165,250,.45); }
+  50%{ border-color: rgba(96,165,250,.85); }
+}
+@keyframes odon-glow-pulse-dark{
+  0%, 100%{ filter: drop-shadow(0 0 3px rgba(96,165,250,.2)); }
+  50%{ filter: drop-shadow(0 0 7px rgba(96,165,250,.45)); }
+}
+.dark .tooth-tile.active{
+  border-color: rgba(96,165,250,.6);
+  background: rgba(96,165,250,.08);
+}
+.dark .tooth-tile.active::after{
+  border-color: rgba(96,165,250,.45);
+  animation-name: odon-dash-pulse-dark;
+}
+.dark .tooth-tile.active .tooth-svg svg{
+  animation-name: odon-glow-pulse-dark;
+  filter: drop-shadow(0 0 4px rgba(96,165,250,.3));
+}
+.dark .tooth-tile:focus-visible{
+  outline-color: rgba(96,165,250,.8);
+  box-shadow: 0 0 0 3px rgba(96,165,250,.25);
+}
+/* Dark note popover */
+.dark .odon-note-backdrop{background: rgba(0,0,0,.55)}
+.dark .odon-note-popover{background: var(--panel); box-shadow: 0 16px 48px rgba(0,0,0,.5)}
+.dark .odon-note-textarea{background: rgba(255,255,255,.06); border-color: var(--line); color: var(--text)}
+.dark .odon-note-textarea:focus{box-shadow: 0 0 0 3px rgba(96,165,250,.2); border-color: rgba(96,165,250,.5)}
+.dark .panel{background: rgba(30,41,59,.95)}
+.dark .card{background: rgba(30,41,59,.8); border-color: var(--line)}
+.dark .icon-btn{background: rgba(30,41,59,.7)}
+.dark .icon-btn:hover{background: rgba(96,165,250,.15)}
+.dark .icon-btn-danger{
+  color:#f87171;
+  border-color: rgba(248,113,113,.3);
+  background: rgba(248,113,113,.1);
+}
+.dark .icon-btn-danger:hover{background: rgba(248,113,113,.2)}
+.dark .warning{
+  color:#fbbf24;
+  border-color: rgba(251,191,36,.3);
+  background: rgba(251,191,36,.1);
+}
+.dark .inline-checks label,
+.dark .check-grid label,
+.dark .radio-list label{background: rgba(255,255,255,.04)}
+.dark .inline-checks label:hover,
+.dark .check-grid label:hover,
+.dark .radio-list label:hover{background: rgba(96,165,250,.1)}
+.dark .row:has(input[type="checkbox"]){background: rgba(255,255,255,.04)}
+.dark .pill{
+  background: rgba(52,211,153,.15);
+  border-color: rgba(52,211,153,.3);
+}
+/* Theme toggle button */
+.btn-theme{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:36px;
+  padding:0;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background: rgba(0,0,0,.04);
+  color:var(--text);
+  cursor:pointer;
+  transition: background .15s ease;
+}
+.btn-theme:hover{background: rgba(59,123,255,.12)}
+.dark .btn-theme{background: rgba(255,255,255,.06)}
+.dark .btn-theme:hover{background: rgba(96,165,250,.15)}
+
+/* ── Note icon in label cell ─────────────────── */
+.tooth-note-icon{
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 3px;
+  vertical-align: middle;
+  color: var(--text);
+}
+.tooth-note-icon svg{
+  width: 13px;
+  height: 13px;
+}
+
+/* ── Note editor popover ─────────────────────── */
+.odon-note-backdrop{
+  position: fixed; inset: 0; z-index: 120;
+  background: rgba(0,0,0,.35);
+  animation: odon-fade-in .12s ease;
+}
+.odon-note-popover{
+  position: relative;
+  background: var(--panel, #fff);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.2);
+  padding: 14px;
+  width: min(320px, 90vw);
+  display: flex; flex-direction: column; gap: 10px;
+  animation: odon-ctx-pop .12s ease;
+}
+.odon-note-header{
+  display: flex; align-items: center; justify-content: space-between;
+}
+.odon-note-title{
+  font-weight: 700; font-size: 14px; color: var(--text);
+}
+.odon-note-textarea{
+  width: 100%;
+  min-height: 60px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: rgba(0,0,0,.02);
+  resize: vertical;
+}
+.odon-note-textarea:focus{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,123,255,.18);
+  border-color: rgba(59,123,255,.5);
+}
+.odon-note-textarea::placeholder{
+  color: var(--muted);
+}
+.odon-note-actions{
+  display: flex; gap: 8px;
+}
+.odon-note-actions .odon-zoom-btn{
+  flex: 1;
+}
+
+/* ── State warnings ──────────────────────────── */
+.warning-item{
+  padding:6px 10px;
+  border-radius:8px;
+  background: rgba(234,179,8,.12);
+  color:#92400e;
+  font-size:12px;
+  font-weight:600;
+  line-height:1.4;
+  margin-bottom:4px;
+}
+.dark .warning-item{
+  background: rgba(250,204,21,.1);
+  color:#fde047;
+}
+
+/* ── Mobile / Touch UX ───────────────────────── */
+
+/* Zoom popover */
+.odon-zoom-overlay{
+  position:fixed; inset:0; z-index:100;
+  background: rgba(0,0,0,.4);
+  display:flex; align-items:center; justify-content:center;
+  animation: odon-fade-in .15s ease;
+}
+@keyframes odon-fade-in{ from{opacity:0} to{opacity:1} }
+.odon-zoom-popover{
+  background: var(--panel, #fff);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  padding:16px;
+  max-width:min(360px, 90vw);
+  width:100%;
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+}
+.odon-zoom-header{
+  width:100%;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.odon-zoom-title{
+  font-weight:800; font-size:16px; color:var(--text);
+}
+.odon-zoom-close{
+  width:32px; height:32px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background: rgba(0,0,0,.04);
+  color:var(--text);
+  font-size:18px; font-weight:700;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  line-height:1;
+}
+.odon-zoom-close:hover{background: rgba(217,69,69,.12); color:#d94545}
+.odon-zoom-svg{
+  width:200px; height:200px;
+  display:flex; align-items:center; justify-content:center;
+}
+.odon-zoom-svg svg{
+  width:180px; height:180px;
+  pointer-events:none;
+}
+.odon-zoom-actions{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:8px;
+  width:100%;
+}
+.odon-zoom-btn{
+  border:1px solid var(--line);
+  background: rgba(59,123,255,.08);
+  color:var(--text);
+  padding:10px 8px;
+  border-radius:12px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+  text-align:center;
+}
+.odon-zoom-btn:hover{background: rgba(59,123,255,.18)}
+.odon-zoom-btn.active{
+  background: rgba(18,185,129,.18);
+  border-color: rgba(18,185,129,.5);
+}
+.odon-zoom-btn.danger{
+  background: rgba(217,69,69,.08);
+  border-color: rgba(217,69,69,.3);
+  color:#b83a3a;
+}
+.odon-zoom-btn.danger:hover{background: rgba(217,69,69,.18)}
+
+/* Context menu (long-press) */
+.odon-ctx-menu{
+  position:fixed;
+  z-index:110;
+  background: var(--panel, #fff);
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.2);
+  padding:6px;
+  min-width:180px;
+  display:flex; flex-direction:column; gap:4px;
+  animation: odon-ctx-pop .12s ease;
+}
+@keyframes odon-ctx-pop{ from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+.odon-ctx-item{
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.02);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+  text-align:start;
+}
+.odon-ctx-item:hover{background: rgba(59,123,255,.1)}
+.odon-ctx-item.danger{color:#b83a3a}
+.odon-ctx-item.danger:hover{background: rgba(217,69,69,.12)}
+.odon-ctx-divider{height:1px;background:var(--line);margin:2px 0}
+
+/* Dark mode overrides for touch UI */
+.dark .odon-zoom-overlay{background: rgba(0,0,0,.6)}
+.dark .odon-zoom-popover{background: var(--panel); box-shadow: 0 20px 60px rgba(0,0,0,.5)}
+.dark .odon-zoom-close{background: rgba(255,255,255,.06)}
+.dark .odon-zoom-close:hover{background: rgba(248,113,113,.15); color:#f87171}
+.dark .odon-zoom-btn{background: rgba(96,165,250,.1)}
+.dark .odon-zoom-btn:hover{background: rgba(96,165,250,.2)}
+.dark .odon-zoom-btn.active{background: rgba(52,211,153,.18); border-color: rgba(52,211,153,.4)}
+.dark .odon-zoom-btn.danger{background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.25); color:#f87171}
+.dark .odon-ctx-menu{background: var(--panel); box-shadow: 0 12px 40px rgba(0,0,0,.5)}
+.dark .odon-ctx-item{background: rgba(255,255,255,.04)}
+.dark .odon-ctx-item:hover{background: rgba(96,165,250,.12)}
+.dark .odon-ctx-item.danger{color:#f87171}
+
+/* Pinch-to-zoom on grid */
+.tooth-grid.odon-pinch-active{
+  touch-action: none;
+  transform-origin: center center;
+  transition: transform .05s ease;
+}
+
+/* Mobile touch targets & layout */
+@media (pointer: coarse){
+  .tooth-tile{
+    min-height:56px;
+  }
+  .tooth-tile .tooth-svg{
+    height:80px;
+  }
+  .tooth-tile.occl-view .tooth-svg{
+    height:60px;
+  }
+  .tooth-label-cell{
+    min-height:44px;
+    min-width:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .chart-actions .btn-icon{
+    min-width:44px;
+    min-height:44px;
+  }
+}
+
+/* Swipe arch toggle bar (mobile only) */
+.odon-arch-toggle{
+  display:none;
+  justify-content:center;
+  gap:8px;
+  padding:8px 10px;
+  border-bottom:1px solid var(--line);
+}
+.odon-arch-toggle .odon-arch-btn{
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.04);
+  color:var(--text);
+  padding:8px 20px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+  flex:1;
+  text-align:center;
+}
+.odon-arch-toggle .odon-arch-btn.active{
+  background: rgba(59,123,255,.18);
+  border-color: rgba(59,123,255,.45);
+}
+.dark .odon-arch-toggle .odon-arch-btn{background: rgba(255,255,255,.06)}
+.dark .odon-arch-toggle .odon-arch-btn.active{background: rgba(96,165,250,.2); border-color: rgba(96,165,250,.45)}
+@media (max-width: 600px){
+  .odon-arch-toggle{display:flex}
+  .tooth-grid.odon-arch-upper .lower-row,
+  .tooth-grid.odon-arch-upper .lower-row + .tooth-label-row{display:none !important}
+  .tooth-grid.odon-arch-lower .upper-row,
+  .tooth-grid.odon-arch-lower .tooth-label-row:first-child{display:none !important}
+}
+
+.odon-export-overlay{position:fixed; inset:0; z-index:130; display:flex; align-items:center; justify-content:center; background:rgba(20,28,40,.55); backdrop-filter:blur(4px)}
+.odon-export-card{background:var(--panel); border-radius:18px; box-shadow:0 20px 60px rgba(30,42,58,.25); padding:28px 40px; text-align:center; min-width:240px}
+.odon-export-title{font-weight:600; font-size:14px; color:var(--muted); margin-bottom:8px}
+.odon-export-pct{font-weight:800; font-size:40px; line-height:1; color:var(--text)}
+.odon-export-phase{font-size:12px; color:var(--muted); margin-top:8px}
+.odon-tour-backdrop{position:fixed; inset:0; z-index:140; background:rgba(20,28,40,.45)}
+.odon-tour-highlight{position:fixed; z-index:141; border:3px solid var(--accent,#3b7bff); border-radius:12px; box-shadow:0 0 0 9999px rgba(20,28,40,.45); pointer-events:none; transition:all .15s ease}
+.odon-tour-card{position:fixed; z-index:142; background:var(--panel); border-radius:16px; box-shadow:0 16px 48px rgba(30,42,58,.25); padding:18px 20px; width:300px}
+.odon-tour-card-center{top:50%; left:50%; transform:translate(-50%,-50%)}
+.odon-tour-counter{font-size:11px; color:var(--muted); margin-bottom:6px}
+.odon-tour-title{font-weight:700; font-size:16px; margin-bottom:6px; color:var(--text)}
+.odon-tour-text{font-size:13px; color:var(--muted); margin-bottom:14px}
+.odon-tour-actions{display:flex; gap:8px; justify-content:flex-end}
+.odon-tour-btn{border:1px solid var(--line); background:rgba(0,0,0,.04); color:var(--text); padding:6px 12px; border-radius:10px; font-weight:600; cursor:pointer}
+.odon-tour-btn:disabled{opacity:.4; cursor:default}
+.odon-tour-skip{margin-right:auto; background:transparent}
+.odon-tour-next{background:rgba(59,123,255,.18); border-color:rgba(59,123,255,.45)}
+.caries-deep path, .caries-deep circle, .caries-deep ellipse { stroke: #b3261e; stroke-width: .5px; }
+.settings-menu{min-width:200px}
+.settings-group-label{font-size:11px; color:var(--muted); font-weight:700; padding:4px 8px 2px}
+.settings-sep{height:1px; background:var(--line); margin:6px 4px}
+.surf-depth.icdas{flex-direction:row; gap:0; padding:0; min-width:15px; height:15px; align-items:center; justify-content:center; border-radius:50%; font-size:10px; font-weight:800; color:#fff; background:#b3261e}
+.surf-depth.icdas[data-depth="surface"]{background:#e6a23c}
+.surf-depth.icdas[data-depth="dentin"]{background:#d9663d}
+.surf-depth.icdas[data-depth="deep"]{background:#b3261e}
+.surf-depth.icdas i{display:none}
+
+/* Left column: chart card + the separate tooth-information card stacked below it */
+.chart-column{grid-column:1; display:flex; flex-direction:column; gap:14px; min-width:0}
+
+/* "Dental Chart" graphical redesign, Task 1: the inline perio panel that
+   replaces .chart-column (hidden via display:none, never unmounted — see
+   above) in the same grid cell when the Odontogram | Dental Chart toggle
+   (#appViewToggle) selects "Dental Chart". Pinned to the SAME explicit
+   column as .chart-column (see the .panel comment above for why the pin is
+   needed at all). */
+.dental-chart-column{grid-column:1; display:flex; flex-direction:column; min-width:0}
+
+/* Bead odontogram-c51: die kieferorthopaedische Ansicht. Anders als die beiden
+   anderen nimmt sie BEIDE Rasterspalten - das rechte Bedienfeld ist daneben
+   ausgeblendet, weil keine der beiden Karten am einzelnen Zahn haengt. Die
+   Modellanalyse zeichnet einen ganzen Bogen, die Fernroentgenanalyse eine
+   fuenfspaltige Tabelle; beide lesen sich in 360 Pixel Restbreite schlecht. */
+/* ZWEI Karten NEBENEINANDER, sobald Platz ist - nicht eine ueber die volle
+   Breite. Gemessen bei 1900 Pixeln Fensterbreite: eine Karte ueber beide
+   Spalten legt in der Modellanalyse zwischen "Norm" und "Gemessen" 900 Pixel
+   Leerraum, und der Balken steht am anderen Ende des Bildschirms als die Zahl,
+   die er zeigt. Eine Zahlenreihe braucht Naehe, nicht Weite. Nebeneinander
+   bekommt jede Karte rund 930 Pixel - genug fuer den Bogen 16..26 (660) und
+   fuer die fuenfspaltige Fernroentgentabelle - und beide sind gleichzeitig zu
+   sehen, was dem Ablauf entspricht: Modell messen, dann das Fernroentgenbild.
+   Die Grenze liegt bei 1400, weil darunter die zweite Spalte den Bogen
+   umbrechen wuerde. `align-items:start` haelt die kurze Karte kurz, statt sie
+   auf die Hoehe der langen zu ziehen. */
+.ortho-column{grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1fr);
+  align-items:start; gap:14px; min-width:0; max-inline-size:1800px; margin-inline:auto;
+  inline-size:100%}
+@media (min-width:1400px){
+  .ortho-column{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+/* Toolbar above the Befund-Dock: a one-line hint plus the Details toggle. */
+.schematic-toolbar{
+  max-inline-size:1400px; margin:0 auto 8px; padding:0 2px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.schematic-hint{color:var(--muted, #667); font-size:13px}
+.schematic-toolbar-actions{display:flex; gap:8px; align-items:center}
+
+/* Befund-Dock in the ANATOMICAL view (Dirk 30.08.2026, behind a flag): the
+   finding dock sits BELOW the (shrunk) odontogram, the tall right control panel
+   is hidden. The drawn
+   tiles are zoomed down so chart + dock fit without scrolling; the overlays are
+   children of #toothGrid, so they scale with it and stay aligned. */
+.layout.dock-mode:not(.dock-mode-all) aside.panel{display:none}
+.layout.dock-mode .chart-column{grid-column:1 / -1}
+.layout.dock-mode .befund-dock-column{grid-column:1 / -1; min-width:0}
+.layout.dock-mode #toothGrid{zoom:0.82}
+/* "Details" drawer: the full card panel relocated below the dock, full-width
+   as a horizontal band. */
+.layout.dock-mode.dock-mode-all aside.panel{grid-column:1 / -1; display:block; margin-top:4px; overflow:visible}
+.layout.dock-mode.dock-mode-all .panel-body{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  align-items:start;
+  gap:12px;
+  /* No scroll box of its own (Dirk, 25.09.2026: "kann nicht bis zum Ende
+     scrollen"): a 46vh box inside the scrolling page kept its bottom below the
+     window, so its end could not be seen. The page is the only scroller. */
+  max-height:none;
+  overflow:visible;
+}
+
+/* Details drawer of the anatomical dock: the relocated
+   card panel is a grid of 260 px tracks, but every <select> carries a 220 px
+   minimum and sits BESIDE its label — so label + select ran up to 250 px past
+   the card's frame (Dirk, 25.09.2026, screenshot). A grid item also defaults
+   to min-width:auto and grew past its track. Here the cards stay in their
+   track, a row wraps its label above the control when both do not fit, and a
+   select shrinks to the card instead of holding its 220 px. */
+.layout.dock-mode.dock-mode-all .panel-body > *{min-width:0; max-width:100%}
+.layout.dock-mode.dock-mode-all .panel-body .row{flex-wrap:wrap}
+.layout.dock-mode.dock-mode-all .panel-body select{min-width:0; max-width:100%; flex:1 1 150px}
+/* A label that WRAPS its select (wear, discoloration) must wrap too. */
+.layout.dock-mode.dock-mode-all .panel-body .row > label{display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-width:0; max-width:100%}
+
+/* The compact keypad. */
+.schematic-keypad{
+  max-inline-size:1600px; margin:4px auto 0; padding:6px 10px 8px;
+  background:rgba(255,255,255,.9); border:1px solid var(--line, #d8dde3);
+  border-radius:10px;
+}
+.keypad-readout{margin-inline-start:auto; font:600 13px ui-monospace, SFMono-Regular, Menlo, monospace; padding:2px 8px; border-radius:6px; background:rgba(59,123,255,.10); color:#274b8f}
+.keypad-readout.is-notice{background:rgba(198,40,40,.10); color:#9b1c1c; font-family:inherit; font-weight:500}
+.schematic-keypad.is-disabled .keypad-row-label,
+.schematic-keypad.is-disabled .keypad-hint{opacity:.6}
+.keypad-head{display:flex; gap:12px; align-items:baseline; margin-bottom:4px}
+.keypad-title{font-weight:700; font-size:14px}
+.keypad-active{color:var(--muted, #667); font-size:13px}
+/* Befund-Dock (Dirk 30.08.2026): the rows are grouped into titled cards laid
+   out in a responsive grid, so all findings sit below the chart in reach. */
+/* Dense like charly's key field (25.09.2026): no cards, the groups side by side
+   and separated by a hairline, a row label INLINE before its keys, small keys
+   with tight gaps — the keypad is about half the chart's height, not equal. */
+.keypad-groups{display:flex; flex-wrap:wrap; gap:6px 0; align-items:flex-start}
+.keypad-group{padding:0 12px; border-inline-start:1px solid var(--line, #d8dde3)}
+.keypad-group:first-child{padding-inline-start:0; border-inline-start:0}
+.keypad-group-title{font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted, #667); margin:0 0 3px; font-weight:700}
+.keypad-row{display:flex; flex-direction:row; align-items:center; gap:5px; margin:3px 0 0}
+.keypad-row:first-of-type{margin-top:0}
+.keypad-row-label{
+  inline-size:auto; flex:none; text-align:start;
+  color:var(--muted, #667); font-size:10px; letter-spacing:.05em; text-transform:uppercase;
+}
+.keypad-keys{display:flex; flex-wrap:wrap; gap:3px; align-items:center}
+.keypad-btn{
+  position:relative;
+  min-inline-size:30px; block-size:27px; padding:0 7px;
+  border:1px solid var(--line, #d8dde3); border-radius:5px;
+  background:#fff; color:#222; font-size:12.5px; font-weight:600; cursor:pointer;
+  transition:border-color .08s, color .08s, background .08s;
+}
+.keypad-btn:hover:not(:disabled){border-color:#3b7bff; color:#3b7bff}
+/* Hover-Karte, die den Schalter erklärt (Dirk 31.08.2026) — data-tip statt
+   nativem title, damit sie stilisiert und ohne 1-s-Verzögerung erscheint. */
+.keypad-btn[data-tip]::after{
+  content:attr(data-tip);
+  position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%);
+  z-index:60; width:max-content; max-width:220px; text-align:center;
+  padding:6px 9px; border-radius:6px;
+  background:#1f2937; color:#fff; font-size:12px; font-weight:500; line-height:1.35;
+  white-space:normal; box-shadow:0 4px 14px rgba(0,0,0,.18);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .12s ease, visibility 0s linear .12s;
+}
+.keypad-btn[data-tip]::before{
+  content:""; position:absolute; left:50%; bottom:calc(100% + 3px); transform:translateX(-50%);
+  z-index:60; border:5px solid transparent; border-top-color:#1f2937;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .12s ease, visibility 0s linear .12s;
+}
+.keypad-btn[data-tip]:hover:not(:disabled)::after,
+.keypad-btn[data-tip]:hover:not(:disabled)::before,
+.keypad-btn[data-tip]:focus-visible::after,
+.keypad-btn[data-tip]:focus-visible::before{
+  opacity:1; visibility:visible; transition-delay:.3s,.3s;
+}
+@media (prefers-reduced-motion: reduce){
+  .keypad-btn[data-tip]::after,.keypad-btn[data-tip]::before{transition:none}
+}
+.keypad-btn:active:not(:disabled){background:#eef4ff}
+.keypad-btn:disabled{opacity:.4; cursor:default}
+.keypad-surf{min-inline-size:30px}
+.keypad-mat.is-active{background:#3b7bff; color:#fff; border-color:#3b7bff}
+/* The caries switch lights in the caries red, not the material blue: it says
+   what a surface click will enter. */
+.keypad-caries{color:#b3261e}
+.keypad-caries.is-active{background:#c62828; color:#fff; border-color:#c62828}
+.keypad-caries:hover:not(:disabled){border-color:#c62828; color:#c62828}
+.keypad-caries.is-active:hover:not(:disabled){color:#fff}
+.keypad-hint{color:#8a94a2; font-size:12px; margin-inline-start:4px}
+.perio-inline-panel{min-height:480px}
+
+/* Tooth information panel — its own card below (outside) the dental chart box */
+.tooth-info{margin-top:0}
+.tooth-info-overview{margin:0 0 10px; font-weight:600}
+.tooth-info-list{margin:0 0 6px; font-size:13px; color:var(--muted)}
+.tooth-info-line{margin:6px 0 0; font-size:13px; line-height:1.5}
+.tooth-info-heading{font-weight:700}
+.tooth-info-empty{color:var(--muted); font-style:italic}
+.tooth-info-notes{margin:6px 0 0; font-size:13px; line-height:1.5}
+.tooth-info-note-item{margin:2px 0 0 12px}
+/* R2-B Task 2: "What changes" box — a tinted panel that visually separates
+   the status->plan diff from the descriptive summary sections above it.
+   Reuses the same accent-blue "plan" visual language as the active
+   .chart-mode-btn / .chart.plan-mode so the diff reads as belonging to the
+   Plan chart. */
+.planned-changes{
+  margin-top:10px;
+  padding:8px 10px;
+  border-radius:12px;
+  background: rgba(59,123,255,.08);
+  border:1px solid rgba(59,123,255,.35);
+}
+.planned-changes .tooth-info-heading{margin-bottom:4px}
+.planned-changes-item{margin:4px 0 0; font-size:13px; line-height:1.5}
+.dark .planned-changes{
+  background: rgba(96,165,250,.12);
+  border-color: rgba(96,165,250,.4);
+}
+
+/* ── Settings modal ──────────────────────────── */
+.odon-settings-backdrop{
+  position: fixed; inset: 0; z-index: 150;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(20,28,40,.55);
+  backdrop-filter: blur(4px);
+  animation: odon-fade-in .12s ease;
+}
+.odon-settings-modal{
+  position: relative;
+  display: flex; flex-direction: column;
+  width: min(640px, 96vw);
+  max-height: min(84vh, 720px);
+  background: var(--panel, #fff);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(20,28,40,.30);
+  overflow: hidden;
+  animation: odon-ctx-pop .12s ease;
+}
+.odon-settings-header{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.odon-settings-title{
+  margin: 0; font-size: 16px; font-weight: 700; color: var(--text);
+}
+.odon-settings-close{
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: rgba(0,0,0,.04); color: var(--text);
+  cursor: pointer;
+}
+.odon-settings-close:hover{ background: rgba(0,0,0,.08); }
+.odon-settings-close:focus-visible{
+  outline: none; box-shadow: 0 0 0 3px rgba(59,123,255,.35);
+}
+.odon-settings-body{
+  display: flex; min-height: 0; flex: 1;
+}
+.odon-settings-tabs{
+  display: flex; flex-direction: column; gap: 2px;
+  width: 168px; flex-shrink: 0;
+  padding: 12px 10px;
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+.odon-settings-tab{
+  text-align: start;
+  padding: 8px 12px;
+  border: 1px solid transparent; border-radius: 10px;
+  background: transparent; color: var(--muted);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.odon-settings-tab:hover{ background: rgba(0,0,0,.04); color: var(--text); }
+.odon-settings-tab.is-active{
+  background: rgba(59,123,255,.14);
+  border-color: rgba(59,123,255,.35);
+  color: var(--text);
+}
+.odon-settings-tab:focus-visible{
+  outline: none; box-shadow: 0 0 0 3px rgba(59,123,255,.30);
+}
+.odon-settings-panel{
+  flex: 1; min-width: 0;
+  padding: 16px 18px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.odon-settings-group-title{
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted); margin: 4px 0 -2px;
+}
+.odon-settings-group-title:first-child{ margin-top: 0; }
+.odon-settings-row{
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px;
+}
+.odon-settings-row-disabled{ opacity: .6; }
+.odon-settings-row-text{ min-width: 0; flex: 1; }
+.odon-settings-row-label{
+  font-size: 13px; font-weight: 700; color: var(--text);
+}
+.odon-settings-row-desc{
+  margin-top: 3px; font-size: 12px; line-height: 1.45; color: var(--muted);
+}
+.odon-settings-row-control{ flex-shrink: 0; }
+.odon-settings-badge{
+  display: inline-block; margin-inline-start: 6px;
+  padding: 1px 7px; border-radius: 999px;
+  background: rgba(59,123,255,.14); color: var(--accent, #3b7bff);
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  vertical-align: middle;
+}
+.odon-settings-select{
+  min-width: 150px;
+  padding: 6px 10px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--panel, #fff); color: var(--text);
+  font-size: 13px; font-family: inherit;
+}
+.odon-settings-select:focus-visible{
+  outline: none; box-shadow: 0 0 0 3px rgba(59,123,255,.30); border-color: rgba(59,123,255,.5);
+}
+.odon-settings-switch{
+  position: relative; display: inline-flex; align-items: center;
+  width: 42px; height: 24px; cursor: pointer;
+}
+.odon-settings-switch input{
+  position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer;
+}
+.odon-settings-switch-track{
+  position: absolute; inset: 0;
+  border-radius: 999px; background: rgba(120,130,145,.35);
+  transition: background .15s ease;
+}
+.odon-settings-switch-track::after{
+  content: ""; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  transition: transform .15s ease;
+}
+.odon-settings-switch input:checked + .odon-settings-switch-track{
+  background: var(--accent, #3b7bff);
+}
+.odon-settings-switch input:checked + .odon-settings-switch-track::after{
+  transform: translateX(18px);
+}
+.odon-settings-switch input:focus-visible + .odon-settings-switch-track{
+  box-shadow: 0 0 0 3px rgba(59,123,255,.30);
+}
+.dark .odon-settings-close{ background: rgba(255,255,255,.06); }
+.dark .odon-settings-close:hover{ background: rgba(255,255,255,.12); }
+.dark .odon-settings-tab:hover{ background: rgba(255,255,255,.06); }
+.dark .odon-settings-select{ background: #1e293b; }
+@media (max-width: 520px){
+  .odon-settings-body{ flex-direction: column; }
+  .odon-settings-tabs{
+    flex-direction: row; width: auto;
+    border-right: none; border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+  }
+}
+
+/* DS-1 Task 2: blocking confirm dialog (status edit on a planned tooth).
+   Mirrors .odon-settings-backdrop/.odon-settings-modal's look. Layered ABOVE
+   every other overlay/modal (settings 150, perio overlay 160) because it is a
+   blocking confirmation — nothing may sit over it. */
+.odon-confirm-backdrop{
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(20,28,40,.55);
+  backdrop-filter: blur(4px);
+  animation: odon-fade-in .12s ease;
+}
+.odon-confirm-modal{
+  position: relative;
+  display: flex; flex-direction: column; gap: 18px;
+  width: min(420px, 96vw);
+  padding: 22px 22px 18px;
+  background: var(--panel, #fff);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(20,28,40,.30);
+  animation: odon-ctx-pop .12s ease;
+}
+.odon-confirm-message{
+  margin: 0; font-size: 14px; line-height: 1.5; color: var(--text);
+}
+.odon-confirm-actions{
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+.odon-confirm-btn{
+  padding: 8px 16px;
+  border: 1px solid var(--line); border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+}
+.odon-confirm-btn:focus-visible{
+  outline: none; box-shadow: 0 0 0 3px rgba(59,123,255,.35);
+}
+.odon-confirm-cancel{
+  background: rgba(0,0,0,.04); color: var(--text);
+}
+.odon-confirm-cancel:hover{ background: rgba(0,0,0,.08); }
+.odon-confirm-accept{
+  background: var(--brand, #3b7bff); color: #fff; border-color: transparent;
+}
+.odon-confirm-accept:hover{ filter: brightness(1.05); }
+.dark .odon-confirm-cancel{ background: rgba(255,255,255,.06); }
+.dark .odon-confirm-cancel:hover{ background: rgba(255,255,255,.12); }
+
+/* P2 Task 1: perio-chart overlay shell. Full-screen, layered ABOVE the
+   odontogram (which it never unmounts) — higher z-index than every other
+   overlay/modal in this file (settings modal is 150). Mirrors
+   .odon-settings-backdrop/.odon-settings-modal's look, but #perioOverlay
+   itself carries role="dialog" (no separate backdrop element). */
+.perio-overlay{
+  position: fixed; inset: 0; z-index: 160;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: rgba(20,28,40,.55);
+  backdrop-filter: blur(4px);
+  animation: odon-fade-in .12s ease;
+}
+.perio-overlay-panel{
+  display: flex; flex-direction: column;
+  width: min(960px, 96vw);
+  max-height: min(90vh, 800px);
+  background: var(--panel, #fff);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(20,28,40,.30);
+  overflow: hidden;
+  animation: odon-ctx-pop .12s ease;
+}
+.perio-overlay-header{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.perio-overlay-title{
+  margin: 0; font-size: 16px; font-weight: 700; color: var(--text);
+}
+.perio-overlay-close{
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: rgba(0,0,0,.04); color: var(--text);
+  cursor: pointer;
+}
+.perio-overlay-close:hover{ background: rgba(0,0,0,.08); }
+.perio-overlay-close:focus-visible{
+  outline: none; box-shadow: 0 0 0 3px rgba(59,123,255,.35);
+}
+.perio-overlay-body{
+  flex: 1; min-height: 240px;
+  padding: 16px 18px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.dark .perio-overlay-close{ background: rgba(255,255,255,.06); }
+.dark .perio-overlay-close:hover{ background: rgba(255,255,255,.12); }
+
+/* P2 Task 2: full-mouth perio grid + summary bar, built inside
+   #perioOverlayGrid (.perio-overlay-body above). Distinct class prefix
+   (`perio-fullgrid-*`) from the P1 tooth-panel's single-tooth
+   `.perio-grid`/`.perio-site-*` classes (index.css ~657) — the overlay uses
+   its own unique id (#perioOverlayGrid) so it never collides with the P1
+   panel's always-present #perioGrid, and the two class prefixes never
+   collide since the two subtrees are never both matched by the same
+   selector. */
+.perio-fullgrid-summary{
+  flex: 0 0 auto;
+  display: flex; flex-wrap: wrap; gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: rgba(0,0,0,.02);
+  position: sticky; top: 0; z-index: 3;
+}
+.dark .perio-fullgrid-summary{ background: rgba(255,255,255,.04); }
+.perio-fullgrid-summary-item{ display: flex; align-items: baseline; gap: 6px; font-size: 12px; }
+.perio-fullgrid-summary-label{ color: var(--muted); }
+.perio-fullgrid-summary-value{ font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* UI-1 Task 2: `<PerioSidebar/>` — the three titled cards (whole-mouth
+   summary / "Páciens adatok" case metadata / 2017 classification, the last
+   nested inside the metadata card under its own subheading). Background/
+   border/radius mirror `.card` exactly so the sidebar reads as part of the
+   same design system (dark-mode override mirrors `.dark .card` too). Rows
+   are a two-column label->control grid (`.case-meta-row`); the classification
+   axis rows add a third column for the derived value
+   (`.perio-class-row`: label / derived value / override select). Collapses
+   to a single column below the mobile breakpoint. */
+.perio-summary-card,
+.case-meta-panel{
+  background: rgba(255,255,255,.9);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.dark .perio-summary-card,
+.dark .case-meta-panel{
+  background: rgba(30,41,59,.8);
+  border-color: var(--line);
+}
+.perio-summary-card{ padding: 12px; }
+.perio-summary-card-title{ font-weight: 800; margin-bottom: 10px; color: var(--text); }
+.perio-summary-card .perio-fullgrid-summary{
+  /* Reset the P2 full-grid overlay's sticky header treatment — inside this
+     titled card the summary bar is plain content, not a sticky toolbar. */
+  position: static;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+}
+
+.case-meta-panel{ overflow: hidden; }
+.case-meta-panel-title{
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 12px;
+  font-weight: 800; color: var(--text);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.case-meta-panel-title::-webkit-details-marker{ display: none; }
+.case-meta-panel-title::after{
+  content: "";
+  width: 8px; height: 8px; flex-shrink: 0;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform .15s ease;
+}
+.case-meta-panel[open] .case-meta-panel-title::after{ transform: rotate(45deg); }
+.case-meta-panel-title:hover{ background: rgba(0,0,0,.03); }
+.dark .case-meta-panel-title:hover{ background: rgba(255,255,255,.04); }
+.case-meta-panel-title:focus-visible{
+  outline: none; box-shadow: inset 0 0 0 3px rgba(59,123,255,.30);
+}
+.case-meta-panel-body{
+  padding: 2px 12px 14px;
+  border-top: 1px solid var(--line);
+  display: flex; flex-direction: column;
+}
+.case-meta-row{
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  column-gap: 12px;
+  padding-top: 10px;
+}
+.case-meta-row:first-child{ padding-top: 12px; }
+.case-meta-row-label{ font-size: 13px; font-weight: 600; color: var(--text); }
+.case-meta-row-disabled{ opacity: .55; }
+.case-meta-row-disabled .case-meta-row-label{ color: var(--muted); }
+.case-meta-input,
+.case-meta-select{
+  justify-self: start;
+  padding: 6px 10px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--panel, #fff); color: var(--text);
+  font-size: 13px; font-family: inherit;
+}
+.case-meta-input:focus-visible,
+.case-meta-select:focus-visible{
+  outline: none; box-shadow: 0 0 0 3px rgba(59,123,255,.30); border-color: rgba(59,123,255,.5);
+}
+.case-meta-input-narrow{ width: 72px; }
+.dark .case-meta-input,
+.dark .case-meta-select{ background: #1e293b; }
+.case-meta-panel-subheading{
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-weight: 800; font-size: 13px; color: var(--text);
+}
+.perio-class-row{
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+  padding-top: 10px;
+}
+.perio-class-row-label{ font-size: 13px; font-weight: 600; color: var(--text); }
+.perio-class-derived{
+  font-size: 12px; color: var(--muted); font-style: italic;
+  justify-self: start;
+}
+/* The override <select> drops to its own full-width line so its long
+   "(use derived: …)" option can never overflow the fixed-width sidebar
+   (the native select truncates its text internally). */
+.perio-class-row .case-meta-select{
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 600px){
+  .perio-summary-card .perio-fullgrid-summary{ grid-template-columns: 1fr; }
+  .case-meta-row,
+  .perio-class-row{
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+  .case-meta-input,
+  .case-meta-select{
+    justify-self: stretch;
+    width: 100%;
+  }
+  .case-meta-input-narrow{ width: 100%; }
+}
+
+/* "Dental Chart" graphical redesign, Task 2 (UI-3a Task 2 update): the
+   tooth-row graphic — TWO standalone arch SVGs per arch band (buccal,
+   palatal), each built by `buildBuccalArchSvg`/`buildPalatalArchSvg`
+   (perioGraphic.ts). Purely decorative (`aria-hidden` is set directly on
+   each SVG by its builder — the accessible data lives in the
+   `.perio-fullgrid-*` grid it sits inside, unaffected).
+   T1 polish: the SVG carries NO fixed width/height — it fills the graphic
+   cell (which spans all tooth columns) via `width:100%` and derives its
+   height from the viewBox aspect ratio, so it scales when the browser window
+   is resized instead of being pinned to a fixed intrinsic size. The tooth
+   columns are widened by `PERIO_DISPLAY_SCALE` (applyArchColumns) so the teeth
+   read larger while staying column-aligned with the number cells. */
+.perio-tooth-arch{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* T3 curve overlay: CEJ baseline + gingival-margin line + pocket-base line +
+   a filled band between them, drawn over the T2 tooth arch. */
+.perio-curve-cej{
+  stroke: #e11d48; /* red CEJ reference line */
+  stroke-width: 0.8;
+  opacity: 0.85;
+}
+.perio-curve-band{
+  fill: #3b82f6; /* blue, semi-transparent pocket band (reference style) */
+  fill-opacity: 0.18;
+  stroke: none;
+}
+.perio-curve-margin{
+  fill: none;
+  stroke: #f472b6; /* gingival margin */
+  stroke-width: 0.9;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.perio-curve-pocket{
+  fill: none;
+  stroke: #1d4ed8; /* pocket base (probing depth) */
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.dark .perio-curve-band{ fill-opacity: 0.24; }
+.dark .perio-curve-pocket{ stroke: #60a5fa; }
+.dark .perio-curve-margin{ stroke: #f9a8d4; }
+
+/* Perio polish T2: background millimetre guide grid — faint 1-mm horizontal
+   lines below the CEJ toward the root, every 5th emphasized + numbered. Drawn
+   BEHIND the teeth + curve, so it reads as a subtle backdrop the curve/teeth
+   sit on top of. Decorative (aria-hidden). */
+.perio-mm-line{
+  stroke: #94a3b8;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.perio-mm-line-minor{
+  stroke-width: 0.35;
+  opacity: 0.28;
+}
+.perio-mm-line-major{
+  stroke-width: 0.6;
+  opacity: 0.5;
+}
+.perio-mm-label{
+  fill: #64748b;
+  font-size: 5px;
+  font-weight: 600;
+  opacity: 0.7;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+.dark .perio-mm-line{ stroke: #64748b; }
+.dark .perio-mm-line-minor{ opacity: 0.35; }
+.dark .perio-mm-line-major{ opacity: 0.55; }
+.dark .perio-mm-label{ fill: #94a3b8; opacity: 0.8; }
+
+/* PG-B Task 2: the Dental Chart index switcher (a radio-style toggle row in
+   the Dental Chart / overlay header) + the discrete-highlight overlay marks
+   it drives. Display-only over the existing perio data. */
+/* UI-1 Task 4: `.chart-title` at 800 (rather than the shared `.chart-header`
+   default of 700) matches the sidebar cards' title weight
+   (`.perio-summary-card-title`/`.panel-title`, both 800) now that this header
+   carries the "Parodontális Státusz" wording shared with the view toggle —
+   scoped to `.perio-chart-header` only, so the odontogram chart card's own
+   header is untouched. Row/column gaps split out (rather than one shared
+   `gap`) so wrapped pills get a bit more breathing room between rows than
+   between the title and the pill row. */
+.perio-chart-header{ flex-wrap: wrap; row-gap: 10px; column-gap: 12px; }
+.perio-chart-header .chart-title{ font-weight: 800; }
+.perio-overlay-switch{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.perio-overlay-switch-btn{
+  border: 1px solid var(--line);
+  background: var(--card, #fff);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.perio-overlay-switch-btn:hover{ border-color: var(--accent, #3b82f6); }
+.perio-overlay-switch-btn.is-active{
+  background: var(--accent, #3b82f6);
+  border-color: var(--accent, #3b82f6);
+  color: #fff;
+}
+.perio-overlay-switch-btn:focus-visible{ outline: 2px solid var(--accent, #3b82f6); outline-offset: 1px; }
+.perio-overlay-readout{
+  margin-inline-start: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.dark .perio-overlay-switch-btn{ background: rgba(255,255,255,.04); }
+.dark .perio-overlay-switch-btn.is-active{ color: #0b1220; }
+
+/* Bead odontogram-vnt: the assessment-row toggle, sitting beside the overlay
+   switcher in both chart chromes (inline panel + modal overlay). */
+.perio-assessment-toggle{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.perio-assessment-toggle input{ cursor: pointer; }
+
+/* Overlay marks drawn over the arch, in the oriented row groups. */
+.perio-overlay-mark{ vector-effect: non-scaling-stroke; }
+.perio-overlay-bop{ fill: #e11d48; opacity: 0.9; stroke: #fff; stroke-width: 0.4; }
+.perio-overlay-plaque{ fill: #f59e0b; opacity: 0.85; stroke: #fff; stroke-width: 0.4; }
+.perio-overlay-pd5{ fill: #fb923c; fill-opacity: 0.55; stroke: none; }
+.perio-overlay-pd6{ fill: #dc2626; fill-opacity: 0.55; stroke: none; }
+.dark .perio-overlay-bop{ fill: #fb7185; stroke: #0b1220; }
+.dark .perio-overlay-plaque{ fill: #fbbf24; stroke: #0b1220; }
+.dark .perio-overlay-pd5{ fill: #fdba74; fill-opacity: 0.5; }
+.dark .perio-overlay-pd6{ fill: #f87171; fill-opacity: 0.5; }
+
+/* PG-B Task 3: continuous mm heat overlays. PD/CAL share one yellow->red
+   depth ramp; GR (recession) uses a separate blue ramp so it reads distinctly
+   from pocket/attachment depth at a glance. */
+.perio-overlay-pd .perio-overlay-heat-shallow,
+.perio-overlay-cal .perio-overlay-heat-shallow{ fill: #facc15; fill-opacity: 0.55; stroke: none; }
+.perio-overlay-pd .perio-overlay-heat-moderate,
+.perio-overlay-cal .perio-overlay-heat-moderate{ fill: #fb923c; fill-opacity: 0.6; stroke: none; }
+.perio-overlay-pd .perio-overlay-heat-deep,
+.perio-overlay-cal .perio-overlay-heat-deep{ fill: #dc2626; fill-opacity: 0.65; stroke: none; }
+.perio-overlay-gr .perio-overlay-heat-shallow{ fill: #7dd3fc; fill-opacity: 0.6; stroke: none; }
+.perio-overlay-gr .perio-overlay-heat-moderate{ fill: #38bdf8; fill-opacity: 0.65; stroke: none; }
+.perio-overlay-gr .perio-overlay-heat-deep{ fill: #0369a1; fill-opacity: 0.7; stroke: none; }
+.dark .perio-overlay-pd .perio-overlay-heat-shallow,
+.dark .perio-overlay-cal .perio-overlay-heat-shallow{ fill: #fde047; fill-opacity: 0.5; }
+.dark .perio-overlay-pd .perio-overlay-heat-moderate,
+.dark .perio-overlay-cal .perio-overlay-heat-moderate{ fill: #fdba74; fill-opacity: 0.55; }
+.dark .perio-overlay-pd .perio-overlay-heat-deep,
+.dark .perio-overlay-cal .perio-overlay-heat-deep{ fill: #f87171; fill-opacity: 0.6; }
+.dark .perio-overlay-gr .perio-overlay-heat-shallow{ fill: #93c5fd; fill-opacity: 0.55; }
+.dark .perio-overlay-gr .perio-overlay-heat-moderate{ fill: #60a5fa; fill-opacity: 0.6; }
+.dark .perio-overlay-gr .perio-overlay-heat-deep{ fill: #38bdf8; fill-opacity: 0.75; }
+
+.perio-fullgrid-scroll{
+  flex: 1 1 auto;
+  overflow: auto;
+  border: 1px solid var(--line); border-radius: 10px;
+}
+.perio-fullgrid-arch{
+  display: grid;
+  align-items: stretch;
+}
+.perio-fullgrid-arch + .perio-fullgrid-arch{
+  border-top: 2px solid var(--line);
+}
+/* UI-1 Task 3: the column widened (`ROW_LABEL_WIDTH` 132 -> 220,
+   PerioChart.tsx) to fit full row-label names instead of truncating them.
+   220px still doesn't fit every language's longest label on one line, so
+   `white-space: nowrap` is dropped here (was forcing a single line) — the
+   text below wraps instead of clipping; the row simply grows taller (grid
+   rows are auto-sized), never breaking the shared first-track alignment. */
+.perio-fullgrid-row-label{
+  position: sticky; left: 0; z-index: 2;
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+.perio-fullgrid-row-label-text{
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.25;
+}
+/* SP-perio PG-B Task 1: the small "i" info button appended after a row
+   label's text (see `mkRowLabelCell` in PerioChart.tsx) + the positioned
+   popover it opens. `--panel`/`--line`/`--muted`/`--text`/`--accent` already
+   flip under `.dark` (see the P1 perio-block comment above), so no separate
+   dark-mode overrides are needed. */
+.perio-info-btn{
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--muted, #7b8794);
+  background: transparent;
+  color: var(--muted, #7b8794);
+  font-size: 9px; font-weight: 700; font-style: italic; line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+.perio-info-btn:hover{
+  border-color: var(--accent, #3b7bff);
+  color: var(--accent, #3b7bff);
+}
+.perio-info-btn:focus-visible{
+  outline: none;
+  border-color: var(--accent, #3b7bff);
+  color: var(--accent, #3b7bff);
+  box-shadow: 0 0 0 2px rgba(59,123,255,.35);
+}
+/* Layered above the perio-overlay dialog (z-index 160) so it is never hidden
+   behind the perio chart chrome it annotates, but BELOW the DS-1 confirm
+   modal (z-index 200) — the info popover must never stack over/obscure a
+   blocking confirmation. */
+.perio-info-popover{
+  position: fixed; z-index: 165;
+  max-width: 280px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(30,42,58,.18);
+  padding: 10px 12px;
+}
+.perio-info-popover-text{
+  margin: 0;
+  font-size: 12px; line-height: 1.5;
+  color: var(--text);
+}
+.perio-fullgrid-header-cell{
+  position: sticky; top: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px 4px;
+  font-size: 12px; font-weight: 700; color: var(--text);
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.perio-fullgrid-arch .perio-fullgrid-row-label:first-child,
+.perio-fullgrid-header-cell + .perio-fullgrid-header-cell:first-of-type{
+  z-index: 4;
+}
+/* UI-3a Task 2: the tooth-row graphic is now TWO cells inside the number-row
+   grid — `buccalCell` (crown-down) above the central perio index band
+   (Plaque/PI/GI/mPI/mBI), `palatalCell` (crown-up) below it — each spanning
+   all tooth columns and each holding its OWN standalone arch SVG (own
+   viewBox, tightly cropped to just that band's content), so the teeth line
+   up column-for-column with the number cells on both sides of the band; the
+   whole grid scrolls horizontally in `.perio-fullgrid-scroll`. */
+.perio-fullgrid-graphic-cell{
+  display: block; overflow: hidden; line-height: 0;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.perio-fullgrid-graphic-cell .perio-tooth-arch{ display: block; }
+/* UI-3a Task 2: the band-orientation legend row sitting between the buccal
+   graphic and the central index band — a larger-font, chrome-only label
+   (never a data row, never gated by row visibility) marking which edge of
+   the band is buccal vs. lingual/palatal. */
+.perio-fullgrid-band-label{
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 4px 10px;
+  font-size: 13px; font-weight: 700; letter-spacing: .01em;
+  color: var(--text);
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.perio-fullgrid-band-label-buccal,
+.perio-fullgrid-band-label-lingual{
+  white-space: nowrap;
+}
+.perio-fullgrid-cell{
+  display: flex; align-items: center; justify-content: center;
+  /* UI-1 Task 3: vertical padding only bumped (2px -> 3px) for a taller tap
+     target — horizontal padding is UNCHANGED. Every tooth column's width is
+     baked in from the tooth's real SVG viewBox (`applyArchColumns`,
+     PerioChart.tsx — off-limits to this task).
+     UI-1 Task 3b: the column width is no longer a fixed multiple of the
+     viewBox width — `applyArchColumns` now fits a dynamic per-render
+     `fillScale` (`computeFillScale`, perioGraphic.ts) to the container, so
+     the narrowest columns (lateral incisors) grow well past the old
+     ~50.6px on anything wider than a narrow/mobile viewport. The
+     `.perio-fullgrid-input`/`.perio-fullgrid-cal` tiles inside now flex-fill
+     the sitegroup's width instead of a fixed 13/15px, so extra column width
+     goes straight to bigger, more tappable PD/GM/CAL cells — horizontal
+     padding here stays untouched since the site tiles absorb the growth. */
+  padding: 3px 1px;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+/* UI-1 Task 3b: the site group now stretches to fill its (now dynamically
+   scaled, see `applyArchColumns`/`computeFillScale` in PerioChart.tsx) cell
+   width, so the 3 PD/GM/CAL tiles it holds grow proportionally with the
+   column instead of staying pinned to a fixed pixel size. */
+.perio-fullgrid-sitegroup{
+  display: flex; gap: 1px;
+  width: 100%;
+}
+/* UI-1 Task 3b: PD/GM inputs now FILL their one-third share of the (dynamic)
+   site-group width instead of a fixed 13px — `flex:1 1 0` + `min-width:0`
+   divides the group's width evenly across the 3 site tiles, growing with the
+   column as the chart's fill-scale widens on a bigger screen; `width:100%`
+   is the fallback for `.perio-fullgrid-kg` below, which is NOT inside a
+   sitegroup (no flex-basis context) and keeps its own fixed width instead.
+   `box-sizing:border-box` so the border doesn't add to the flexed width. */
+.perio-fullgrid-input{
+  flex: 1 1 0; width: 100%; min-width: 0; box-sizing: border-box;
+  font-size: 10px; text-align: center;
+  padding: 3px 0;
+  border: 1px solid var(--line); border-radius: 4px;
+  background: var(--card); color: var(--text);
+  -moz-appearance: textfield;
+}
+/* Hide the native number spinners — the compact tooth-aligned columns have no
+   room for them (charting is single-keystroke / spinner-free anyway). */
+.perio-fullgrid-input::-webkit-outer-spin-button,
+.perio-fullgrid-input::-webkit-inner-spin-button{
+  -webkit-appearance: none; margin: 0;
+}
+.perio-fullgrid-input:disabled,
+.perio-fullgrid-mobility-select:disabled{
+  opacity: .45; cursor: not-allowed;
+}
+/* CAL read-out: same fluid one-third-of-the-sitegroup share as PD/GM above
+   (it is a third 3-per-tooth row) — not interactive, so weight/contrast carry
+   the "bigger" intent alongside the extra pixels a wide screen now gives it. */
+.perio-fullgrid-cal{
+  flex: 1 1 0; width: 100%; min-width: 0; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+/* KG (keratinized gingiva width) reuses `.perio-fullgrid-input` but is a
+   SINGLE per-tooth cell (no site subdivision, no sitegroup), so it keeps its
+   own FIXED width/flex for a comfortable touch target rather than stretching
+   to fill the whole cell (`flex: 0 0 auto` overrides the `.perio-fullgrid-input`
+   `flex: 1 1 0` above — `.perio-fullgrid-cell` is a flex container too, so
+   without this override a lone flex-growing input would stretch edge-to-edge). */
+.perio-fullgrid-kg{ width: 30px; flex: 0 0 auto; }
+.perio-fullgrid-bop{ width: 14px; height: 14px; margin: auto; }
+.perio-fullgrid-cell-mobility{ padding: 3px 6px; }
+.perio-fullgrid-mobility-select{
+  width: 100%;
+  font-size: 11px;
+  padding: 3px 4px;
+  border: 1px solid var(--line); border-radius: 4px;
+  background: var(--card); color: var(--text);
+}
+
+/* SP-perio P2b Task 4: furcation cycle control — a compact square button per
+   entrance whose face is the current Glickman grade (I-IV, "–" when none).
+   A set grade (data-grade > 0) is emphasised with the accent colour.
+   UI-1 Task 3: enlarged (15px -> 20px) — furcation is a SINGLE control per
+   entrance (max 3 on an upper molar), not 3-per-site like PD/GM, so it has
+   real spare width in every tooth column, even the narrowest. */
+.perio-fullgrid-furc{
+  width: 20px; height: 20px; padding: 0;
+  font-size: 10px; font-weight: 700; line-height: 1;
+  text-align: center; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 4px;
+  background: var(--card); color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.perio-fullgrid-furc[data-grade]:not([data-grade="0"]){
+  border-color: var(--accent, #c0392b);
+  background: var(--accent, #c0392b); color: #fff;
+}
+.perio-fullgrid-furc:disabled{ opacity: .45; cursor: not-allowed; }
+
+/* Bead odontogram-vnt: assessment-status cycle control — one per measurement
+   point, same square-button shape as the furcation control above (the face is
+   "–" / "A" / "U" / "NA"; the full localized status rides on title +
+   aria-label). Deliberately NOT the accent colour a charted finding uses: a
+   recorded assessment status is metadata ABOUT the examination, not a
+   clinical finding, so it reads as a neutral outline until it is set. */
+.perio-fullgrid-assess{
+  width: 20px; height: 20px; padding: 0;
+  font-size: 9px; font-weight: 700; line-height: 1;
+  text-align: center; cursor: pointer;
+  border: 1px dashed var(--line); border-radius: 4px;
+  background: var(--card); color: var(--muted);
+}
+.perio-fullgrid-assess[data-assessment-status]:not([data-assessment-status="not-assessed"]){
+  border-style: solid;
+  border-color: var(--muted);
+  color: var(--text);
+  font-weight: 800;
+}
+.perio-fullgrid-assess:disabled{ opacity: .45; cursor: not-allowed; }
+
+/* SP-perio P2b Task 4: plaque control — an anatomical DIAMOND of toggle
+   buttons (mesial/distal/buccal/lingual). An active surface
+   (data-present="1") fills with the plaque colour; an inactive one is a
+   hollow outline.
+   UI-1 Task 3: tiles doubled (8px -> 16px) — well within even the narrowest
+   tooth column's budget. The SAME quad container is reused (unstyled) for
+   the PI/GI/mPI/mBI per-surface grade buttons, so they grow to match too.
+   UI-3a Task 3: 2x2 grid replaced by a 3-row `grid-template-areas` diamond
+   (buccal top-centered, mesial+distal middle, lingual bottom-centered) — the
+   caller (`buildPlaqueCell`/`buildGradeCell`) assigns each button's
+   `style.gridArea` per {@link diamondGridArea}/`mesialOnLeft`, swapping the
+   mesial/distal columns per tooth so mesial always points toward the arch
+   midline. The `> button` rule gives every tile (plaque AND the unstyled
+   PI/GI/mPI/mBI grade buttons) a fixed square size so the buccal/lingual
+   tips — spanning both columns via their area — don't stretch to fill it. */
+.perio-fullgrid-plaque-quad{
+  display: grid;
+  grid-template-areas:
+    "buc buc"
+    "mes dis"
+    "lin lin";
+  grid-template-columns: repeat(2, 16px);
+  grid-template-rows: repeat(3, 16px);
+  gap: 2px;
+}
+.perio-fullgrid-plaque-quad > button{
+  width: 16px; height: 16px;
+}
+.perio-fullgrid-plaque-buccal, .perio-fullgrid-plaque-lingual,
+.perio-fullgrid-pi-buccal, .perio-fullgrid-pi-lingual,
+.perio-fullgrid-gi-buccal, .perio-fullgrid-gi-lingual,
+.perio-fullgrid-mpi-buccal, .perio-fullgrid-mpi-lingual,
+.perio-fullgrid-mbi-buccal, .perio-fullgrid-mbi-lingual{
+  justify-self: center;
+}
+.perio-fullgrid-plaque{
+  width: 16px; height: 16px; padding: 0;
+  cursor: pointer; font-size: 0;
+  border: 1px solid var(--line); border-radius: 3px;
+  background: var(--card);
+}
+.perio-fullgrid-plaque[data-present="1"]{
+  background: var(--accent, #2d6cdf);
+  border-color: var(--accent, #2d6cdf);
+}
+.perio-fullgrid-plaque:disabled{ opacity: .45; cursor: not-allowed; }
+.dark .perio-fullgrid-furc,
+.dark .perio-fullgrid-plaque{ background: rgba(255,255,255,.04); }
+.dark .perio-fullgrid-furc[data-grade]:not([data-grade="0"]){
+  background: var(--accent, #e05252); border-color: var(--accent, #e05252);
+}
+.dark .perio-fullgrid-plaque[data-present="1"]{
+  background: var(--accent, #4d8bff); border-color: var(--accent, #4d8bff);
+}
+
+/* SP-perio PG-C Task 3 / PG-D Task 4: CEJ-visibility, root-concavity,
+   gingival-thickness (GT) and Miller-class cycle controls — one compact
+   button per tooth, face shows a short abbreviation of the current value
+   ("–" when none/unknown). GT/Miller previously had NO dedicated CSS (fell
+   back to unstyled native buttons) — UI-1 Task 3 folds them into this same
+   rule group instead of leaving them unstyled, and enlarges all four
+   (17x15 -> 30x24): each is a SINGLE control per tooth, so — like furcation
+   above — there is ample spare width even on the narrowest tooth column. */
+.perio-fullgrid-cej,
+.perio-fullgrid-rootconcavity,
+.perio-fullgrid-gt,
+.perio-fullgrid-miller{
+  width: 30px; height: 24px; padding: 0;
+  font-size: 9px; font-weight: 700; line-height: 1;
+  text-align: center; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 4px;
+  background: var(--card); color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.perio-fullgrid-cej[data-value]:not([data-value="none"]),
+.perio-fullgrid-rootconcavity[data-value]:not([data-value="none"]),
+.perio-fullgrid-gt[data-value]:not([data-value="unknown"]),
+.perio-fullgrid-miller[data-value]:not([data-value="none"]){
+  border-color: var(--accent, #c0392b);
+  background: var(--accent, #c0392b); color: #fff;
+}
+.perio-fullgrid-cej:disabled,
+.perio-fullgrid-rootconcavity:disabled,
+.perio-fullgrid-gt:disabled,
+.perio-fullgrid-miller:disabled{ opacity: .45; cursor: not-allowed; }
+.dark .perio-fullgrid-cej,
+.dark .perio-fullgrid-rootconcavity,
+.dark .perio-fullgrid-gt,
+.dark .perio-fullgrid-miller{ background: rgba(255,255,255,.04); }
+.dark .perio-fullgrid-cej[data-value]:not([data-value="none"]),
+.dark .perio-fullgrid-rootconcavity[data-value]:not([data-value="none"]),
+.dark .perio-fullgrid-gt[data-value]:not([data-value="unknown"]),
+.dark .perio-fullgrid-miller[data-value]:not([data-value="none"]){
+  background: var(--accent, #e05252); border-color: var(--accent, #e05252);
+}
+
+/* UI-1 Task 3: responsive scale-down for the enlarged touch-target cells
+   above, at the same breakpoints already used elsewhere in this file
+   (1100/600/520). The grid stays horizontally scrollable at every width
+   (`.perio-fullgrid-scroll`, `overflow:auto`, bounded by ancestors that all
+   carry `min-width:0` — `.chart-column`/`.dental-chart-column`/
+   `.perio-overlay-body`) — never a page-level scroll — these rules only trim
+   the per-cell footprint so a narrow/mobile viewport needs less of it. The
+   3-per-site PD/GM/BOP/CAL inputs/CAL read-out are intentionally NOT resized
+   here (or above) — their width is already at the ceiling the narrowest real
+   tooth column allows (see the comments above); shrinking them further would
+   only reduce legibility, not the scroll distance in any meaningful way. */
+@media (max-width: 1100px){
+  .perio-fullgrid-bop{ width: 12px; height: 12px; }
+  .perio-fullgrid-plaque-quad{
+    grid-template-columns: repeat(2, 13px);
+    grid-template-rows: repeat(3, 13px);
+    gap: 1px;
+  }
+  .perio-fullgrid-plaque-quad > button{ width: 13px; height: 13px; }
+  .perio-fullgrid-plaque{ width: 13px; height: 13px; }
+  .perio-fullgrid-furc{ width: 17px; height: 17px; }
+  .perio-fullgrid-cej,
+  .perio-fullgrid-rootconcavity,
+  .perio-fullgrid-gt,
+  .perio-fullgrid-miller{ width: 25px; height: 21px; }
+  .perio-fullgrid-kg{ width: 24px; }
+}
+@media (max-width: 600px){
+  .perio-fullgrid-bop{ width: 11px; height: 11px; }
+  .perio-fullgrid-plaque-quad{
+    grid-template-columns: repeat(2, 10px);
+    grid-template-rows: repeat(3, 10px);
+    gap: 1px;
+  }
+  .perio-fullgrid-plaque-quad > button{ width: 10px; height: 10px; }
+  .perio-fullgrid-plaque{ width: 10px; height: 10px; }
+  .perio-fullgrid-furc{ width: 15px; height: 15px; font-size: 9px; }
+  .perio-fullgrid-cej,
+  .perio-fullgrid-rootconcavity,
+  .perio-fullgrid-gt,
+  .perio-fullgrid-miller{ width: 20px; height: 17px; font-size: 8px; }
+  .perio-fullgrid-kg{ width: 20px; }
+  .perio-fullgrid-mobility-select{ font-size: 10px; padding: 2px 3px; }
+}
+@media (max-width: 520px){
+  .perio-fullgrid-plaque-quad{
+    grid-template-columns: repeat(2, 8px);
+    grid-template-rows: repeat(3, 8px);
+  }
+  .perio-fullgrid-plaque-quad > button{ width: 8px; height: 8px; }
+  .perio-fullgrid-plaque{ width: 8px; height: 8px; }
+  .perio-fullgrid-cej,
+  .perio-fullgrid-rootconcavity,
+  .perio-fullgrid-gt,
+  .perio-fullgrid-miller{ width: 17px; height: 15px; }
+  .perio-fullgrid-kg{ width: 16px; }
+}
+
+/* odontogram-im1 — which implant is in the tooth. Its own block, shown only on
+   an implant, because a product record with five fields and a scan field does
+   not belong inside a restoration dropdown. Every field may stay empty: an
+   implant that arrived with the patient is a complete record without any of
+   this, so nothing here is styled as required or missing. */
+.implant-product{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:8px 10px;
+  margin-top:6px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:rgba(255,255,255,.5);
+}
+.implant-product.hidden{display:none}
+.implant-product-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  font-weight:600;
+}
+.implant-product-head .hint{font-weight:400}
+.implant-product .row{gap:8px}
+.implant-product input[type="text"]{flex:1 1 auto; min-width:0}
+.implant-product-dims input[type="number"]{width:5.5em}
+.implant-product-readout{min-height:1em}
+
+/* Bead odontogram-ap7: the initial examination card. The correcting banner is
+   deliberately loud — while it shows, the chart holds the INITIAL examination
+   rather than today's findings, and the stash that holds today's findings is
+   runtime-only. */
+#examinationCard .examination-baseline{margin:0 0 8px}
+#examinationCard .examination-actions{gap:6px; align-items:center; flex-wrap:wrap}
+#examinationCard input[type="date"]{padding:4px 6px; border:1px solid var(--line); border-radius:8px; background:var(--panel); color:inherit}
+#examinationCard .examination-list{list-style:none; margin:8px 0 0; padding:0; font-size:12px; color:var(--muted)}
+#examinationCard .examination-list li{padding:2px 0}
+#examinationCard .examination-list li.is-baseline{color:inherit; font-weight:600}
+#examinationCard .examination-badge{margin-left:6px; padding:1px 6px; border-radius:999px; font-size:10px; font-weight:600;
+  background:rgba(46,49,146,.12); color:#2e3192}
+.baseline-correcting{border:2px dashed #b9770e; border-radius:10px; padding:8px; background:rgba(185,119,14,.08)}
+.baseline-correcting-text{margin:0 0 8px; font-size:12px; line-height:1.35}
+
+/* Bead odontogram-ap7: the "this import is the initial examination" choice,
+   inside the import menu — the file picker is the OS's, so the menu is the
+   only place a question can be asked before the file is chosen. */
+.dropdown-check{display:flex; align-items:center; gap:8px; padding:8px 12px; cursor:pointer; font-size:13px; border-top:1px solid var(--line)}
+.dropdown-check input{margin:0}
+.dropdown-hint{margin:0; padding:0 12px 8px; font-size:11px; line-height:1.35; color:var(--muted); max-width:280px}
+
+/* Bead odontogram-dma: retention elements.
+   The tile marker is charly's own shorthand rather than invented artwork —
+   no template carries a clasp or an attachment, and a drawing nobody verified
+   would be worse than a notation Dirk already reads. It lives on the tile
+   <div>, never in the SVG, so it is outside the fingerprint entirely. */
+.tooth-tile[data-retention="ste"]::after,
+.tooth-tile[data-retention*="G"]::after{
+  content:attr(data-retention); position:absolute; left:50%; transform:translateX(-50%);
+  font-size:10px; font-weight:700; line-height:1; letter-spacing:.02em;
+  color:#5b3a8e; background:rgba(91,58,142,.10); border-radius:4px; padding:1px 4px;
+  pointer-events:none; white-space:nowrap;
+}
+.tooth-tile.upper-row[data-retention]::after{ bottom:2px }
+.tooth-tile.lower-row[data-retention]::after{ top:2px }
+.tooth-tile.occl-view[data-retention]::after{ display:none }
+
+/* The derived bar. Its own overlay, but the same tile geometry the bridge
+   saddle reads, so the two cannot drift apart. */
+#toothGrid > svg.retention-overlay{position:absolute; inset:0; pointer-events:none; z-index:3}
+.retention-overlay-bar{fill:#8e7cc3; stroke:#4a3b6b; stroke-width:.75}
+/* The clasp is DRAWN, at Dirk's request — he reads charly every day and a
+   notation he has to translate is one that slows him down. */
+/* FILLED, not stroked: a cast clasp tapers from the connector to the tip, and
+   a stroke has one width from end to end. */
+.retention-overlay-clasp{fill:#1a1a1a; stroke:none}
+/* Verblockung: a rigid metal bar joining the splinted crowns. Grey, distinct
+   from the purple retention bar; over the tiles like the other overlays. */
+#toothGrid > svg.splint-overlay{position:absolute; inset:0; pointer-events:none; z-index:3}
+.splint-overlay-bar{fill:#8a9096; stroke:#5c6166; stroke-width:.75}
+/* Schiene: a translucent bite-guard band over the occlusal edge. */
+#toothGrid > svg.occlusal-splint-overlay{position:absolute; inset:0; pointer-events:none; z-index:3}
+.occlusal-splint-overlay-band{fill:#7fb3d5; fill-opacity:.45; stroke:#4a7fb5; stroke-width:.75}
+
+/* KFO-Overlay (Etappe 2): Bracket, Bogen, Band in Endkoordinaten konstruiert.
+   Ueber den Kacheln, unter der Retention/Fraktur-Ebene ist egal - es ueber-
+   deckt nichts Klinisches. */
+#toothGrid > svg.ortho-overlay{position:absolute; inset:0; pointer-events:none; z-index:3}
+/* Der durchgehende Bogen: eine feine Metalllinie auf Slot-Hoehe. */
+.ortho-overlay-wire{fill:none; stroke:#5b6472; stroke-width:1.6; stroke-linejoin:round; stroke-linecap:round}
+/* Das Bracket: Koerper plus Slotlinie, damit der Bogen sichtbar durchlaeuft. */
+.ortho-overlay-bracket rect{fill:#c9ced6; stroke:#5b6472; stroke-width:.9}
+.ortho-overlay-slot{stroke:#3c434e; stroke-width:1}
+/* Lingual: blass, weil es hinter dem Zahn steht. */
+.ortho-overlay-bracket.is-lingual{opacity:.4}
+.ortho-overlay-bracket.is-lingual rect{stroke-dasharray:2 1.5}
+/* Das Band: waagerechter Metallguertel. */
+.ortho-overlay-band{fill:#c9ced6; stroke:#5b6472; stroke-width:1; opacity:.9}
+
+/* Die Donor-Ebenen der Ortho-Apparatur in der SEITENANSICHT ausblenden - das
+   Overlay zeichnet sie dort konstruiert. Die Kauflaechenansicht behaelt Bracket
+   und Ring. Rein visuell (display): der Fingerabdruck liest `data-active`, also
+   Paritaet byte-identisch. */
+.tooth-tile.side-view svg #ortho-bracket,
+.tooth-tile.side-view svg #ortho-ring{display:none !important}
+
+/* KFO: linguales Bracket in der KAUFLAECHENANSICHT auf die andere bukkolinguale
+   Kante spiegeln. Der Transform sitzt im eigenen Rahmen der Vorlage (unter der
+   rotate180-Drehung des UK), scaleY um die viewBox-Mitte kippt buccal<->lingual.
+   Korrigiert zugleich den bestehenden UK-Fehler (Bracket stand dort gedreht auf
+   der falschen Seite). */
+.tooth-tile.occl-view[data-ortho-bracket-flip] svg #ortho-bracket{
+  transform-box: view-box; transform-origin: center; transform: scaleY(-1);
+}
+
+/* Bead odontogram-im1: an empty implant product is only a GAP where the
+   practice placed the implant. One the patient arrived with is complete. */
+.implant-product-gap{color:#b9770e; font-weight:600}
+
+/* Bead odontogram-sjr: the restoration colour pickers. */
+.settings-colour-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:8px 14px; margin:10px 0 14px}
+.settings-colour-row{display:flex; align-items:center; gap:9px; font-size:13px; cursor:pointer}
+.settings-colour-row input[type="color"]{inline-size:34px; block-size:26px; padding:0; border:1px solid var(--line); border-radius:6px; background:none; cursor:pointer}
+
+/* ── Bead odontogram-c51.1: model analysis ──────────────────────────────────
+   Two views over one width record (arch + list) and the derived indices under
+   them. Norms and deviations stay visible while typing, so entering the
+   measurements is also checking them. */
+.ma-card{display:flex; flex-direction:column; gap:12px}
+.ma-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.ma-head h3{margin:0; font-size:15px}
+.ma-viewswitch{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden}
+.ma-viewswitch button{border:0; background:var(--card); color:var(--muted); font:inherit; font-size:12px;
+  padding:4px 12px; cursor:pointer}
+.ma-viewswitch button + button{border-inline-start:1px solid var(--line)}
+.ma-viewswitch button.is-active{background:var(--accent); color:#fff}
+.ma-viewswitch button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+
+/* Arch view. Pinned dir=ltr like #toothGrid — tooth geometry never mirrors. */
+.ma-arch{display:flex; flex-direction:column; gap:10px; overflow-x:auto}
+.ma-arch-row{display:flex; align-items:center; gap:8px}
+.ma-arch-label{flex:0 0 auto; inline-size:6.5em; font-size:11px; color:var(--muted); text-transform:uppercase;
+  letter-spacing:.04em}
+.ma-arch-teeth{display:flex; gap:2px}
+.ma-arch-cell{display:flex; flex-direction:column; align-items:center; gap:2px}
+.ma-arch-cell.is-midline{margin-inline-start:9px; border-inline-start:1px dashed var(--line); padding-inline-start:8px}
+.ma-arch-tooth{font-size:10px; color:var(--muted); font-variant-numeric:tabular-nums}
+.ma-width-input{inline-size:3.6em; padding:3px 4px; text-align:center; font:inherit; font-size:12px;
+  font-variant-numeric:tabular-nums; border:1px solid var(--line); border-radius:5px;
+  background:var(--panel); color:var(--text)}
+.ma-width-input:focus-visible{outline:2px solid var(--accent); outline-offset:-1px}
+.ma-width-input:disabled{opacity:.55; cursor:not-allowed}
+/* Chrome/Safari spinners steal width in a 3.6em field and are useless for a caliper reading. */
+.ma-width-input::-webkit-outer-spin-button,
+.ma-width-input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+.ma-width-input{-moz-appearance:textfield; appearance:textfield}
+
+.ma-list-scroll{overflow-x:auto}
+.ma-list, .ma-indices{border-collapse:collapse; inline-size:100%; font-size:12px}
+.ma-list th, .ma-list td, .ma-indices th, .ma-indices td{padding:3px 8px; text-align:start;
+  border-block-end:1px solid var(--line)}
+.ma-list thead th, .ma-indices thead th{font-size:10px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--muted); font-weight:600}
+.ma-list th[scope="row"]{font-weight:600; font-variant-numeric:tabular-nums; color:var(--muted)}
+
+.ma-sums{display:grid; grid-template-columns:repeat(3,1fr); gap:6px 10px}
+@media (min-width:900px){ .ma-sums{grid-template-columns:repeat(6,1fr)} }
+@media (max-width:520px){ .ma-sums{grid-template-columns:repeat(2,1fr)} }
+.ma-sum{display:flex; flex-direction:column; padding:5px 8px; border:1px solid var(--line); border-radius:7px;
+  background:var(--panel)}
+.ma-sum-label{font-size:10px; color:var(--muted)}
+.ma-sum-value{font-size:14px; font-weight:600; font-variant-numeric:tabular-nums}
+.ma-sum-value small{font-size:10px; font-weight:400; color:var(--muted)}
+
+.ma-num{font-variant-numeric:tabular-nums; text-align:end}
+.ma-norm{color:var(--muted)}
+.ma-delta.is-over{color:#b9770e}
+.ma-delta.is-under{color:#2563eb}
+
+/* Deviation bar: centred on the norm, saturating at ±5 percentage points. */
+.ma-bar-cell{inline-size:88px}
+.ma-bar{position:relative; display:block; block-size:9px; inline-size:80px; border-radius:3px;
+  background:color-mix(in srgb, var(--line) 55%, transparent)}
+.ma-bar-empty{opacity:.4}
+.ma-bar-axis{position:absolute; inset-block:0; inset-inline-start:50%; inline-size:1px; background:var(--muted)}
+.ma-bar-fill{position:absolute; inset-block:1px; border-radius:2px; min-inline-size:2px}
+.ma-bar-fill.is-over{background:#b9770e}
+.ma-bar-fill.is-under{background:#2563eb}
+
+.ma-findings{display:grid; grid-template-columns:auto 1fr; gap:2px 12px; margin:0; font-size:12px}
+.ma-findings dt{color:var(--muted)}
+.ma-findings dd{margin:0; font-weight:600; font-variant-numeric:tabular-nums}
+.ma-findings dd small{font-size:10px; font-weight:400; color:var(--muted)}
+
+.ma-visually-hidden{position:absolute; inline-size:1px; block-size:1px; overflow:hidden; clip-path:inset(50%);
+  white-space:nowrap}
+
+/* Occlusal readings: direct entry, no norm bar — their sign convention is
+   spelled out beside the field instead of left to the reader. */
+.ma-occlusal{display:grid; grid-template-columns:repeat(2,1fr); gap:6px 14px; padding:8px 10px;
+  border:1px solid var(--line); border-radius:8px; background:var(--panel)}
+@media (min-width:760px){ .ma-occlusal{grid-template-columns:repeat(4,1fr)} }
+.ma-occl-field{display:flex; flex-direction:column; gap:2px}
+.ma-occl-field label{font-size:10px; color:var(--muted)}
+.ma-occl-entry{display:flex; align-items:baseline; gap:4px}
+.ma-occl-entry small{font-size:10px; color:var(--muted)}
+.ma-occl-hint{font-size:10px; color:var(--muted); min-block-size:1.2em; font-style:italic}
+
+/* An assumed width is an INFERENCE, and must never read as a measurement. In
+   the browser the first attempt — italics plus a dashed border — was almost
+   invisible next to the measured fields at this size. Tinted, with a corner
+   marker, it cannot be mistaken. Same amber the implant-product gap uses. */
+.ma-width-input.is-assumed{border-style:dashed; border-color:#b9770e;
+  background:color-mix(in srgb, #b9770e 12%, transparent); color:#8a5a08;
+  font-style:italic; cursor:help; position:relative}
+.ma-arch-cell:has(.is-assumed) .ma-arch-tooth,
+.ma-list th[scope="row"]:has(+ td .is-assumed){color:#b9770e; font-weight:700}
+.ma-arch-cell:has(.is-assumed) .ma-arch-tooth::after{content:"*"}
+.ma-assumed-note{margin:0; font-size:11px; color:var(--muted); font-style:italic}
+
+/* Bead odontogram-t8y: the shorthand read-out in the chart header. It shows the
+   standing material mode and the uncommitted keystrokes. Hidden while empty
+   rather than reserving space, so a chart nobody types on looks exactly as it
+   did before. */
+.shorthand-buffer{
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .8rem;
+  letter-spacing: .06em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--odon-border, #d0d5dd);
+  background: var(--odon-surface-2, #f6f7f9);
+  color: var(--odon-text, #1a1d21);
+  white-space: pre;
+  min-width: 3ch;
+}
+.shorthand-buffer.empty{ display: none; }
+
+/* Bead odontogram-apn: no text selection while dragging a span. Scoped to the
+   grid rather than the page, so a drag that leaves the chart does not turn the
+   rest of the interface unselectable. */
+#toothGrid{ -webkit-user-select: none; user-select: none; }
+body.odon-dragging{ cursor: cell; }
+
+/* A key that did nothing has to say so — the read-out turns into the message
+   for a moment rather than a separate box appearing and shifting the header. */
+.shorthand-buffer.notice{
+  border-color: var(--odon-warn-border, #e0a800);
+  background: var(--odon-warn-bg, #fff6dd);
+  color: var(--odon-warn-text, #6b4e00);
+  letter-spacing: 0;
+  font-family: inherit;
+}
+
+/* Bead odontogram-t8y: the key table in Settings. A shorthand nobody can look
+   up is a shorthand nobody uses, so the whole table is on the page rather than
+   hidden behind a help link. Greyed out — not removed — while the feature is
+   off, so one can read it before deciding. */
+/* "Marking several teeth always works" — reassurance that mouse multi-select
+   is independent of the shorthand switches (Dirk 02.09.2026). */
+.settings-note{
+  margin: 10px 0 0; padding: 8px 10px;
+  border-inline-start: 3px solid #3b7bff;
+  background: rgba(59,123,255,.08); border-radius: 6px;
+  font-size: .82rem; line-height: 1.4; color: var(--odon-text, #333);
+}
+.settings-shorthand-table{ margin-top: 12px; }
+.settings-shorthand-table[aria-disabled="true"]{ opacity: .5; }
+.settings-shorthand-table h4{
+  margin: 14px 0 6px; font-size: .82rem; font-weight: 600;
+  color: var(--odon-text-muted, #5b6470);
+}
+.settings-shorthand-table dl{ margin: 0; display: grid; gap: 2px 10px; }
+.settings-shorthand-row{ display: grid; grid-template-columns: 4.5rem 1fr; align-items: baseline; }
+.settings-shorthand-row dt{ margin: 0; }
+.settings-shorthand-row dd{ margin: 0; font-size: .84rem; }
+.settings-shorthand-table kbd,
+.settings-shorthand-pending kbd{
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .78rem; padding: 1px 6px; border-radius: 4px;
+  border: 1px solid var(--odon-border, #d0d5dd);
+  background: var(--odon-surface-2, #f6f7f9);
+}
+.settings-shorthand-pending{ display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Bead odontogram-bn3: wie gross eine Kauflaeche DARGESTELLT wird.
+   -------------------------------------------------------------------------
+   Dirk, 20.08.2026: "die Frontzaehne in der okklusalen Ansicht etwas groesser
+   und die Molaren etwas kleiner… Eckzaehne und Praemolaren natuerlich auch
+   etwas groesser."
+
+   WARUM HIER UND NICHT IM GENERATOR. Es wurde dreimal am Erzeugnis versucht
+   und ging dreimal schief: die Fissuren kommen vom SPENDER und werden nur
+   mitgezogen (siehe den Zahngenerator), also
+   vertraegt der Umriss keine grosse Aenderung - beim letzten Versuch meldete
+   `verify_hoecker.py` an sechs Vorlagen, dass die Kauflaeche nicht mehr in
+   dieselben Hoecker zerfaellt. Die DARSTELLUNGSGROESSE ist aber gar keine
+   Frage der Geometrie. Hier kostet sie nichts: kein Warpfeld, keine Fissur,
+   kein Vertrag, kein Fingerabdruck - und sie laesst sich beim Hinsehen
+   nachstellen, statt in zwei Minuten neu erzeugt zu werden.
+
+   Es ist eine LESBARKEITSENTSCHEIDUNG, keine anatomische. Eine Rechnung
+   "Kauflaeche so breit wie die Krone" wurde versucht und verworfen: sie ging
+   von der Spaltenbreite aus, waehrend die Kacheln sich nach der HOEHE richten
+   und die Breite dem Seitenverhaeltnis folgt - heraus kam das Gegenteil des
+   Gewollten. Die Zahlen unten sind am Bild eingestellt.
+
+   Je Zahn eine Zahl. Wer einen anders haben will, aendert seine. */
+.tooth-tile.occl-view{ --occl-scale: 1; }
+.tooth-tile.occl-view .tooth-svg svg{
+  transform: scale(var(--occl-scale));
+  transform-origin: center center;
+}
+
+/* Bleibende Front und Eckzaehne: etwas groesser. Die MILCHFRONT stand hier bis
+   zum 21.08.2026 mit; sie hat jetzt ihre eigene Gruppe weiter unten. */
+.tooth-tile.tpl-11-occl{ --occl-scale: 1.25; }
+.tooth-tile.tpl-12-occl{ --occl-scale: 1.25; }
+.tooth-tile.tpl-13-occl{ --occl-scale: 1.25; }
+.tooth-tile.tpl-41-occl{ --occl-scale: 1.25; }
+.tooth-tile.tpl-42-occl{ --occl-scale: 1.25; }
+.tooth-tile.tpl-43-occl{ --occl-scale: 1.25; }
+
+/* Praemolaren: eigene Zahl, zwischen Front und Molar.
+
+   Mit derselben 1,25 wie die Front standen sie fast so gross da wie ein
+   Siebener, und ein Molarentisch ist deutlich groesser als ein
+   Praemolarentisch. Drei Gruppen statt zwei. */
+.tooth-tile.tpl-14-occl{ --occl-scale: 1.15; }
+.tooth-tile.tpl-15-occl{ --occl-scale: 1.15; }
+.tooth-tile.tpl-44-occl{ --occl-scale: 1.15; }
+.tooth-tile.tpl-45-occl{ --occl-scale: 1.15; }
+
+/* Molaren: etwas kleiner. */
+.tooth-tile.tpl-16-occl{ --occl-scale: 0.85; }
+.tooth-tile.tpl-17-occl{ --occl-scale: 0.85; }
+.tooth-tile.tpl-18-occl{ --occl-scale: 0.85; }
+.tooth-tile.tpl-46-occl{ --occl-scale: 0.85; }
+.tooth-tile.tpl-47-occl{ --occl-scale: 0.85; }
+.tooth-tile.tpl-48-occl{ --occl-scale: 0.85; }
+
+/* DIE MILCHZAEHNE: EINE Zahl fuer alle zehn, aus der eigenen Kronenbreite.
+   -------------------------------------------------------------------------
+   Zwei Beobachtungen von Dirk am 21.08.2026, und sie legen die Zahl zusammen
+   fest:
+
+     "Milchmolaren-Kauflaechen sind im Vergleich zu Eck und Schneidezaehnen
+      zu klein."
+     "Die Milchzahnkrone 75 ist im Vergleich zu 36 zu gross."
+
+   Gemessen (gemalte Tischbreite geteilt durch die WAHRE Kronenbreite der
+   Seitenansicht, in Bildpunkten je Einheit) sass der Satz vorher so:
+
+       bleibende Molaren        1,16 - 1,21
+       bleibende Front          1,53 - 1,64
+       MILCHFRONT               1,66 - 1,94
+       Milchmolaren (vorher)    1,19        <- zu klein neben der Milchfront
+       Milchmolaren (Zwischenstand) 1,52 - 2,13  <- zu gross neben 36
+
+   Der Fehler war, die Milchmolaren wie die bleibenden zu behandeln. Der
+   Verkleinerungsfaktor 0,85 dort ist eine LESBARKEITSENTSCHEIDUNG gegen die
+   Wucht eines Sechsers - ein bleibender Molar ist 65 % breiter als der
+   Eckzahn. Ein zweiter MILCHmolar ist nur 25 % breiter als der Milcheckzahn;
+   derselbe Faktor dreht dort die Reihenfolge um, und der Molar wird kleiner
+   als der Eckzahn. Genau das war Dirks erste Beobachtung.
+
+   Deshalb EINE Zahl fuer alle zehn Milchvorlagen: 1,35 Bildpunkte je Einheit
+   wahrer Kronenbreite. Damit stimmt der Milchsatz in sich (54 und 53 kommen
+   fast gleich gross heraus, wie im Mund: 7,1 gegen 7,0 mm), und er stimmt
+   gegen den bleibenden Nachbarn - 85 misst 42 Bildpunkte gegen 46 des
+   Sechsers, ist also sichtbar kleiner, wie es sein muss.
+
+   1,35 ist die obere Grenze: bei 1,48 waere 85 so breit wie der Sechser.
+   Der Preis steht dabei: die Milchfront wird kleiner als vorher. Sie stand mit
+   1,66 bis 1,94 als einzige Gruppe ueber allem anderen, und ohne sie
+   herunterzunehmen ist die erste Beobachtung nicht zu erfuellen, ohne die
+   zweite zu verletzen.
+
+   IM WECHSELGEBISS STIMMT DAS VON SELBST. Die Klasse haengt an der VORLAGE,
+   und die Vorlage daran, was an der Position wirklich gechartet ist - nicht an
+   einem Gebissmodus. Steht auf 84 ein Milchmolar, greift `tpl-84-occl`; steht
+   dort der bleibende Praemolar, greift `tpl-44-occl`. Es gibt keinen Schalter,
+   der falsch stehen koennte.
+
+   Die Kacheln richten sich nach der HOEHE, die Breite folgt dem
+   Seitenverhaeltnis - eine Skalenzahl laesst sich also nicht aus der
+   Spaltenbreite ausrechnen. Sie sind am Bild gemessen und nachgestellt. */
+.tooth-tile.tpl-51-occl{ --occl-scale: 0.96; }
+.tooth-tile.tpl-52-occl{ --occl-scale: 0.87; }
+.tooth-tile.tpl-53-occl{ --occl-scale: 0.96; }
+.tooth-tile.tpl-54-occl{ --occl-scale: 0.92; }
+.tooth-tile.tpl-55-occl{ --occl-scale: 1.31; }
+.tooth-tile.tpl-81-occl{ --occl-scale: 1.01; }
+.tooth-tile.tpl-82-occl{ --occl-scale: 0.90; }
+.tooth-tile.tpl-83-occl{ --occl-scale: 0.89; }
+.tooth-tile.tpl-84-occl{ --occl-scale: 1.25; }
+.tooth-tile.tpl-85-occl{ --occl-scale: 1.33; }
+
+/* Tiefenreiz an der Zahnsubstanz (Dirks Frage vom 20.08.2026: "Koennte man
+   ueber optische Tricks an den Wurzeln und den anderen Flaechen die Illusion
+   einer dritten Dimension erzeugen?").
+   -------------------------------------------------------------------------
+   Ein Koerperverlauf quer ueber den Zahn laesst Krone und Wurzel als Zylinder
+   lesen statt als Scherenschnitt. Die Verlaufsdefinition steht einmal im
+   Dokument (src/App.tsx), `objectBoundingBox` rechnet sie auf jede Form um.
+
+   `!important`, weil `tooth-base` seine Fuellung INLINE traegt - eine
+   Stilregel kaeme sonst nicht dagegen an. Das ist hier kein Notnagel, sondern
+   der Schalter: die Regel wegzunehmen heisst, den Zahn wieder flach zu haben.
+
+   NUR die Zahnsubstanz, und das ist die Grenze: Farbe traegt bei uns
+   Bedeutung. Ueber eine Karies, eine Fuellung oder ein Material zu
+   schattieren, hiesse zu veraendern, wie ein Befund gelesen wird. */
+#toothGrid.odon-depth .tooth-tile [id="tooth-base"]{ fill: url(#odonDepthBody) !important; }
+#toothGrid.odon-depth .tooth-tile [id="milktooth-base"]{ fill: url(#odonDepthMilk) !important; }
+
+
+/* Hoeckerschattierung auf den Kauflaechen.
+
+   Die Felder liegen in der Vorlage schon als eigene Formen unter `tooth-base`,
+   nur mit linearen Verlaeufen - eine Rampe statt einer Kuppel.
+
+   `:not([id])` laesst den Aussenumriss `background-cusp` in Ruhe, und
+   `:not([style*="fill: none"])` die Fissurenzuege: die sind nur Striche, und
+   ein `fill` mit `!important` wuerde sie zu Flaechen machen. Ohne diese zweite
+   Bedingung waere die Kauflaeche zugemalt.
+
+   Nur unter `tooth-base` - liegt eine Krone oder Fuellung darauf, ist diese
+   Ebene abgeschaltet und die Restauration behaelt ihre eigene Farbe. */
+#toothGrid.odon-depth .tooth-tile.occl-view [id="tooth-base"]
+  path:not([id]):not([style*="fill: none"]){
+  fill: url(#odonDepthCusp) !important;
+}
+
+/* Bead odontogram-5hm: die Krone als gewoelbter Koerper.
+   -------------------------------------------------------------------------
+   Die Form kommt seit dem Zahngenerator aus dem Zahn selbst; hier
+   bekommt sie ihr Volumen. e.max und Metallkeramik bringen ihre Rampe aus der
+   Vorlage mit und stehen deshalb nicht in dieser Liste - die uebrigen sieben
+   waren eine flache Farbe.
+
+   NICHT an den Schalter `odon-depth` gehaengt, anders als die Schattierung der
+   Zahnsubstanz darueber: jene ist eine Lesehilfe, die man abstellen koennen
+   muss; die Woelbung einer Krone ist die Materialdarstellung selbst. Der
+   mittlere Stopp IST die eingestellte Farbe, die Aussage aendert sich also
+   nicht - siehe den Kommentar an den Verlaeufen in App.tsx.
+
+   `!important` aus demselben Grund wie oben: die Fuellung steht INLINE in der
+   Vorlage. */
+#toothGrid .tooth-tile [id="gold-crown"]{ fill: url(#odonKroneGold) !important; }
+#toothGrid .tooth-tile [id="gradia-crown"]{ fill: url(#odonKroneGradia) !important; }
+#toothGrid .tooth-tile [id="zircon-crown"]{ fill: url(#odonKroneZirkon) !important; }
+#toothGrid .tooth-tile [id="metal-crown"]{ fill: url(#odonKroneMetall) !important; }
+#toothGrid .tooth-tile [id="temporary-crown"]{ fill: url(#odonKroneProvi) !important; }
+#toothGrid .tooth-tile [id="telescope-crown-outside"]{ fill: url(#odonKroneTeleAussen) !important; }
+#toothGrid .tooth-tile [id="telescope-crown-inside"]{ fill: url(#odonKroneTeleInnen) !important; }
+#toothGrid .tooth-tile [id="prosthesis-crown"]{ fill: url(#odonKroneProthZahn) !important; }
+#toothGrid .tooth-tile [id="prosthesis-implant-crown"]{ fill: url(#odonKroneProthBasis) !important; }
+
+/* Das VENEER (odontogram-5hm, 23.08.2026): seit es aus dem Kronenschnitt kommt
+   (kronen.py `veneer_d`), ist es die Kronenform - also bekommt es denselben
+   gewoelbten Materialkoerper wie die Krone. Vorher war jedes Veneer eine flache
+   Farbe (bis auf e.max) mit dem Gradia-Gruenrand; "kein Verlauf" (Dirk). */
+#toothGrid .tooth-tile [id="emax-veneer"]{ fill: url(#odonKroneEmax) !important; }
+#toothGrid .tooth-tile [id="gold-veneer"]{ fill: url(#odonKroneGold) !important; }
+#toothGrid .tooth-tile [id="gradia-veneer"]{ fill: url(#odonKroneGradia) !important; }
+#toothGrid .tooth-tile [id="zircon-veneer"]{ fill: url(#odonKroneZirkon) !important; }
+#toothGrid .tooth-tile [id="temporary-veneer"]{ fill: url(#odonKroneProvi) !important; }
+
+
+/* Bead odontogram-bbd: das Onlay ist die Krone ohne ihr zervikales Drittel.
+   -------------------------------------------------------------------------
+   Dirk, 22.08.2026: "Das Onlay soll auf 2/3 der bukkalen Flaeche reichen. Ich
+   denke, das ist ein guter Kompromiss."
+
+   Geschnitten und nicht gezeichnet, aus demselben Grund wie bei der
+   Hemisektion: etwas wegzunehmen kann keine Auflage. Der Schnitt sitzt an der
+   KRONENEBENE selbst und nicht an der Kachel - anders als dort soll ja nur die
+   Kappe kuerzer werden, der Zahn darunter bleibt ganz.
+
+   `inset()` rechnet in Prozent des Elementkastens - und das ist hier genau die
+   Krone, weil die Kronenebene ihre eigene Form ist, seit sie aus der Kontur
+   geschnitten wird (kronen.py). Vor dieser Ableitung waere derselbe Schnitt
+   schief gelaufen.
+
+   BEIDE FASSUNGEN SCHNEIDEN OBEN, und das sieht falsch aus, bis man es
+   nachmisst. Der Unterkiefer traegt seine Kaukante oben, das zervikale Drittel
+   liegt dort also UNTEN - man erwartet `inset(0 0 33.3% 0)`. Die Kachel wird
+   aber als Ganzes um 180 Grad gedreht, und zwar mit einem transform-ATTRIBUT
+   an einem Wrapper; der Schnitt rechnet im EIGENEN Koordinatensystem des
+   Elements, also VOR dieser Drehung. Oben und unten sind dort vertauscht.
+   Dieselbe Falle wie beim Durchbruch, wo ein negatives `translateY` deshalb in
+   BEIDEN Kiefern "nach apikal" heisst. Am Bild gefunden, nicht im Quelltext. */
+.tooth-tile[data-onlay] .tooth-svg svg [id$="-crown"],
+.tooth-tile[data-onlay] .tooth-svg svg [id="telescope-crown-inside"]{
+  clip-path: inset(33.3% 0 0 0);
+}
+
+
+/* Bead odontogram-7xl: der Lockerungsgrad als roemische Ziffer.
+   -------------------------------------------------------------------------
+   Dirk, 22.08.2026: "Wir schreiben eine roemische Ziffer I - III in das
+   Kaestchen des Zahnes, unten in eine Ecke."
+
+   Nicht nur huebscher, sondern die einzige Darstellung, die den GRAD zeigt: die
+   gezeichnete Gruppe wurde als Ganzes eingeschaltet, M1, M2 und M3 sahen
+   deshalb gleich aus.
+
+   `::before`, weil die Retentionsmarke daneben `::after` benutzt - beide sitzen
+   an derselben Kachel und duerfen sich nicht verdraengen. Unten LINKS, waehrend
+   jene mittig sitzt; damit koennen sie nebeneinander stehen.
+
+   Nur in der Seitenansicht, wie die Retentionsmarke: eine Kaukachel ist klein,
+   und die Lockerung gehoert zum Zahn, nicht zu einer Ansicht. */
+.tooth-tile[data-mobility]::before{
+  content: attr(data-mobility);
+  position: absolute; left: 3px; bottom: 2px;
+  font-size: 10px; font-weight: 700; line-height: 1;
+  letter-spacing: .02em;
+  color: #b3261e;
+  pointer-events: none;
+}
+.tooth-tile.occl-view[data-mobility]::before{ display: none }
+
+
+/* Bead odontogram-qvr: Fissuren und Hoecker unter der Restauration.
+   -------------------------------------------------------------------------
+   Dirk, 21.08.2026: "Bei Kronen und Onlays auf Praemolaren und Molaren sollte
+   die Fissur- und Hoeckerkonfiguration die wir haben auch in der Kauflaeche in
+   dem gewaehlten Material sichtbar sein."
+
+   GEZEICHNET WIRD NICHTS NEUES. Die Vorlage traegt die Hoeckerfelder als
+   `g#cusps` und die Fissuren als `g#fissure`, und beide bleiben unter einer
+   Restauration AKTIV - die Kappe deckt sie nur zu, weil sie im Dokument
+   spaeter steht und die ganze Tafel fuellt. Also nimmt man ihr die Fuellung
+   und gibt sie den Hoeckern.
+
+   `syncOcclusalRelief` in odontogram.ts schreibt `data-occl-resto` mit dem
+   Material an die Kachel - an das DIV, nicht ans SVG. Kein Element wird
+   geschaltet, keine id angefasst: der Fingerabdruck haelt id, opacity und
+   class fest und sieht davon nichts.
+
+   Die Fissurenfarbe ist der Materialton zu 45 Prozent abgedunkelt, ausgerechnet
+   statt geraten - eine feste graue Linie sieht auf Gold wie ein Kratzer aus und
+   auf Metall gar nicht.
+
+   NUR SEITENZAEHNE: das Gating steht in `syncOcclusalRelief`, eine
+   Frontzahn-Draufsicht hat keine Fissuren. */
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gold"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gold"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gold"] [id="background-cusp"]{ fill: var(--odon-rest-gold, #e0a80d) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gold"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneGold) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gold"] [id="fissure"] path{ stroke: #654c06 !important; stroke-width: .55px; }
+
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gradia"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gradia"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gradia"] [id="background-cusp"]{ fill: var(--odon-rest-gradia, #57b285) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gradia"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneGradia) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="gradia"] [id="fissure"] path{ stroke: #27503c !important; stroke-width: .55px; }
+
+#toothGrid .tooth-tile.occl-view[data-occl-resto="zircon"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="zircon"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="zircon"] [id="background-cusp"]{ fill: var(--odon-rest-zircon, #cfe3ee) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="zircon"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneZirkon) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="zircon"] [id="fissure"] path{ stroke: #5d666b !important; stroke-width: .55px; }
+
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal"] [id="background-cusp"]{ fill: var(--odon-rest-metal, #0051bf) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneMetall) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal"] [id="fissure"] path{ stroke: #002456 !important; stroke-width: .55px; }
+
+#toothGrid .tooth-tile.occl-view[data-occl-resto="temporary"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="temporary"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="temporary"] [id="background-cusp"]{ fill: var(--odon-rest-temporary, #c8b392) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="temporary"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneProvi) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="temporary"] [id="fissure"] path{ stroke: #5a5142 !important; stroke-width: .55px; }
+
+#toothGrid .tooth-tile.occl-view[data-occl-resto="telescope"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="telescope"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="telescope"] [id="background-cusp"]{ fill: var(--odon-rest-telescope, #0051bf) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="telescope"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneTeleAussen) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="telescope"] [id="fissure"] path{ stroke: #002456 !important; stroke-width: .55px; }
+
+#toothGrid .tooth-tile.occl-view[data-occl-resto="emax"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="emax"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="emax"] [id="background-cusp"]{ fill: #f0d9c4 !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="emax"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneEmax) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="emax"] [id="fissure"] path{ stroke: #6c6258 !important; stroke-width: .55px; }
+
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id$="-crown"],
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id$="-onlay"]{ fill: none !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id="background-cusp"]{ fill: #cfe0d8 !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id="tooth-base"] [id="cusps"] path[style]{ fill: url(#odonKroneMetKer) !important; }
+#toothGrid .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id="fissure"] path{ stroke: #5d6561 !important; stroke-width: .55px; }
+
+
+/* Bead odontogram-ca0: die entfernte Wurzel wird weggeschnitten.
+   -------------------------------------------------------------------------
+   Dirk, 20.08.2026: "Bei der Hemisektion wird an der Furkation durchtrennt und
+   eine Wurzel entfernt." Etwas wegzunehmen kann keine Auflage - eine Auflage
+   legt auf. Deshalb ein clip-path an der Kachel.
+
+   Die SEITE setzt odontogram.ts als `data-hemi-side`; die FORM des Schnitts
+   steht hier, weil man eine Schnittfuehrung am Bild einstellt und das hier ein
+   Neuladen kostet statt eines Generatorlaufs.
+
+   FURKATION bei 46 % der Kachelhoehe, von der Krone aus gerechnet - dort teilt
+   sich die Wurzel. Der Oberkiefer traegt die Krone unten, der Unterkiefer oben,
+   deshalb zwei Fassungen je Seite.
+
+   Der Schnitt laeuft SCHRAEG von der Furkation zum Rand: durchtrennt wird an
+   der Furkation, und der verbleibende Stumpf laeuft nicht senkrecht aus. */
+.tooth-tile[data-hemi-side] .tooth-svg svg{ transition: none; }
+
+/* Unterkiefer: Krone oben, Wurzeln nach unten. */
+.lower-arch .tooth-tile[data-hemi-side="links"] .tooth-svg svg{
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 100%, 42% 54%, 0% 54%);
+}
+.lower-arch .tooth-tile[data-hemi-side="rechts"] .tooth-svg svg{
+  clip-path: polygon(0% 0%, 100% 0%, 100% 54%, 58% 54%, 50% 100%, 0% 100%);
+}
+/* Oberkiefer: Wurzeln nach oben, Krone unten - der Schnitt spiegelt sich. */
+.upper-arch .tooth-tile[data-hemi-side="links"] .tooth-svg svg{
+  clip-path: polygon(0% 46%, 42% 46%, 50% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+.upper-arch .tooth-tile[data-hemi-side="rechts"] .tooth-svg svg{
+  clip-path: polygon(0% 0%, 50% 0%, 58% 46%, 100% 46%, 100% 100%, 0% 100%);
+}
+
+/* Bead odontogram-t6y: die Bruchlinien liegen wie die Halsverschattung VOR den
+   Kacheln - eine Fraktur liegt AUF dem Zahn. */
+.tooth-grid > svg.fracture-lines{
+  position: absolute; inset: 0; pointer-events: none; z-index: 3;
+}
+/* Bead odontogram-gry: das schwarze Dreieck des Papillenverlusts, VOR den
+   Kacheln aus demselben Grund wie die Bruchlinie - hinter ihnen bliebe von ihm
+   nur der vier Bildpunkte breite Rasterspalt sichtbar, weil sich die beiden
+   Kronen am Kontaktpunkt beruehren. */
+/* Bead odontogram-0n8: der Durchbruchsstand.
+ *
+ * Ein durchbrechender Zahn ist derselbe Zahn, nur weiter von der Kauebene
+ * entfernt. Also wird er VERSCHOBEN, nicht neu gezeichnet - kein Generatorlauf,
+ * keine neue Ebene, kein neuer Fingerabdruck.
+ *
+ * Verschoben werden die GESCHWISTER von `g#base`, und das ist der ganze Trick:
+ * jene Gruppe enthaelt genau zwei Dinge, `bone-base` und `gum-base`. Zahnfleisch
+ * und Knochen bleiben damit stehen, weil sie nicht mitgenommen WERDEN KOENNEN,
+ * nicht weil jemand aufgepasst hat. Das Band gehoert dem Bogen, nicht dem Zahn.
+ *
+ * Die Kieferdrehung (`rotate180`/`mirrorVertical` in odontogram.ts) haengt an
+ * einer HUELLE um den Inhalt, als Transform-ATTRIBUT. Diese Regel greift eine
+ * Ebene tiefer und setzt sich darunter, statt sie zu ueberschreiben. Nebenbei
+ * heisst deshalb ein negatives translateY in BEIDEN Kiefern "nach apikal" - der
+ * Unterkiefer wird ja aussen gekippt. Eine Regel, kein Fall je Bogen.
+ *
+ * Die Einheiten sind Template-Einheiten (4,048 je Millimeter), nicht Bruchteile
+ * der Krone: ein Durchbruch ist eine Wanderung um Millimeter. Ein Bruchteil
+ * liesse den Sechser weiter wandern als den Zweier, obwohl beide gleich weit
+ * durchgebrochen sind.
+ */
+.tooth-tile[data-eruption] .tooth-svg svg{
+  /* Die Wurzel laeuft sonst in die Nachbarreihe - die Kachel-SVG traegt
+     `overflow: visible`, damit der Knochen an kurzen Vorlagen ueber den
+     viewBox-Rand darf. Maskiert wird an der KACHELKANTE, nicht am
+     Zahnfleisch: eine Wurzel, die im Knochen steht, ist genau das Bild, das
+     ein Wechselgebiss zeigen soll. */
+  clip-path: inset(0);
+}
+/* Die Strecke steht als `--erupt-shift` an der Kachel und ist je Vorlage aus
+   deren EIGENER Kronenhoehe gerechnet (siehe `sichtbareKrone` in
+   odontogram.ts). Eine feste Zahl waere hier falsch: die Kronen streuen von 16
+   Einheiten am unteren Milchschneidezahn bis 28,6 am Eckzahn, und im
+   Wechselgebiss stehen genau diese nebeneinander. */
+.tooth-tile[data-eruption] .tooth-svg svg g#base ~ g{
+  transform: translateY(calc(-1 * var(--erupt-shift, 0px)));
+}
+
+.tooth-grid > svg.papilla-marks{
+  position: absolute; inset: 0; pointer-events: none; z-index: 3;
+}
+
+/* ===========================================================================
+   Compact inspector — the embedded-host panel placement
+   ---------------------------------------------------------------------------
+   `<OdontogramShell panelPlacement="compact" />` keeps the SAME `aside.panel`
+   and the same wired controls; only its placement and the presentation of its
+   sections change. Everything below is scoped to
+   `.odontogram-root[data-panel-placement="compact"]`, so the standalone layout
+   above is untouched.
+
+   The inspector is positioned against the shell root, NOT the viewport: an
+   embedding page scrolls its own container, and a viewport-fixed panel would
+   drift away from the chart it belongs to. `position: sticky` inside the grid
+   column keeps it beside the chart while the host page scrolls.
+   =========================================================================== */
+.odontogram-root[data-panel-placement="compact"] .layout{
+  grid-template-columns: minmax(0, 1fr) var(--odon-inspector-width, 320px);
+  align-items: start;
+}
+
+.odontogram-root[data-panel-placement="compact"] .panel{
+  position: sticky;
+  top: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: var(--odon-inspector-max-height, 82vh);
+  border-radius: 12px;
+}
+
+/* The panel's two scroll bodies own the overflow, so a long section scrolls
+   inside the inspector instead of stretching the patient page. */
+.odontogram-root[data-panel-placement="compact"] .panel-odontogram-controls,
+.odontogram-root[data-panel-placement="compact"] .panel > .panel-body{
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-odontogram-controls{
+  display: flex;
+  flex-direction: column;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-body{
+  max-height: none;
+  padding: 12px;
+  gap: 10px;
+}
+
+.odontogram-root[data-panel-placement="compact"] .panel-group-nav{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-group-nav .is-active{
+  background: var(--odon-bg, #f3f6fb);
+  border-color: var(--line);
+  font-weight: 700;
+}
+
+/* One group at a time. The sections stay MOUNTED and keep their one-time
+   wireControls() listeners; only their presentation is grouped — the same
+   construction the clinical views use for their columns.
+
+   `#examinationCard` is exempt while it carries the baseline-correction
+   banner: a correction in progress must stay visible in every group, because
+   leaving it unnoticed would file the correction against the wrong
+   examination. */
+.odontogram-root[data-panel-placement="compact"] .panel[data-panel-group] .panel-odontogram-controls .panel-body > *{
+  display: none;
+}
+.odontogram-root[data-panel-placement="compact"] .panel[data-panel-group="tooth"] .panel-odontogram-controls .panel-body > :is(#examinationCard, div:has(#toothSelect), section:has(#toothSelect)),
+.odontogram-root[data-panel-placement="compact"] .panel[data-panel-group="surfaces"] .panel-odontogram-controls .panel-body > :is(#cariesSection, #fillingSection),
+.odontogram-root[data-panel-placement="compact"] .panel[data-panel-group="roots"] .panel-odontogram-controls .panel-body > :is(#rootPeriodontiumSection),
+.odontogram-root[data-panel-placement="compact"] .panel[data-panel-group="more"] .panel-odontogram-controls .panel-body > :not(#examinationCard, #cariesSection, #fillingSection, #rootPeriodontiumSection, div:has(#toothSelect), section:has(#toothSelect)),
+.odontogram-root[data-panel-placement="compact"] .panel[data-panel-group] .panel-odontogram-controls .panel-body > #examinationCard:has(#baselineCorrectionBanner){
+  display: block;
+}
+
+/* The compact placement owns the panel in EVERY clinical view.
+   ---------------------------------------------------------------------------
+   The standalone layout relocates the control panel in the anatomical dock:
+   it hides `aside.panel` and offers editing in a band below the chart. That
+   is right for a full-width page and wrong for an embedded inspector,
+   where they read as a second set of findings forms under the chart while the
+   right inspector stays empty.
+
+   In compact placement the panel therefore stays the right inspector in every
+   view, and the below-chart relocations are switched off. `!important` is not
+   needed: these selectors carry the placement attribute and so outrank the
+   view-mode rules they override. */
+.odontogram-root[data-panel-placement="compact"] .layout.dock-mode aside.panel{
+  display: flex;
+  grid-column: 2;
+  margin-top: 0;
+}
+
+/* The panel keeps its own single-group body instead of the wide multi-column
+   grid those views spread it into. */
+.odontogram-root[data-panel-placement="compact"] .odontogram-root[data-panel-placement="compact"] .layout.dock-mode.dock-mode-all .panel-body{
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: none;
+  max-height: none;
+}
+
+/* The chart keeps the first column rather than spanning the full width to make
+   room for a band that no longer exists here. */
+.odontogram-root[data-panel-placement="compact"] .layout.dock-mode .chart-column{
+  grid-column: 1;
+}
+
+/* The duplicate lower surfaces themselves.
+   ---------------------------------------------------------------------------
+   Everything the standalone layout parks BELOW the chart is the second copy of
+   what the inspector already shows, and the approved embedded preview
+   hides exactly
+   this set in its drawer placement: the finding dock column, the finding
+   keypad, the toolbar that introduces it, the tooth-info card and the hint
+   that points at the band. The inspector is where these live when the chart is
+   embedded; the standalone layout, which carries no placement attribute, keeps
+   every one of them. */
+.odontogram-root[data-panel-placement="compact"] .befund-dock-column,
+.odontogram-root[data-panel-placement="compact"] .schematic-keypad,
+.odontogram-root[data-panel-placement="compact"] .schematic-toolbar,
+.odontogram-root[data-panel-placement="compact"] .tooth-info,
+.odontogram-root[data-panel-placement="compact"] .schematic-hint{
+  display: none;
+}
+
+/* The native selection actions move WITH the inspector instead of being left
+   behind under the chart. They sit in the panel header, so the group filter
+   that blanks the panel body never reached them, and the compact inspector is
+   now the only place a user can select "Oberkiefer Front 6" — with the keypad
+   band gone, hiding them too would take whole-arch charting away from the
+   embedded chart. The row wraps rather than scrolling sideways in 320px, and
+   every button keeps its own tab stop. */
+.odontogram-root[data-panel-placement="compact"] #controlsActions{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.odontogram-root[data-panel-placement="compact"] #controlsActions .select-actions-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  overflow: visible;
+}
+
+/* Every clinical view keeps the FIRST column, so the inspector keeps the
+   second one.
+   ---------------------------------------------------------------------------
+   The standalone layout lets the orthodontic workspace span
+   `grid-column: 1 / -1`, because in a full-width page the control panel is
+   hidden beside them anyway. In compact placement the panel stays, so a
+   full-width column pushes it onto the NEXT grid row — the inspector was then
+   not missing but parked a chart's height below the fold.
+
+   `.dental-chart-column` already sits in column 1 and is listed only so the
+   views state the same rule in one place. */
+.odontogram-root[data-panel-placement="compact"] .ortho-column,
+.odontogram-root[data-panel-placement="compact"] .dental-chart-column{
+  grid-column: 1;
+  min-width: 0;
+}
+
+/* KFO: one card per row. The two-up rule is a viewport media query, and the
+   viewport is wide exactly when an embedded chart is NOT — a patient page
+   gives the workspace a fraction of that width, where two columns wrap the
+   model-analysis cards into unreadable slivers. */
+.odontogram-root[data-panel-placement="compact"] .ortho-column{
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The chart controls that moved INTO the inspector.
+   ---------------------------------------------------------------------------
+   `.panel-chart-controls` exists only in this placement, so it is styled only
+   here: the visual toggles and the Status/Plan tabs on their own rows, each
+   wrapping inside 320px instead of overflowing it. */
+.odontogram-root[data-panel-placement="compact"] .panel-chart-controls{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-chart-controls .chart-actions{
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-chart-controls .chart-mode-toggle{
+  align-self: stretch;
+  justify-content: center;
+  padding: 2px;
+  gap: 2px;
+}
+
+/* Compact field and button dimensions.
+   ---------------------------------------------------------------------------
+   The standalone controls are sized for a wide column: a 220px minimum on
+   every `<select>`, 32px icons in the chart toggles, 9px/15px button padding.
+   In a 320px inspector that select is wider than its card once padding is
+   counted, and one row of chart toggles is wider than the panel — the two
+   things that made the embedded panel read as "wild" rather than dense.
+
+   Dimensions only. No colour, no border radius, nothing that would make the
+   inspector look like a different component than the standalone panel, and
+   every rule carries the placement attribute so the standalone layout keeps
+   its own sizes untouched. */
+.odontogram-root[data-panel-placement="compact"] .panel select{
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 26px 5px 9px;
+  border-radius: 9px;
+  font-size: 12px;
+  background-position: calc(100% - 14px) 52%, calc(100% - 9px) 52%;
+}
+.odontogram-root[data-panel-placement="compact"] .panel input[type="text"],
+.odontogram-root[data-panel-placement="compact"] .panel input[type="number"],
+.odontogram-root[data-panel-placement="compact"] .panel input[type="date"],
+.odontogram-root[data-panel-placement="compact"] .panel textarea{
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 8px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .btn{
+  padding: 5px 9px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .btn-icon{
+  padding: 4px 7px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .btn-icon .icon,
+.odontogram-root[data-panel-placement="compact"] .panel .btn-icon .icon-img,
+.odontogram-root[data-panel-placement="compact"] .panel .btn-icon svg{
+  width: 18px;
+  height: 18px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .chart-mode-btn{
+  padding: 4px 10px;
+  font-size: 12px;
+}
+/* A row's label sits BESIDE its control and carries no wrapping of its own,
+   so a long label plus a select overflowed the card before the select could
+   shrink. */
+.odontogram-root[data-panel-placement="compact"] .panel .row{
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .row > label{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .status-extra-row select{
+  min-width: 0;
+  flex: 1 1 130px;
+}
+
+/* The drawer's own chrome: header, cards, hints.
+   ---------------------------------------------------------------------------
+   The standalone panel is a full-page card — an 18px radius, a 14px header,
+   16px cards at 12px padding. Nested inside a 320px drawer those paddings cost
+   more width than the controls they frame, and three borders (panel, card,
+   control) read as three frames around every select.
+
+   Dimensions only, and every colour stays on the tokens this sheet already
+   defines (`--line`, `--muted`, `--panel`), so the inspector remains
+   recognisably the same component as the standalone panel rather than a
+   second, differently-themed one. */
+.odontogram-root[data-panel-placement="compact"] .panel-header{
+  padding: 10px 12px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .card{
+  border-radius: 12px;
+  padding: 10px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .card-title{
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .panel-subtitle,
+.odontogram-root[data-panel-placement="compact"] .panel .hint{
+  font-size: 11px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel .hint{
+  margin: 4px 0 6px;
+}
+
+/* The two action BARS the inspector carries.
+   ---------------------------------------------------------------------------
+   `#examinationCard`'s capture row — the date field that saves an examination,
+   beside Save and the baseline-correction buttons — and `#statusCard`'s
+   reset-and-dentition row are the only bars in the drawer: a field and several
+   buttons on one line, authored for the wide panel.
+
+   Both are reached by an ID, so the generic compact field and button rules
+   above cannot touch them (an id outranks the placement attribute plus a
+   class). These selectors therefore carry the id themselves — which is also
+   why the standalone sizes stay untouched: the placement attribute is still
+   the first thing in every one of them.
+
+   They WRAP rather than scroll sideways, and the date field shrinks with its
+   card instead of holding the card open past the drawer's width. */
+.odontogram-root[data-panel-placement="compact"] #examinationCard .examination-actions,
+.odontogram-root[data-panel-placement="compact"] #statusCard .status-actions{
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.odontogram-root[data-panel-placement="compact"] #examinationCard .examination-actions .btn,
+.odontogram-root[data-panel-placement="compact"] #statusCard .status-actions .btn{
+  padding: 5px 9px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+.odontogram-root[data-panel-placement="compact"] #examinationCard input[type="date"]{
+  min-width: 0;
+  flex: 1 1 110px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+.odontogram-root[data-panel-placement="compact"] #examinationCard .examination-list{
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* The compact KFO inspector.
+   ---------------------------------------------------------------------------
+   `.panel-ortho-controls` exists only in this placement, so it is styled only
+   here — the same construction as `.panel-chart-controls` above. It behaves
+   like `.panel-odontogram-controls` beside it: a flex column whose body owns
+   the overflow, so a long measurement table scrolls inside the drawer instead
+   of stretching the patient page. */
+.odontogram-root[data-panel-placement="compact"] .panel-ortho-controls{
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-ortho-controls > .panel-body{
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The entry halves inside it. Each card already carries `overflow-x: auto` on
+   its own scroll wrapper (`.ma-arch`, `.ma-list-scroll`), so
+   nothing new is needed to keep the table inside the drawer — the wrappers
+   only have to be ALLOWED to shrink, which a grid/flex child is not by
+   default. That is what `min-width: 0` does here, and it is the difference
+   between an inner scrollbar and a drawer pushed wider than its column. */
+.odontogram-root[data-panel-placement="compact"] .panel-ortho-controls .card{
+  min-width: 0;
+  gap: 8px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-ortho-controls .ma-arch,
+.odontogram-root[data-panel-placement="compact"] .panel-ortho-controls .ma-list-scroll{
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* The sub-layouts inside the entry halves are authored for a full-page card:
+   the occlusal readings sit in a two-up grid. At 320px that puts a label and
+   a field in about 140px, so they get one column. */
+.odontogram-root[data-panel-placement="compact"] .panel-ortho-controls .ma-occlusal{
+  grid-template-columns: minmax(0, 1fr);
+  padding: 8px;
+}
+.odontogram-root[data-panel-placement="compact"] .panel-ortho-controls .ma-occl-field{
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* The results half beside the chart. The sums are a six-up grid on a wide
+   page; the compact left column is a fraction of that, and the KFO findings
+   are the one thing in this view that must stay readable at a glance. */
+.odontogram-root[data-panel-placement="compact"] .ortho-column .ma-sums{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Narrow embedding: the inspector becomes a bounded panel under the chart
+   rather than a column, and the anatomical chart scrolls inside its card.
+   ---------------------------------------------------------------------------
+   Keyed on the SHELL's own width, not the viewport. An embedded chart sits in
+   a host slot that is routinely narrower than the window — a patient page with
+   its own navigation and inspector chrome is well under 1100px of content
+   width while the window is far wider. A viewport query therefore collapsed
+   the inspector on every real patient page, which is what made the live page
+   show no right inspector at all. */
+.odontogram-root[data-panel-placement="compact"]{
+  container-type: inline-size;
+  container-name: odon-embed;
+}
+
+@container odon-embed (max-width: 760px){
+  .odontogram-root[data-panel-placement="compact"] .layout{
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .odontogram-root[data-panel-placement="compact"] .panel,
+    .odontogram-root[data-panel-placement="compact"] .layout.dock-mode aside.panel{
+    position: static;
+    grid-column: 1;
+    max-height: var(--odon-inspector-max-height-narrow, 52vh);
+  }
+  .odontogram-root[data-panel-placement="compact"] .chart{
+    overflow-x: auto;
+  }
+}
+
+/* Anatomische Darstellung "Entwurf v1" (Claude Design, 26.09.2026).
+   -------------------------------------------------------------------------
+   Eine DRITTE Ansicht neben der klassischen, kein Ersatz: alles haengt an der
+   einen Klasse `odon-style-v1` auf #toothGrid (setAnatomicalStyle) - ohne sie
+   greift keine Regel hier, und der Zahn sieht aus wie vorher. Die Palette der
+   Materialien kommt ueber die Variablen (DRAFT_V1_PALETTE in
+   restorationPalette.ts), der Rest steht hier.
+
+   Nur Farbe und Strich, nichts wird geschaltet: der Fingerabdruck (id,
+   opacity, class) bleibt byte-gleich. `!important` wie ueberall in dieser
+   Datei, wo eine Vorlage ihre Fuellung INLINE traegt.
+
+   Stufe 1 von docs/design/anatomisch-v1.md: Palette, Signale, entsaettigte
+   Gingiva/Knochen/Pulpa, Kacheln ohne Rahmen, dunkles Thema. */
+#toothGrid.odon-style-v1{
+  --v1-ink: #1d2127;
+  --v1-caries: #d32f2f;
+  --v1-caries-edge: #a82424;
+  --v1-caries-under: #9a1f1f;       /* unter einer Fuellung: dunkler, aber Rot */
+  --v1-inflam: #e8781e;
+  --v1-inflam-soft: #fcecdf;        /* = Entzuendung 14 % auf Weiss */
+  --v1-gum: #f0dbd6;
+  --v1-bone: #f5efe3;
+  --v1-pulp: #f0c6bf;
+  --v1-select: rgba(29,33,39,.045);
+  --v1-hover: rgba(29,33,39,.03);
+}
+.dark #toothGrid.odon-style-v1{
+  --v1-ink: #f1eee8;
+  --v1-caries: #ff5147;
+  --v1-caries-edge: #d9403a;
+  --v1-caries-under: #c93a33;
+  --v1-inflam: #ff9a3d;
+  --v1-inflam-soft: #3a2a1d;
+  --v1-gum: #4a3538;
+  --v1-bone: #28251f;
+  --v1-pulp: #a4706a;
+  --v1-select: rgba(241,238,232,.07);
+  --v1-hover: rgba(241,238,232,.04);
+}
+
+/* Kacheln A: ohne Rahmen, ohne 70 %-Weiss. Das Band dahinter steht damit in
+   seiner ENDFARBE (--v1-gum), statt durch das Weiss vorkompensiert zu werden -
+   deshalb faellt auch die Aufhellung der Luecken (.gum-wash) weg. */
+#toothGrid.odon-style-v1 .tooth-tile,
+#toothGrid.odon-style-v1 .tooth-tile.placeholder{
+  border-color: transparent;
+  background: transparent;
+}
+#toothGrid.odon-style-v1 .tooth-tile:hover{ background: var(--v1-hover); }
+#toothGrid.odon-style-v1 .tooth-tile.active{
+  border-color: var(--v1-ink);
+  background: var(--v1-select);
+}
+#toothGrid.odon-style-v1 .tooth-tile.active::after{ border-color: transparent; animation: none; }
+#toothGrid.odon-style-v1 .tooth-tile.active .tooth-svg svg{ filter: none; animation: none; }
+#toothGrid.odon-style-v1 > svg.gum-overlay .gum-wash{ display: none; }
+#toothGrid.odon-style-v1 > svg.gum-overlay [id="gum-base"]{ fill: var(--v1-gum) !important; }
+#toothGrid.odon-style-v1 > svg.gum-overlay [id="bone-base"]{ fill: var(--v1-bone) !important; }
+#toothGrid.odon-style-v1 [data-gum-strip]{ fill: var(--v1-gum); }
+#toothGrid.odon-style-v1 .tooth-tile [id="tooth-healthy-pulp"] path{ fill: var(--v1-pulp) !important; }
+
+/* Signale: Rot NUR fuer Karies, Entzuendung orange, Extraktion in Tusche. */
+#toothGrid.odon-style-v1 .tooth-tile [id^="caries-"] [style*="fill: #b3261e"],
+#toothGrid.odon-style-v1 .tooth-tile [id^="caries-"][style*="fill: #b3261e"]{
+  fill: var(--v1-caries) !important; stroke: var(--v1-caries-edge) !important;
+}
+#toothGrid.odon-style-v1 .tooth-tile [id^="subcaries-"] [style*="fill: #721813"],
+#toothGrid.odon-style-v1 .tooth-tile [id^="subcaries-"][style*="fill: #721813"]{
+  fill: var(--v1-caries-under) !important; stroke: var(--v1-caries-edge) !important;
+}
+#toothGrid.odon-style-v1 .tooth-tile [id="extraction-plan"] [style*="stroke: #b70000"]{
+  stroke: var(--v1-ink) !important;
+}
+#toothGrid.odon-style-v1 .tooth-tile [style*="fill: #ffa46a"],
+#toothGrid.odon-style-v1 .tooth-tile [style*="fill: #ff422a"]{ fill: var(--v1-inflam) !important; }
+/* Parodontal/periimplantaer und der Knochenabbau: ein Rahmen mit leiser
+   Flaeche, keine Vollflaeche - sie liegen gross ueber dem Zahn. */
+#toothGrid.odon-style-v1 .tooth-tile [id="parodontal"] [style*="fill: #ffa46a"],
+#toothGrid.odon-style-v1 .tooth-tile [id="parodontal"][style*="fill: #ffa46a"],
+#toothGrid.odon-style-v1 .tooth-tile [style*="fill: #d9534f"]{
+  fill: var(--v1-inflam-soft) !important; stroke: var(--v1-inflam) !important; stroke-width: 1.4px;
+}
+#toothGrid.odon-style-v1 .tooth-tile [style*="stroke: #ffa46a"]{ stroke: var(--v1-inflam) !important; }
+#toothGrid.odon-style-v1 .tooth-tile [style*="fill: #feffd5"]{ fill: var(--v1-inflam-soft) !important; }
+/* Randspalt: statt der grellen lila Linie in Tusche (der Keil der Vorlage
+   kommt mit Stufe 3, in der eigenen Zeichenebene). */
+#toothGrid.odon-style-v1 .tooth-tile [id="crown-leakage"] [style*="#9e00e9"],
+#toothGrid.odon-style-v1 .tooth-tile [id="crown-leakage"][style*="#9e00e9"]{
+  fill: var(--v1-ink) !important; stroke: var(--v1-ink) !important;
+}
+#toothGrid.odon-style-v1 .tooth-tile[data-mobility]::before{ color: var(--v1-ink); }
+
+/* Materialien: flach, kein Verlauf - die Kuppeln der klassischen Ansicht
+   (odonKrone...) gelten hier nicht; e.max und Metallkeramik werden ueber
+   ihre neun gleichen Rampen-Variablen flach. Kontur je Material in dessen
+   dunklerem Ton, 1,2. */
+#toothGrid.odon-style-v1 .tooth-tile [id="gold-crown"],
+#toothGrid.odon-style-v1 .tooth-tile [id="gold-veneer"]{ fill: var(--odon-rest-gold, #dca72a) !important; stroke: #9c730c !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="gradia-crown"],
+#toothGrid.odon-style-v1 .tooth-tile [id="gradia-veneer"]{ fill: var(--odon-rest-gradia, #8fb0dc) !important; stroke: #4f78ad !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="zircon-crown"],
+#toothGrid.odon-style-v1 .tooth-tile [id="zircon-veneer"]{ fill: var(--odon-rest-zircon, #ddecf3) !important; stroke: #7c9db1 !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="metal-crown"]{ fill: var(--odon-rest-metal, #a3abb5) !important; stroke: #646c77 !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="temporary-crown"],
+#toothGrid.odon-style-v1 .tooth-tile [id="temporary-veneer"]{ fill: var(--odon-rest-temporary, #f2c9a0) !important; stroke: #bf8a57 !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="telescope-crown-outside"]{ fill: var(--odon-rest-telescope, #dca72a) !important; stroke: #9c730c !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="telescope-crown-inside"]{ fill: var(--odon-rest-telescope-inner, #9c730c) !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="emax-crown"],
+#toothGrid.odon-style-v1 .tooth-tile [id="emax-veneer"]{ fill: var(--odon-rest-emax-4, #f0e2c6) !important; stroke: #b39a6c !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id="metal-ceramic-crown"]{ fill: var(--odon-rest-metal-ceramic-4, #ece0c8) !important; stroke: #8b9098 !important; }
+#toothGrid.odon-style-v1 .tooth-tile [id$="-crown"],
+#toothGrid.odon-style-v1 .tooth-tile [id$="-veneer"]{ stroke-width: 1.2px; }
+
+/* Fuellungen: Kontur im dunkleren Ton des Materials (die Vorlage gab
+   Komposit einen Gruenrand). Am Variablennamen erkannt, nicht an der id. */
+#toothGrid.odon-style-v1 .tooth-tile [style*="--odon-fill-composite"]{ stroke: #4f78ad !important; }
+#toothGrid.odon-style-v1 .tooth-tile [style*="--odon-fill-gic"]{ stroke: #7f68b8 !important; }
+#toothGrid.odon-style-v1 .tooth-tile [style*="--odon-fill-amalgam"]{ stroke: #3f454d !important; }
+#toothGrid.odon-style-v1 .tooth-tile [style*="--odon-fill-temporary"]{ stroke: #bf8a57 !important; }
+
+/* Kauflaeche unter e.max und Metallkeramik: die klassische Ansicht gibt ihnen
+   feste, gruenliche Toene (#cfe0d8) - hier die Materialfarbe, flach. Die
+   Hoecker und Fissuren (odontogram-qvr) bleiben sichtbar. */
+#toothGrid.odon-style-v1 .tooth-tile.occl-view[data-occl-resto="emax"] [id="background-cusp"],
+#toothGrid.odon-style-v1 .tooth-tile.occl-view[data-occl-resto="emax"] [id="tooth-base"] [id="cusps"] path[style]{ fill: var(--odon-rest-emax-4, #f0e2c6) !important; }
+#toothGrid.odon-style-v1 .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id="background-cusp"],
+#toothGrid.odon-style-v1 .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id="tooth-base"] [id="cusps"] path[style]{ fill: var(--odon-rest-metal-ceramic-4, #ece0c8) !important; }
+#toothGrid.odon-style-v1 .tooth-tile.occl-view[data-occl-resto="metal-ceramic"] [id="fissure"] path,
+#toothGrid.odon-style-v1 .tooth-tile [id^="metal-ceramic"] [style*="stroke: #1b3f1c"]{ stroke: #8b9098 !important; }
+
+/* Dunkles Thema: der Zahnkoerper gedaempft, damit er nicht blendet - als
+   Filter auf die Substanz-Ebenen, so bleibt die Tiefenwirkung erhalten und
+   keine Materialfarbe wird mitgedimmt. */
+.dark #toothGrid.odon-style-v1 .tooth-tile [id="tooth-base"],
+.dark #toothGrid.odon-style-v1 .tooth-tile [id="milktooth-base"]{
+  filter: brightness(.84) sepia(.18);
+}

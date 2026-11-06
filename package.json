@@ -1,0 +1,36 @@
+{
+  "name": "odontogram-workspace",
+  "private": true,
+  "type": "module",
+  "description": "Bun workspace for the Cognovis odontogram: the published chart SDK, the Aidbox transport package, and the standalone app that consumes both.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "bun run --filter @cognovis/odontogram-standalone dev",
+    "build": "bun run build:lib && bun run --filter @cognovis/odontogram-standalone build",
+    "build:lib": "bun run --filter @cognovis/odontogram build:lib && bun run --filter @cognovis/odontogram-fhir build:lib",
+    "test": "bun run --filter '*' test",
+    "typecheck": "tsc -p packages/odontogram --noEmit && tsc -p packages/odontogram-fhir --noEmit && tsc -p apps/standalone --noEmit",
+    "lint": "eslint .",
+    "docs": "bun run --filter @cognovis/odontogram docs",
+    "verify:lib-artifacts": "bun run --filter @cognovis/odontogram verify:lib-artifacts",
+    "verify:packed-sdk": "bun scripts/verify-packed-sdk.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.15.0",
+    "jiti": "^2.6.1",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.53.1"
+  }
+}

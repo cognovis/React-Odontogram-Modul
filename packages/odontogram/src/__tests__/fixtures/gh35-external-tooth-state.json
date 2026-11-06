@@ -1,0 +1,21 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "identifier": { "system": "https://fhir.cognovis.de/dental-core", "value": "odontogram-dental-core-0.8.1" },
+  "entry": [{
+    "fullUrl": "urn:uuid:00000000-0000-4000-8000-000000000001",
+    "resource": {
+      "resourceType": "Observation",
+      "meta": { "profile": ["https://fhir.cognovis.de/dental-core/StructureDefinition/dental-tooth-state"] },
+      "status": "final",
+      "code": { "coding": [{ "system": "https://fhir.cognovis.de/dental-core/CodeSystem/dental-component", "code": "tooth-presence" }] },
+      "subject": { "reference": "Patient/example" },
+      "effectiveDateTime": "2026-09-25T12:00:00Z",
+      "bodySite": { "coding": [{ "system": "https://fhir.cognovis.de/dental-core/CodeSystem/tooth-position-fdi", "code": "16" }] },
+      "component": [{
+        "code": { "coding": [{ "system": "https://fhir.cognovis.de/dental-core/CodeSystem/dental-component", "code": "tooth-presence" }] },
+        "valueCodeableConcept": { "coding": [{ "system": "https://fhir.cognovis.de/dental-core/CodeSystem/dental-chart-value", "code": "implant-in-tooth-position" }] }
+      }]
+    }
+  }]
+}

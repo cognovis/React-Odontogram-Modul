@@ -1,0 +1,37 @@
+{
+  "name": "@cognovis/odontogram-standalone",
+  "version": "5.0.2",
+  "private": true,
+  "type": "module",
+  "description": "The standalone odontogram app: the fixture playground at / and, given a live configuration, the same chart loading and saving against Aidbox.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cognovis/fhir-sdk": "0.23.0",
+    "@cognovis/odontogram": "workspace:*",
+    "@cognovis/odontogram-fhir": "workspace:*",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "autoprefixer": "^10.4.20",
+    "gh-pages": "^6.1.1",
+    "jsdom": "^28.1.0",
+    "postcss": "^8.4.45",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}

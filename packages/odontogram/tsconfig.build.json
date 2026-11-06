@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": false,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"],
+  // Bead odontogram-0w9: five entries left this list because the files left the
+  // package. `src/main.tsx`, `src/live/LiveApp.tsx`, `src/live/config.ts` and
+  // `src/live/main.tsx` are the app's (apps/standalone), and `src/live/aidbox.ts`
+  // is the transport's (packages/odontogram-fhir). What remains under `src/live`
+  // is the HTTP-free session SPI, which IS published: load, save, writePlan,
+  // gateway. Excluding a file that no longer exists is silent, so this list
+  // cannot say whether the split happened — `0w9`'s boundary suites do.
+  "exclude": [
+    "src/lib-entry.ts",
+    "src/**/__tests__/**",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ]
+}

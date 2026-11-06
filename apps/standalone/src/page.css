@@ -1,0 +1,41 @@
+/* Cognovis odontogram - https://github.com/cognovis/odontogram
+   Dirk Saeger, Malte Sussdorff 2026
+
+   The standalone app's PAGE. Until 5.0.2 these rules shipped inside
+   @cognovis/odontogram/style.css, where every host that imported the chart's
+   stylesheet got them too: the chart's tokens on :root and on `.dark`, the
+   page gradient and text colour on <body> (GitHub cognovis/odontogram#44).
+   The package now scopes its tokens to .odontogram-root/.odontogram-portal;
+   this app is the host here, so it owns its page and keeps it as it was. */
+:root{
+  --bg: var(--odon-bg, #f3f6fb);
+  --panel: var(--odon-panel, #ffffff);
+  --card: var(--odon-card, #ffffff);
+  --muted: var(--odon-muted, #5b6b7d);
+  --text: var(--odon-text, #1e2a3a);
+  --line: var(--odon-line, #d7e0ec);
+  --accent: var(--odon-accent, #3b7bff);
+  --accent2: var(--odon-accent2, #12b981);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  /* The glow is painted ONCE at the top; the page ground continues below it.
+     Without no-repeat + a colour the gradient tiled every window height and
+     left a hard edge on a long page (All options, 25.09.2026). */
+  background: radial-gradient(1200px 600px at 15% 0%, #ffffff 0%, var(--bg) 60%) no-repeat, var(--bg);
+  color:var(--text);
+}
+.dark{
+  --bg: var(--odon-bg, #0f172a);
+  --panel: var(--odon-panel, #1e293b);
+  --card: var(--odon-card, #1e293b);
+  --muted: var(--odon-muted, #94a3b8);
+  --text: var(--odon-text, #f1f5f9);
+  --line: var(--odon-line, #334155);
+}
+.dark body{
+  background: var(--bg);
+}

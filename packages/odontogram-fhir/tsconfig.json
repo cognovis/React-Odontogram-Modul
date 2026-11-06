@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": false,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "."
+    // Bead odontogram-0w9: NO source alias for `@cognovis/odontogram`, here or
+    // in `tsconfig.build.json`. Type checking resolves it through the
+    // workspace link to the SDK's published `dist/index.d.ts` — the same file
+    // an outside consumer reads — so `bun run build:lib` has to have run once.
+    //
+    // Aliasing it to `../odontogram/src/index.ts` was tried and rejected. This
+    // package's entire point is that it does not pull the chart in, and that
+    // alias pulled the chart's whole SOURCE into a 2 kB transport's type
+    // check: it needed `jsx`, then Vite's ambient `*.svg?raw` and
+    // `import.meta.glob` declarations, and it would have gone on needing
+    // whatever the chart needs next. `vitest.config.ts` keeps its own alias,
+    // so the TESTS still run straight off source with no build.
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,85 @@
+{
+  "name": "@cognovis/odontogram",
+  "version": "5.2.6",
+  "license": "MIT",
+  "type": "module",
+  "description": "Interactive, SVG-based dental odontogram (dental chart) editor for React + TypeScript \u2014 multi-surface caries/filling charting, endodontic/prosthetic/periodontal states, FDI/Universal/Palmer numbering, Dental Core via @cognovis/fhir-sdk against Aidbox, and ICDAS scoring.",
+  "author": "Zolt\u00e1n Dul",
+  "keywords": [
+    "odontogram",
+    "dental-chart",
+    "dental-charting",
+    "dentistry",
+    "dental-records",
+    "react",
+    "typescript",
+    "svg",
+    "fhir",
+    "icdas",
+    "periodontal"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/odontogram.js",
+  "module": "./dist/odontogram.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/odontogram.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build:lib": "vite build --config vite.lib.config.ts",
+    "verify:lib-artifacts": "bun tools/verify-library-artifacts.mjs",
+    "fhir:validate": "bun tools/fhir-validate.mjs",
+    "test": "NODE_OPTIONS=--max-old-space-size=8192 vitest run",
+    "test:watch": "NODE_OPTIONS=--max-old-space-size=8192 vitest",
+    "test:coverage": "NODE_OPTIONS=--max-old-space-size=8192 vitest run --coverage",
+    "parity:capture": "PARITY_CAPTURE=1 NODE_OPTIONS=--max-old-space-size=8192 vitest run src/__tests__/parity/capture.test.ts",
+    "prototype:kfo": "vite --config vite.prototype.config.ts --open '/prototypes/kfo-view/?variant=A'",
+    "docs": "typedoc",
+    "prepublishOnly": "bun run build:lib",
+    "prepack": "bun run build:lib"
+  },
+  "peerDependencies": {
+    "@cognovis/fhir-sdk": "^0.22.0 || ^0.23.0",
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "dependencies": {
+    "@types/fhir": "^0.0.44",
+    "dompurify": "^3.4.13"
+  },
+  "devDependencies": {
+    "@cognovis/fhir-sdk": "0.23.0",
+    "@microsoft/api-extractor": "^7.58.12",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jsdom": "^28.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "autoprefixer": "^10.4.20",
+    "jiti": "^2.6.1",
+    "jsdom": "^28.1.0",
+    "postcss": "^8.4.45",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^3.4.10",
+    "typedoc": "^0.28.17",
+    "typescript": "^5.5.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.0.18",
+    "yaml": "^2.9.0"
+  }
+}

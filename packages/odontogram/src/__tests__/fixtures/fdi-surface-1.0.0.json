@@ -1,0 +1,17 @@
+{
+  "source": "tx.fhir.org CodeSystem http://terminology.hl7.org/CodeSystem/FDI-surface|1.0.0 (content complete)",
+  "valueSet": "https://fhir.cognovis.de/dental-core/ValueSet/tooth-surface",
+  "codes": [
+    { "code": "M", "tooth": "16", "surfaces": ["mesial"] },
+    { "code": "O", "tooth": "16", "surfaces": ["occlusal"] },
+    { "code": "I", "tooth": "11", "surfaces": ["occlusal"] },
+    { "code": "D", "tooth": "16", "surfaces": ["distal"] },
+    { "code": "B", "tooth": "16", "surfaces": ["buccal"] },
+    { "code": "V", "tooth": "11", "surfaces": ["buccal"] },
+    { "code": "L", "tooth": "16", "surfaces": ["lingual"] },
+    { "code": "MO", "tooth": "16", "surfaces": ["mesial", "occlusal"] },
+    { "code": "DO", "tooth": "16", "surfaces": ["distal", "occlusal"] },
+    { "code": "DI", "tooth": "11", "surfaces": ["distal", "occlusal"] },
+    { "code": "MOD", "tooth": "16", "surfaces": ["mesial", "occlusal", "distal"] }
+  ]
+}

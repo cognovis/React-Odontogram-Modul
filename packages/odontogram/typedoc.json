@@ -1,0 +1,27 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/App.tsx",
+    "src/odontogram.ts",
+    "src/i18n/translations.ts",
+    "src/i18n/useI18n.ts",
+    "src/utils/numbering.ts",
+    "src/status_extras.ts",
+    "src/theme.ts",
+    "src/plugin.ts"
+  ],
+  // Bead odontogram-0w9: the generated site is the WORKSPACE's GitHub Pages
+  // output and stays at the workspace root, where it was before the package
+  // moved under `packages/`. Only the generator moved.
+  "out": "../../docs",
+  "name": "Cognovis Odontogram",
+  "readme": "README.md",
+  "tsconfig": "tsconfig.json",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "githubPages": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/ZoliQua/React-Odontogram-Modul"
+  }
+}

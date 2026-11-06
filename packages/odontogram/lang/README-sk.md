@@ -1,0 +1,872 @@
+# 🦷 React Advanced Odontogram
+
+[![Download](https://img.shields.io/badge/Download-React--Odontogram--Modul-blue?style=for-the-badge&logo=github)](https://github.com/ZoliQua/React-Odontogram-Modul/releases)
+[![Version](https://img.shields.io/badge/version-5.2.6-green?style=for-the-badge)](https://github.com/ZoliQua/React-Odontogram-Modul)
+[![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)](https://github.com/ZoliQua/React-Odontogram-Modul/blob/main/LICENSE)
+[![DOI](../src/assets/zenodo.21156787.svg)](https://doi.org/10.5281/zenodo.21156787)
+
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+
+---
+
+> 🌐 **Languages:**  🇬🇧 [English](README-en.md) | 🇪🇸 [Español](README-es.md) | 🇩🇪 [Deutsch](README-de.md) | 🇭🇺 [Magyar](README-hu.md) | 🇮🇹 [Italiano](README-it.md) | 🇸🇰 [Slovenčina](README-sk.md) | 🇵🇱 [Polski](README-pl.md) | 🇷🇺 [Русский](README-ru.md) | 🇧🇷 [Português (BR)](README-pt-br.md) | 🇸🇦 [العربية](README-ar.md) | 🇨🇳 [简体中文](README-zh.md) | 🇫🇷 [Français](README-fr.md)
+
+---
+
+## 🇸🇰 Slovenčina
+
+### 📋 Prehľad
+Tento projekt je interaktívny, prehliadačovo orientovaný editor odontogramu, ktorý umožňuje rýchle zaznamenávanie zubného statusu s prehľadným rozhraním. Vykresľuje vrstvené SVG šablóny zubov na reprezentáciu reštaurácií, kazu, endodontického stavu, mobility a ďalších klinických detailov, pričom poskytuje viacnásobný výber, filtre výberu a preddefinované stavové predvoľby. Každá pozícia zuba má vlastnú kresbu — šestnásť bočných pohľadov stálych zubov, dvadsať okluzálnych pohľadov a mliečny chrup — a pohľad zhora na predné zuby vôbec umožňuje zaznamenať palatinálny nález na rezáku, ktorý bočný pohľad nedokáže zobraziť.
+
+---
+![Odontogram – náhľad (slovenčina)](screenshot_sk_odontogram.png)
+
+🔗 **Test URL:** https://react-odontogram-modul.vercel.app/
+
+---
+
+### 📦 Použitie ako npm balík
+
+Odontogram sa distribuuje ako samostatná knižnica React komponentov na npm:
+`@cognovis/odontogram`.
+
+#### Požiadavky
+- **React 18 alebo 19** (deklarovaný ako peer dependency — zabezpečuje ho vaša aplikácia).
+- **Bundler**, ktorý rozumie poľu `exports` a formátu ESM: Vite, webpack 5, Next.js, Rollup, esbuild, Parcel. Balík je **iba ESM**.
+- Node **≥ 18** pre nástroje.
+
+#### Inštalácia
+
+```bash
+bun add @cognovis/odontogram react react-dom
+```
+
+#### Základné použitie
+
+Vykreslite `OdontogramShell` a **raz** kdekoľvek vo vašej aplikácii importujte hárok štýlov:
+
+```tsx
+import { OdontogramShell } from "@cognovis/odontogram";
+import "@cognovis/odontogram/style.css";
+
+export function Chart() {
+  return (
+    <OdontogramShell
+      language="sk"          // hu | en | de | es | it | sk | pl | ru | pt-br | ar | zh | fr
+      numberingSystem="FDI"  // FDI | Universal | Palmer
+      darkMode={false}
+    />
+  );
+}
+```
+
+#### Vlastnosti (props) komponentu
+
+`OdontogramShell` je riadený (controlled) komponent. Najbežnejšie vlastnosti:
+
+| Vlastnosť | Typ | Predvolená hodnota | Popis |
+|------|------|---------|-------------|
+| `language` | `Language` | `"hu"` | Jazyk používateľského rozhrania (`hu`/`en`/`de`/`es`/`it`/`sk`/`pl`/`ru`/`pt-br`/`ar`/`zh`). |
+| `numberingSystem` | `"FDI" \| "Universal" \| "Palmer"` | `"FDI"` | Systém číslovania zubov. |
+| `darkMode` | `boolean` | `false` | Prepínač tmavého motívu. |
+| `readOnly` | `boolean` | `false` | Vypne všetko úpravy (iba na zobrazenie). |
+| `themeConfig` | `OdontogramThemeConfig` | — | Prepíše CSS premenné motívu (`--odon-*`). |
+| `plugins` | `OdontogramPlugin[]` | — | Registrácia vlastných stavových pluginov / ďalších vrstiev. |
+| `enableNotes` | `boolean` | `false` | Povolí poznámky pre jednotlivé zuby. |
+| `enableIcdas` | `boolean` | `false` | Povolí hodnotenie kazu podľa ICDAS II. |
+| `onLanguageChange` / `onNumberingChange` / `onDarkModeChange` | `(value) => void` | — | Spustí sa, keď používateľ zmení nastavenie z rozhrania. |
+
+Akceptujú sa aj jemnejšie vlastnosti úrovne detailu (`pulpDetailLevel`, `secondaryCariesMode`, `rootCariesMode`, `radiographicDepthMode`, `wearDetailLevel`, `discolorationDetailLevel`, `surfaceNotation`, `showStatusCard`, `showOrthoCard`) — úplný, typovaný zoznam nájdete v dodaných typoch `.d.ts`.
+
+#### Verejné API (pomenované exporty)
+
+`OdontogramShell` je zároveň predvoleným aj pomenovaným exportom. Imperatívne stavové API, samostatný komponent `PerioChart`, sprievodná prehliadka a všetky verejné typy sú pomenované exporty z rovnakého vstupného bodu:
+
+```ts
+import {
+  OdontogramShell,           // aj predvolený export
+  PerioChart,                // samostatný komponent parodontálnej karty
+  // čítanie stavu
+  getOdontogramSummary,
+  getToothStateSummary,
+  onStateChange,             // odber zmien stavu
+  // export / import
+  exportSvg, exportImage,    // vektorový / rastrový export karty
+  // ovládanie
+  setReadOnly, getReadOnly,
+  clearSelection,
+  registerPlugins, setPluginState, getPluginState,
+  startIntroTour,            // spustenie úvodnej prehliadky
+  // …a mnoho ďalších funkcií nastavení setX/getX
+} from "@cognovis/odontogram";
+```
+
+Celý rozsah (≈ 44 funkcií + typy ako `OdontogramSummary`, `OdontogramThemeConfig`, `OdontogramPlugin`, `PerioViewMode`, …) je plne typovaný v priložených deklaráciách.
+
+#### Použitie s Next.js (App Router)
+
+Komponent funguje iba na strane klienta, preto ho vykresľujte z klientskeho komponentu:
+
+```tsx
+"use client";
+import { OdontogramShell } from "@cognovis/odontogram";
+import "@cognovis/odontogram/style.css";
+
+export default function OdontogramClient() {
+  return <OdontogramShell language="sk" numberingSystem="FDI" />;
+}
+```
+
+Alebo ho načítajte pomocou dynamického importu iba na strane klienta: `dynamic(() => import("./OdontogramClient"), { ssr: false })`.
+
+#### Dôležité poznámky a súčasné obmedzenia
+- **Iba ESM** — balík publikuje hlavný ES modul (`dist/odontogram.js`) s príslušnými deklaráciami typov (`dist/index.d.ts`). Je cielený na rozlíšenie modulov bundlerom; neexistuje CommonJS zostavenie.
+- **Hárok štýlov je samostatný** — **musíte** raz importovať `@cognovis/odontogram/style.css`; nevkladá sa automaticky. Štýlovanie je globálne CSS ohraničené pod `.odontogram-root` a riadené CSS premennými `--odon-*`. V nevydanej verzii nenastavuje nič na `:root`, `html` ani `body`: pozadie stránky, písmo a vlastné tokeny hostiteľa zostávajú nedotknuté; plochy pripojené k `<body>` (sprievodca, vyskakovacie okná) nesú `.odontogram-portal`.
+- **SSR / iba klient** — komponent pri pripojení číta DOM (`document`), preto musí bežať v prehliadači. V SSR frameworkoch ho vykresľujte v klientskom komponente (`"use client"`) alebo cez dynamický import iba na strane klienta.
+- **Zdroje sú samostatné** — SVG súbory zubov a ikon sú pri zostavení vložené priamo do JavaScriptového balíka; **nie je potrebné konfigurovať žiadne získavanie zdrojov za behu** a nič netreba kopírovať do vášho verejného priečinka.
+- **Viac inštancií, jeden aktívny editor** — každá pripojená `<OdontogramShell>` môže držať vlastný klinický stav cez izolovanú reláciu (`createOdontogramSession()`) a dve relácie nikdy nezdieľajú dáta. Interaktívny DOM editor zostáva jediným globálnym enginom, takže ho naraz ovláda práve jedna pripojená inštancia: tá vykresľuje kartu, ostatné vykresľujú neaktívny zástupný prvok a zostávajú plne čitateľné a zapisovateľné cez svoje API relácie. Po odpojení aktívnej inštancie ju prevezme čakajúca.
+
+---
+
+### ✨ Kľúčové funkcie
+- 🖱️ Rýchly výber a viacnásobný výber (CMD/CTRL + klik)
+- 🦷 Typy zubov: trvalý, mliečny, implantát, subgingiválny, chýbajúci
+- 🍼 Mliečny chrup má vlastnú anatómiu: osem generovaných šablón pokrýva všetkých dvadsať mliečnych zubov s vlastnými meranými podielmi koreňa, dĺžkami a šírkami, pomerne väčšou dreňou a koreňmi rozostúpenými okolo zárodku trvalého zuba. Ak sa zub zaznamená ako mliečny, jeho kresba nahradí kresbu nástupcu. Vo FHIR sa zub označuje ako **51–85**, pretože v FDI samotné číslo hovorí, do ktorého chrupu patrí; pri importe rozhoduje ono a prepísaná je len prítomnosť
+- 🦷 Substrát zuba (nezávislý od akejkoľvek náhrady): prirodzený, radix (zvyšok koreňa), zlomený, preparovaný na korunku
+- 👑 Náhrady podľa typu × materiálu: korunka / inlay / onlay / fazeta / mostík z e.max, zlata, gradie, zirkónu, kovu, kovovo-keramického materiálu, teleskopu alebo dočasného materiálu (onlay je dostupný len v okluzálnom zobrazení) — vyberané z jedného kombinovaného výberu s nízkym počtom klikov „Korunka – …"; staršie korunky `metal` sa automaticky migrujú na `metal-ceramic` (kovovo-keramickú); implantáty používajú rovnaký model typ × materiál, doplnený o vrstvu konektora implantátu. Výber je obmedzený podľa druhu zuba: implantát ponúka iba korunku/mostík (plus svojich päť možností upevnenia, pozri nižšie); chýbajúci/medzerový zub ponúka iba článok mostíka (plus snímateľnú čiastočnú/celkovú protézu); substrát `radix` úplne skrýva ovládací prvok náhrady (na zvyšku koreňa nemožno zaznamenať žiadnu náhradu)
+- 🦿 Snímateľná/náustavcová protetika na vyhradenej osi `prosthesis` (položky „Kivehető:" v kombinovanom výbere): hojivý abutment implantátu, lokátor, lokátor s protézou (overdenture), steg, steg s protézou; zubami podopretá snímateľná čiastočná alebo celková náhrada
+- 🌉 Zuby mostíka vykresľujú súčasne korunkový uzáver aj sedlový konektor; prekrytie viaczubového mostíkového úseku vykresľuje jeden súvislý, oblúku prispôsobený konektor cez po sebe idúce zuby mostíka (články + piliere) a medzizubné medzery medzi nimi (horný a dolný oblúk používajú zrkadlenú geometriu sedla, čím zostáva konektor zarovnaný na oboch oblúkoch), zahrnuté v exporte PNG/JPG/SVG; aplikovanie mostíka cez predvoľbu stavov okamžite prepočíta prekrytie
+- 🔍 Zaznamenávanie kazu na 6 plochách: meziálne, distálne, bukálne, linguálne, oklúzne, subkoronálne
+- 🪥 Materiály výplní na každú plochu: amalgám, kompozit, GIC, dočasný
+- 🏥 Jeden zlúčený výber „Stav drene / endo" (zoskupený: vitálna dreň vs. liečená/endo) pre liečivú, úplnú alebo nekompletnú koreňovú výplň a samostatný výber materiálu koreňového kolíka (`rootPostType`: none / glass-fiber / metal): endodontická liečba a AAE diagnóza drene (`pulpDx`: normálna / reverzibilná / ireverzibilná pulpitída / nekróza) sa navzájom vylučujú, zatiaľ čo kolík možno zaznamenať pri každom stave koreňovej výplne. Zub s ošetreným koreňovým kanálikom (nastavené `endo`) nemôže mať zároveň diagnózu vitálnej drene; pri ošetrení sa `pulpDx` normalizuje na `normal` a glyf chorej drene sa potlačí. Reverzibilná pulpitída sa zobrazuje ako zmenšený glyf drene. Voliteľné 3-úrovňové nastavenie podrobnosti drene (`pulpDetailLevel`: simple / AAE / praktická latinčina) cez `pulpLatin` sprístupňuje 9 praktických latinských podtypov drene (pulpa sana … gangraena pulpae); resekcia a parapulpálny kolík zostávajú samostatnými špeciálnymi indikátormi
+- 🦴 Apikálna diagnóza (`apicalDx`: symptomatická/asymptomatická apikálna parodontitída, akútny/chronický apikálny absces, kondenzujúca osteitída) priamo určuje periapikálny glyf; kvalifikátor podtypu lézie granulóm/cysta sa zobrazuje iba pri symptomatickej/asymptomatickej apikálnej parodontitíde (redundantný podtyp „absces" bol odstránený — je už pokrytý apikálnou diagnózou)
+- 🩹 Zlúčená karta „Koreň a parodont" (jedna zbaliteľná sekcia pre nálezy koreňa/periapikálnej oblasti a parodontu)
+- ⚕️ Modifikácie: periapikálny zápal (zobrazený iba na chýbajúcich zuboch/zuboch s extrakčnou ranou; skrytý na prítomných zuboch, kde periapikálny glyf priamo určuje `apicalDx`, a na implantátoch, kde ho pokrýva `periImplant`), parodontálne ochorenie, stupne mobility (M1/M2/M3, skryté na implantátoch)
+- 🦷🔩 Stav peri-implantátu (`periImplant`: `none` / `mucositis` / `peri-implantitis-mild` / `peri-implantitis-moderate` / `peri-implantitis-severe`) — stagingovanie podľa 2018 World Workshop, zobrazené ako vyhradený výber na implantátoch; mukozitída opätovne používa parodontálny glyf ďasna, peri-implantitída pridáva odstupňovanú vrstvu `peri-implant-bone-loss` (priehľadnosť 0,4/0,7/1,0). Implantáty už nezobrazujú glyf periapikálnej lézie — ich zápal sa namiesto toho vyjadruje touto osou — a modifikátorové zaškrtávacie políčka parodontu sú na implantátoch skryté (provizórne premenovanie zaškrtávacieho políčka „Peri-implantitída" bolo zrušené)
+- 🏷️ Špeciálne indikátory: potrebná korunka, potrebná výmena korunky, uzavretá medzera po strate zuba, plán extrakcie, zapečatenie fisúr, strata kontaktného bodu
+- 👁️ Oklúzny pohľad, zuby múdrosti, prepínače viditeľnosti kosti a drene
+- 🔢 12 filtrov výberu (všetky, prítomné, trvalé, mliečne, implantáty, chýbajúce, horné/dolné, predné/moláre)
+- 📊 Preddefinované stavové predvoľby (obnoviť, mliečny chrup, zmiešaný chrup, bezzubý)
+- 📦 34 preddefinovaných šablón reštaurácií (mostíky, snímateľné protézy, stegové protézy s implantátmi)
+- 💾 Export/import stavu v JSON (verzia 2.20; import stále akceptuje staršie verzie 1.4 a 2.0 až 2.19 a automaticky ich migruje, s vlastnými stavmi pluginov a poznámkami ku každému zubu)
+- 🧭 **Ortodoncia je tretí klinický pohľad** (`odontogram-c51`): prepínač `Odontogram | Parodontálny stav | Ortodoncia` (`#appViewToggle`) nesie nasledujúcu kartu analýzy modelov. Odontogram sa nikdy neodpojí, iba skryje, takže zmena pohľadu nemôže narušiť nález. Ortodontický pohľad nemá vlastné okno, preto zostáva segmentom prepínača aj tam, kde je parodontálny stav nastavený ako vyskakovacie okno — vtedy zmizne iba jeho segment.
+- 📐 **Vyhodnotenie modelu** (`odontogram-c51.1`): Tonn a Bolton z meziodistálnych šírok zubov, s cieľovým súčtom rezákov, rozdielom šírky zubov a tým, ktorá čeľusť nesie prebytok. Šírky sa zadávajú na zubnom oblúku alebo v zozname — dva pohľady na jeden záznam. Zub, ktorý na modeli nie je (neprerezaný, stratený, pod ďasnom), preberá šírku kontralaterálneho zuba, viditeľne označenú ako predpoklad. K tomu horizontálny a vertikálny prekryt a odchýlka stredovej čiary na čeľusť
+- 🔗 Aidbox Dental Core cez `@cognovis/fhir-sdk`: hostitelia injektujú gateway; relácia načíta a uloží. JSON export/import stavu s migráciami
+- ✚ Krížový výber plôch (B/M/O/D/L) pre kaz a výplne
+- 🧱 Materiály reštaurácie pre každú plochu (zmiešané výplne, napr. bukálny amalgám + distálny kompozit)
+- 🖼️ Export obrázka odontogramu vo formáte PNG/JPG/SVG (na stiahnutie; PNG/JPG rastrovaný z vektorového SVG)
+- 🦷 Kaz/sekundárny kaz ako stavový automat na každú plochu: kazivá plocha bez výplne sa zobrazuje ako primárny kaz (priehľadnosť odstupňovaná podľa ICDAS); hneď ako má táto plocha výplň, zobrazuje sa namiesto toho ako sekundárny (rekurentný) kaz (vrstva `subcaries-{surface}`, so skóre CARS) — obidva nikdy nie sú aktívne súčasne na tej istej ploche
+- 🎯 Zjednotená závažnosť na plochu (`cariesSeverity`, 0–6, nahrádza pôvodné oddelené polia hĺbky ICDAS a CARS): na primárnej ploche sa číta ako hĺbka ICDAS, na rekurentnej ako pomenované skóre CARS (Zdravý … Rozsiahla kavita), prostredníctvom kontextového popupu, ktorý zobrazuje iba škálu relevantnú pre aktuálny stav plochy
+- 🌱 Kaz koreňa (`rootCaries`: none / active / arrested / active-cavitated), aktivujúci vyhradenú vrstvu ilustrácie kazu koreňa s priehľadnosťou závislou od závažnosti (active 0,5 / arrested 0,7 / active-cavitated plná priehľadnosť)
+- 🎚️ Tri nastavenia podrobnosti kazu (`secondaryCariesMode`, `rootCariesMode`, `radiographicDepthMode`) a prepínač `cariesDepthEnabled`, ktoré zbaľujú každú škálu do jednoduchšieho výberu bez straty uloženej hodnoty
+- 🩹 Súhrnný riadok sekundárneho kazu v paneli výplní: pod ovládacími prvkami výplní vypíše každý vybraný zub so sekundárnym kazom a jeho plochy (napr. „36 (O) má pri výplni nastavený sekundárny kaz.")
+- 🪛 Poruchy výplne na každú plochu (`fillingDefect`: none / marginal / fracture / wear) na priamych reštauráciách, nezávislé od sekundárneho kazu — zaznamenávané cez indikátor pre každú plochu na karte Výplne (podľa vzoru indikátora hĺbky kazu, so zvislo usporiadaným zoznamom možností), zobrazené na odontograme a v tooltipe aj v súhrne výplní za celé ústa s explicitným popiskom (napr. „36 (O) – Porucha výplne: O: okrajová"), rovnakým spôsobom, akým je označený sekundárny kaz v riadku Kaz; karta Výplne tiež zobrazuje upozorňujúcu poznámku pre každý vybraný zub so zaznamenanou poruchou výplne (napr. „36 má zaznamenanú poruchu výplne."), paralelne s existujúcou poznámkou o sekundárnom kaze
+- 🔗 Retenčné prvky, ktoré držia snímateľnú náhradu na prirodzenom zube (`retention`, `retentionSide`) — tri ukotvenia, nie jedna os: **spona** vyžaduje len prítomný zub, **zásuvný spoj** a **pilier trámca** korunku. JEDNA hodnota na zub, nikdy množina. Spona sa KRESLÍ ako štvrťoblúkové rameno na korunke (bruchom k ďasnu, zrkadlené podľa oblúka); zásuvný spoj a trámec nesú charlyho značky `( G )` a `ste`. **Rozpätie trámca sa odvodzuje**, nikdy neukladá, a jeden trámec môže spočívať súčasne na implantátových aj prirodzených pilieroch
+- 🎨 **Farby výplní a náhrad sú voliteľné** (Nastavenia → Farby). Každá výplňová farba je CSS premenná s dodanou farbou ako záložnou; e.max a kov-keramika sa kreslia z deväťstupňového prechodu a voľba zachová jeho svetlostný priebeh. Nastavenie ambulancie, nie súčasť dokumentu.
+- 🔩 **Prázdny údaj o implantáte je medzerou len tam, kde implantát zaviedla ambulancia** (`isImplantProductGap`) — ten, s ktorým pacient prišiel, je úplný záznam. Odvodené zo vstupného vyšetrenia, nikdy neukladané.
+- 🦷🔻 Postihnutie krčka výplňou alebo kazovou léziou (`cervicalSurfaces`: množina nad vestibulárnou a orálnou plochou) — krčková oblasť **nie je** šiestou plochou, ale značkou na existujúcej (BEMA ju píše ako príponu „vz"/„lz"), takže nikdy nemení počet plôch, ktorý číta pozičný stupeň (`getFillingSurfaceCount()`); zaznamenáva sa v tom istom vyskakovacom okne pre plochu, ktoré otvára kríž kazu aj kríž výplní, na bunke plochy je označená písmenom prípony a zobrazuje sa v tooltipe a v riadku nálezu, ktorý spresňuje, v súhrne celých úst. Zámerne sa nekreslí do grafu — bočný pohľad nemá žiadnu linguálnu vrstvu
+- 🦷💥 Opotrebenie zuba typizované podľa klinickej príčiny a miesta (`wearEdge`: none / attrition / erosion, incizálne/oklúzne; `wearCervical`: none / abrasion / abfraction / erosion, cervikálne) — nahrádza dva staré prepínače opotrebenia zap/vyp z bruxizmu; zaznamenávané cez dva rozbaľovacie zoznamy v riadku opotrebenia, opätovne používa existujúcu ilustráciu opotrebenia a zobrazuje sa v tooltipe a novej sekcii súhrnu „Opotrebenie" za celé ústa
+- 🎨 Zafarbenie zuba podľa príčiny (`discoloration`: none / tetracycline / fluorosis / nonvital / extrinsic / other) na trvalých aj mliečnych zuboch — zafarbí zobrazenú prirodzenú korunku reprezentatívnou farbou, keď zub nemá náhradu a má prirodzený substrát; zobrazené v tooltipe a novej sekcii súhrnu „Zafarbenie" za celé ústa; dopĺňa sadu povrchových a štrukturálnych nálezov popri poruchách výplne a opotrebení
+- ✏️ Predné zuby (rezáky/špičáky) označujú svoju hryzaciu plochu v celom rozhraní ako „incizálnu" (výber, popup, súhrny); uložený kľúč plochy zostáva `occlusal`
+- 🔤 Notácia plôch citlivá na polohu zuba (Nastavenia → Detaily zuba → „Notácia plôch", simple/full, predvolené full): v režime full sa písmeno a popisok plochy kazu/výplne riadia zubnou anatómiou — okluzálna → I/incizálna na predných zuboch, bukálna → L/labiálna na predných zuboch, linguálna → P/palatinálna na horných zuboch a L/linguálna na dolných zuboch (meziálna/distálna/subkoronálna nie sú ovplyvnené); v režime simple sa vždy používa všeobecná sada B/M/O/D/L/SC bez ohľadu na polohu zuba. Platí pre súhrn za celé ústa aj pre oba výbery plôch — kazu a poruchy výplne (písmeno + popisok); uložený kľúč plochy nie je ovplyvnený
+- 🦷↕️ Ortodontické zaznamenávanie na každý zub (`orthoAppliance`: none / bracket / band; `orthoDrift`: none / mesial / distal; `orthoVertical`: none / extrusion / intrusion; `orthoRotation`: boolean) na prítomnom prirodzenom zube (trvalom alebo mliečnom) — opätovne používa nevyužitú ilustráciu ortodoncie z v2.5.0 (žiadne nové SVG); zobrazené na odontograme, v tooltipe a novej sekcii súhrnu „Ortodoncia" za celé ústa
+- 🪨 Zubný kameň a resorpcia koreňa typizovaná ako interná alebo externá cervikálna (`resorptionType`)
+- 📏 Hĺbka kazu na každú plochu (povrchový / dentín / hlboký), alebo voliteľné skórovanie ICDAS II (0–6) cez `enableIcdas`
+- 🩹 Prepínač okrajovej netesnosti korunky, zobrazený len pri korunkovej alebo mostíkovej náhrade
+- 🧰 Zjednotená lišta ikon v hornej časti so záložkovým modálnym oknom Nastavenia (Všeobecné / Panely / Detaily zuba / Kaz / Dreň / Poznámky / Periodontálne — číslovanie, poznámky, viditeľnosť panelov, ICDAS, prepínač hĺbky kazu, podrobnosť kazu koreňa/rádiografického kazu, úroveň podrobnosti drene, úroveň podrobnosti opotrebenia/zafarbenia zuba, informácie o zuboch)
+- 🗂️ Nastavenia → záložka „Panely": nezávisle zobraziť/skryť panely súhrnu za celé ústa Stavy a Ortodoncia
+- 🦷🩺 Nastavenia → záložka „Periodontálne": 16 prepínačov zobraziť/skryť pre jednotlivé indexy riadkov parodontálneho grafu (zoskupené Vrecko/Hygiena/Mukogingválne/Podpora/Peri-implantátové — PD/GM/CAL/BOP, plak, PI, GI, viditeľnosť CEJ, koreňová konkavita, KG, GT, furkácia, mobilita, Millerova trieda, mPI, mBI), každý s vlastným popisom, plus možnosť zobrazenia názvov indexov preložené vs. kanonické (kanonický = pevný anglicko-latinský vedecký názov vo všetkých jazykoch rozhrania; tooltipy zostávajú vždy lokalizované bez ohľadu na toto nastavenie). Obe sú preferencie na úrovni aplikácie (podobne ako `perioViewMode`) — nikdy nie sú súčasťou exportného payloadu
+- 🩹 Nastavenia sekundárneho kazu (CARS) zlúčené do záložky Nastavení Kaz, umiestnené nad Rádiografickou hĺbkou (samostatná záložka „Sekundárny kaz" bola zrušená)
+- 🎚️ Úroveň podrobnosti detailov zuba (Nastavenia → Detaily zuba): nastavenie simple/complex pre opotrebenie zuba a pre zafarbenie. Jednoduchý režim zobrazuje prepínač áno/nie pre každý nález (opotrebenie zapnuté → attrition/abrasion, zafarbenie zapnuté → other); zložitý režim (predvolený) zachováva rozbaľovacie zoznamy typu/príčiny, pričom uložená hodnota sa pri prepínaní úrovní zachováva
+- 📋 Panel informácií o zuboch: živý textový súhrn celého odontogramu (počty zubov, zoznamy prítomných/chýbajúcich, kaz vrátane sekundárneho, výplne, koreňové kanáliky, protetika, implantáty, stav parodontu) — zobrazený predvolene, prepínateľný v Nastaveniach
+- 🗂️ Konsolidovaný rozbaľovací zoznam Exportu (Stav JSON / FHIR / PNG / JPG)
+- 📥 Rozbaľovací zoznam Importu s importom FHIR (spätne načítava exportované Bundles)
+- ⏳ Prekrytie priebehom počas exportu obrázka
+- 🎓 12-krokový interaktívny úvodný sprievodca
+- 🔢 Tri systémy číslovania (FDI, Universal, Palmer)
+- 🌐 I18n (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR) s prepínačom jazyka (190+ prekladových kľúčov na jazyk)
+- 🌗 Podpora tmavého režimu s prepínacím tlačidlom (samostatný alebo riadený nadradenou aplikáciou)
+- 🎨 Vlastná konfigurácia témy (prop `themeConfig`) s CSS vlastnými vlastnosťami (`--odon-*`)
+- 📱 Mobilné dotykové UX: vyskakovacie okno pre priblíženie kliknutím, kontextová ponuka dlhým stlačením, priblíženie štipnutím, WCAG 44px dotykové ciele, navigácia prepínania oblúka
+- 🔌 Vlastný SVG systém pluginov: vkladanie vizuálnych prekrytí, vlastný stav pre každý zub, podpora exportu/importu JSON
+- ⚠️ Varovania validácie stavu pre nekompatibilné kombinácie zubných stavov
+- 🏷️ Automatický tooltip stavu na dlaždiciach zubov (zobrazuje všetky aktívne stavy)
+- 🩺 Modernizovaný tooltip pre každý zub a panel súhrnu za celé ústa: obidva zobrazujú kompletnú sadu klinických nálezov (diagnóza drene/apikálna + podtyp lézie, resorpcia koreňa, stav peri-implantátu, odstupňovaný kaz koreňa, zubný kameň, okrajová netesnosť korunky, zlomenina, strata kontaktu, typizované okrajové/cervikálne opotrebenie), s vyhradenou sekciou „Diagnózy" v paneli, vyhradenou sekciou „Opotrebenie" a hrubým kvalifikátorom závažnosti kazu (povrchový/stredný/hlboký)
+- ♿ Klávesnicová prístupnosť (WCAG): ARIA role listbox/option, výber klávesmi Enter/Medzera, navigácia šípkami, obrysy focus-visible
+- 🔒 Režim iba na čítanie: zakázanie všetkých interakcií pre prípady tlače/správ/prezerania
+- ✨ Animácie výberu: pulzujúci prerušovaný okraj a žiariaci tieň na vybraných zuboch (s podporou prefers-reduced-motion)
+- 📝 Poznámky ku každému zubu: dvojklik pre pridanie/úpravu poznámok, ikona poznámky vedľa čísla zuba, tooltip pri najetí s textom poznámky, riadok „Individuálne poznámky" v súhrnnom paneli za celé ústa, export/import JSON
+- 🔀 Rozdelenie grafu Stav ↔ Plán: prepínač `Status | Plan` v hlavičke grafu prepína medzi aktuálnym grafom **stavu** (status) a grafom **plánu** (plan, zamýšľaný stav po ošetrení), pričom každý má vlastné stavy zubov; graf plánu sa pri prvom prepnutí naň vytvorí ako kópia stavu a úpravy v jednom grafe nikdy neovplyvnia druhý. Export/import (`exportStatus`/import súboru) sa vždy vzťahuje na graf stavu; graf plánu sa číta/zapisuje samostatne cez vlastné API (pozri Verejné API nižšie) a — keď sa líši od stavu — je zahrnutý ako doplnková sekcia `plan` v exporte JSON
+- 📝 Rámček „Čo sa zmenilo": kedykoľvek sa plán líši od aktuálneho stavu, rámček pod panelom informácií o zuboch vypíše každý rozdiel podľa zuba a osi ošetrenia (prítomnosť, substrát, náhrada, protetika, plánovaná korunka, ortodoncia, dreň/endo, apikálna) ako riadok `zub: os  z → na`; dostupné aj programovo cez `getPlanChanges()`
+
+![Parodontologická karta celých úst (slovenčina)](screenshot_sk_perio.png)
+
+- 🅿️ Navrhovaný štýl: v režime Plán sa nálezy, ktoré plán **pridáva** oproti aktuálnemu stavu (plánovaná korunka, extrakcia, ortodontický pohyb, protetika, …), vykresľujú s výrazným prerušovaným, tónovaným „navrhovaným" obrysom, aby bolo zrejmé, že ide o zámer, nie fakt — s legendou „prerušovane = navrhované" na karte grafu. Vykresľovanie v režime Stav je bajtovo identické; ošetrenie existuje iba v pláne a pri prepnutí späť sa úplne resetuje
+- 🚦 Obmedzenie v režime Plán: graf Plán zobrazuje iba to, čo zubár môže *vykonať* — základný výber ponúka iba Chýbajúci / Trvalý / Implantát a nálezy iba pre stav (kaz, opotrebenie zuba, zafarbenie a celý parodontálny blok — mobilita, šesťmiestna sondovacia mriežka, modifikácie zápalu/parodontu, zubný kameň, stav peri-implantátu) sú skryté; ovládací prvok drene/endo ponecháva endodontické **ošetrenie** (koreňový kanálik / kolík / apikektómia / parapulpálny kolík), pričom skrýva **diagnózu** drene/apikálnej oblasti a resorpciu koreňa. Náhrada, protetika, ortodoncia, potreba/výmena korunky a plán extrakcie zostávajú plánovateľné
+- 🧪 1746 prebiehajúcich automatizovaných testov (1 ďalší test preskočený) (Vitest) v 164 testovacích súboroch (165 spolu) pokrývajúcich číslovanie, preklady, predvoľby, i18n, komponent App, tému, dotyk, pluginy, prístupnosť a paritu klinických osí/diagnóz
+- 📖 Dokumentácia API TypeDoc s komentármi JSDoc pre všetky verejné exporty (`bun run docs`)
+
+### 📦 Moduly
+- 🦷 Mriežka odontogramu a rozhranie dlaždíc zubov
+- 🎛️ Ovládacie prvky a stavový panel
+- 🎨 SVG vrstevnací modul a šablóny
+- 🔢 Číslovanie zubov a mapovanie popiskov (FDI/Universal/Palmer)
+- 🌐 Lokalizácia (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR)
+- 💾 Export/import stavu
+- 📋 Doplnky stavu: preddefinované šablóny reštaurácií
+- 🎨 Konfigurácia témy: prispôsobiteľná farebná paleta cez CSS vlastnosti `--odon-*`
+- 📱 Mobilné dotykové interakcie (priblíženie kliknutím, dlhé stlačenie, priblíženie štipnutím, prepínanie oblúka)
+- 🔌 Vlastný SVG systém pluginov
+- ⚠️ Systém validácie stavu a tooltipov
+- ♿ Klávesnicová prístupnosť a podpora ARIA
+- 🔒 Režim iba na čítanie
+- ✨ Animácie výberu
+- 📝 Systém poznámok ku každému zubu
+- 🧪 Automatizovaná testovacia sada (Vitest + Testing Library)
+
+### 🛠️ Ovládacie prvky rozhrania
+
+**🔝 Horná lišta:**
+- Prepínač jazyka (rozbaľovací zoznam HU/EN/DE/ES/IT/SK/PL/RU/PT-BR)
+- Prepínacie tlačidlo tmavého režimu (ikona slnka/mesiaca, prepína medzi svetlou a tmavou témou)
+- Prepínač systému číslovania (rozbaľovací zoznam FDI/Universal/Palmer)
+- Tlačidlá Exportovať stav / Importovať stav
+
+**📊 Hlavička grafu:**
+- Prepínač oklúzneho pohľadu
+- Prepínač viditeľnosti zubov múdrosti
+- Prepínač viditeľnosti kosti
+- Prepínač viditeľnosti drene
+- Tlačidlo zrušiť výber
+
+**🔍 Filtre výberu:**
+- Vybrať všetky / Všetky prítomné / Trvalé / Mliečne / Implantáty / Všetky chýbajúce
+- Vybrať horné / Horné 6 predných / Horné moláre
+- Vybrať dolné / Dolné 6 predných / Dolné moláre
+
+**📋 Stavové predvoľby:**
+- Obnoviť všetko (obnoviť ústa)
+- Mliečny chrup
+- Zmiešaný chrup
+- Prepínač bezzubého
+
+**📦 Rozbaľovací zoznam doplnkov stavu:**
+- Horné/dolné zirkónové mostíky (12-22, 13-23, 16-26, celý oblúk)
+- Horné/dolné kovové mostíky (12-22, 13-23, 16-26, celý oblúk)
+- Horné/dolné čiastočné snímateľné protézy
+- Horné/dolné celkové snímateľné protézy
+- Horné/dolné stegové protézy s implantátmi
+
+**🦷 Panel editora zuba** (pre vybraný zub/zuby, zoskupené do zbaliteľných kariet):
+- **Základný riadok:** výber zuba (základný typ vrátane variantov zlomenej korunky) a substrát zuba (natural/radix/broken/crownprep)
+- **Riadok náhrady:** kombinovaný rozbaľovací zoznam náhrady zoskupené podľa druhu (Korunka / Mostík / Inlay / Onlay / Fazeta / „Kivehető:"), pričom každý riadok sám pomenúva svoj druh a materiál (pevné možnosti `restorationType`×`restorationMaterial` plus možnosti upevnenia/snímateľné z osi `prosthesis`, obmedzené podľa druhu zuba); zaškrtávacie políčko okrajovej netesnosti korunky (len korunka/mostík); zaškrtávacie políčka miesta zlomenej korunky; prepínače potrebná korunka / potrebná výmena korunky
+- **Riadok opotrebenia a zafarbenia:** rozbaľovací zoznam typu incizálneho/oklúzneho opotrebenia, rozbaľovací zoznam typu cervikálneho opotrebenia, rozbaľovací zoznam príčiny zafarbenia (každý sa v Nastaveniach → Detaily zuba → jednoduchom režime prepína na jednoduchý prepínač áno/nie)
+- **Karta Ortodoncia:** pomôcka, meziálny/distálny drift, vertikálny pohyb (extrúzia/intrúzia), prepínač rotácie — zobrazená na prítomnom prirodzenom zube
+- **Karta Kaz:** rozbaľovací zoznam režimu hĺbky kazu, zaškrtávacie políčko subkoronálneho kazu, rozbaľovací zoznam závažnosti kazu koreňa a výber plôch kazu B/M/O/D/L s kontextovým popupom hĺbky ICDAS/CARS a odznakom rádiografickej hĺbky
+- **Karta Výplne:** rozbaľovací zoznam materiálu výplne, výber výplní na každú plochu (s materiálom pre každú plochu), indikátor poruchy výplne pre každú plochu (marginal/fracture/wear), upozorňujúce poznámky o sekundárnom kaze a poruche výplne
+- **Karta Koreň a parodont:** zlúčený výber „Stav drene / endo", výber apikálnej diagnózy, výber podtypu periapikálnej lézie (iba symptomatická/asymptomatická apikálna parodontitída), výber typu resorpcie koreňa, výber stupňa mobility, výber stavu peri-implantátu (iba implantáty)
+- **Špeciálne indikátory:** plán extrakcie/rana, uzavretá medzera, zapečatenie fisúr, strata kontaktného bodu, zubný kameň, parapulpálny kolík, endo resekcia, pilier mostíka
+
+### ⌨️ Zápis nálezu skratkami
+
+Nálezy sa zapisujú v sekundách, často diktované. Pri 46 osiach a 129 hodnotách je počet klikov
+skutočným úzkym miestom, preto sa dá nález zadať tak, ako človek aj tak píše (`odontogram-t8y`):
+
+```
+označiť 13–23     ťahaním po zuboch, Shift + šípka alebo Shift + klik
+E                 režim materiálu: keramika — zostáva nastavený
+k                 šesť koruniek, jeden stlač
+```
+
+**Materiál stojí pred nálezom a zostáva nastavený**, ako režim, nie ako dodatok. Jedna klávesa
+materiálu má dve čítania, pretože výplň a náhrada čerpajú z rôznych množín hodnôt: `K mo` je
+kompozitná výplň na dvoch plôškach, `K k` korunka z Gradie. Kde čítanie neexistuje, nevymýšľa sa.
+
+**Tabulátor prejde na ďalší zub**, Shift+tabulátor späť, od 18 a okolo úst (18–28, potom 38–48),
+s obehom. Posúva výber, nielen zameranie, takže zub, na ktorom stojíte, je zvýraznený. Šípky
+zostávajú nezmenené.
+
+```
+G k    Tab    b          zlatá korunka, potom medzičlen na susedovi
+A  mod Tab               jedna amalgámová výplň cez tri plôšky
+c mod K3                 kaz na troch plôškach, so závažnosťou
+```
+
+Mapovanie žije v `src/shorthand.ts`, bez DOM a nezávisle od jadra, pretože tá istá množina nálezov
+musí byť dosiahnuteľná tromi cestami: klávesnicou, FHIR dopytom voči ambulantnému systému a rečou.
+
+Skratka je prepísaná z klávesnice nálezov programu *charly* (solutio), nie vymyslená.
+
+Úsek sleduje **oblúk**, nie geometriu (`odontogram-apn`): cez strednú čiaru (13 po 23) áno, cez
+čeľusť nikdy.
+
+### 🦷 Typy a stavy zubov
+
+**Výber zuba (základný typ):**
+| Hodnota | Popis |
+|---|---|
+| `none` | Chýbajúci zub |
+| `tooth-base` | Trvalý zub |
+| `milktooth` | Mliečny (dočasný) zub |
+| `implant` | Dentálny implantát |
+| `tooth-under-gum` | Subgingiválny (nevyrastený) zub |
+
+**Varianty zlomeného zuba:**
+`tooth-broken-inicisal`, `tooth-broken-distal-inicisal`, `tooth-broken-distal`, `tooth-broken-mesial-distal-inicisal`, `tooth-broken-mesial-distal`, `tooth-broken-mesial-inicisal`, `tooth-broken-mesial`, `no-tooth-after-extraction`
+
+**Substrát zuba (trvalé zuby):**
+`natural` (predvolené), `radix` (zvyšok koreňa), `broken`, `crownprep` (preparovaná na korunku)
+
+**Typ náhrady (trvalé zuby):**
+`none`, `crown`, `inlay`, `onlay` (len okluzálne zobrazenie), `veneer`, `bridge`
+
+**Materiál náhrady (trvalé zuby):**
+`none`, `emax`, `gold`, `gradia`, `zircon`, `metal`, `metal-ceramic` (staršie korunky `metal` sa migrujú sem), `telescope`, `temporary`
+
+**Možnosti náhrady sú obmedzené podľa druhu zuba** (`restorationOptions()` v `src/registry/restorations.ts`): implantát ponúka iba typy náhrady `crown`/`bridge` (doplnené o vrstvu konektora implantátu) plus päť nižšie uvedených položiek upevnenia `prosthesis`; chýbajúci/medzerový zub ponúka iba článok `bridge` plus dve položky snímateľnej protézy `prosthesis`; substrát `radix` úplne skrýva ovládací prvok náhrady. Staršie ploché polia `crownMaterial`/`bridgeUnit` (hodnoty upevnenia implantátu/mostíka spred v1.14) sú z aktívneho modelu zrušené — akceptované sú už iba ako migračná cesta na čítanie pre staré dáta.
+
+**Prosthesis** (`prosthesis`; nezávislá os snímateľnej protetiky/upevnenia, zobrazovaná ako položky „Kivehető:" v kombinovanom rozbaľovacom zozname náhrady):
+`none`, `healing-abutment`, `locator`, `locator-denture`, `bar`, `bar-denture` (upevnenia implantátu, s protézou alebo bez nej), `removable-partial`, `removable-full` (zubami podopreté protézy na chýbajúcom/medzerovom zube). Zub má buď pevnú náhradu, alebo protetiku, nikdy oboje — nastavenie jednej vynuluje druhú.
+
+**Okrajová netesnosť korunky** (`crownLeakage`; boolean): zobrazená iba keď je `restorationType` typu `crown` alebo `bridge`; aktivuje vrstvu ilustrácie `crown-leakage`.
+
+**Endodontické možnosti (trvalé zuby):**
+`none`, `endo-medical-filling`, `endo-filling`, `endo-filling-incomplete`
+
+**Materiál koreňového kolíka (trvalé zuby, nezávisle od `endo`):**
+`none`, `glass-fiber`, `metal`
+
+**Endodontické možnosti (mliečne zuby):**
+`none`, `endo-medical-filling`
+
+Polia `endo` a `pulpDx` sa zobrazujú cez jeden zlúčený výber „Stav drene / endo" (`<select>`, zoskupený: vitálna dreň vs. liečená/endo) a navzájom sa vylučujú — výber ošetreného stavu (`endo != none`) vynuluje `pulpDx` na `normal` a výber diagnózy drene vynuluje `endo` na `none`.
+
+**Materiály výplní (trvalé zuby):**
+`amalgam`, `composite`, `gic`, `temporary`
+
+**Materiály výplní (mliečne zuby):**
+`composite`, `gic`, `temporary`
+
+**Plochy výplní/kazu:**
+`mesial`, `distal`, `buccal`, `lingual`, `occlusal`, `subcrown` (iba kaz)
+
+**Modifikácie:**
+`inflammation` (periapikálny), `parodontal` (parodontálny), `mobility` (M1/M2/M3)
+
+**Typ periapikálnej lézie** (`periapicalType`; upresňuje periapikálny glyf, zobrazený iba pri symptomatickej/asymptomatickej apikálnej parodontitíde):
+`none`, `granuloma`, `cyst` — možnosti na zaznamenávanie; staršia hodnota `abscess` sa stále akceptuje/ukladá, ale vo výbere sa už neponúka, keďže duplikuje apikálnu diagnózu. Pri importe sa zahodí: zahrnutá do `apicalDx`, ak zub má nastavený modifikátor zápalu, inak vynulovaná na `none`
+
+**Diagnóza drene** (terminológia AAE; `pulpDx`):
+`normal`, `reversible-pulpitis` (zobrazuje zmenšený glyf drene), `irreversible-pulpitis`, `necrosis` — navzájom sa vylučuje s `endo`; na zube s ošetreným koreňovým kanálikom sa normalizuje na `normal`
+
+**Diagnóza drene, praktická latinčina** (`pulpLatin`; výber drene ju zobrazuje iba keď je `pulpDetailLevel` nastavené na `latin`):
+`none`, `pulpa-sana`, `hyperaemia-pulpae`, `pulpitis-acuta-serosa`, `pulpitis-acuta-purulenta`, `pulpitis-chronica-clausa`, `pulpitis-chronica-ulcerosa`, `pulpitis-chronica-hyperplastica`, `necrosis-pulpae`, `gangraena-pulpae`
+
+**Úroveň podrobnosti drene** (`pulpDetailLevel`, globálne nastavenie): `simple`, `aae` (predvolené), `latin` — určuje, aký slovník drene výber ponúka
+
+**Apikálna diagnóza** (`apicalDx`; určuje periapikálny glyf):
+`normal`, `symptomatic-apical-periodontitis`, `asymptomatic-apical-periodontitis`, `acute-apical-abscess`, `chronic-apical-abscess`, `condensing-osteitis`
+
+**Typ resorpcie koreňa** (`resorptionType`):
+`none`, `internal`, `external-cervical`
+
+**Stav peri-implantátu** (`periImplant`; iba implantáty, stagingovanie podľa 2018 World Workshop): `mucositis` opätovne používa parodontálny glyf ďasna; `peri-implantitis-*` pridáva vrstvu `peri-implant-bone-loss` s priehľadnosťou odstupňovanou podľa závažnosti (mierna 0,4 / stredná 0,7 / ťažká 1,0). Implantáty už nezobrazujú glyf periapikálnej lézie (ich zápal sa namiesto toho vyjadruje touto osou) a zaškrtávacie políčka `mods` zápal/parodont sú na implantátoch skryté:
+`none`, `mucositis`, `peri-implantitis-mild`, `peri-implantitis-moderate`, `peri-implantitis-severe`
+
+**Závažnosť kazu** (`cariesSeverity`; zjednotené pole na plochu, `0`–`6`): na ploche bez výplne sa číta ako škála hĺbky ICDAS (`superficial` / `dentin` / `deep`, alebo surové kódy ICDAS II `0–6`, keď je zapnuté `enableIcdas`) a zobrazuje primárnu vrstvu `caries-{surface}`; na ploche s výplňou sa číta ako pomenované skóre CARS (`0` zdravý … `6` rozsiahla kavita) a namiesto toho zobrazuje vrstvu `subcaries-{surface}` (sekundárny kaz) — plocha nikdy nie je primárna a rekurentná zároveň
+
+**Kaz koreňa** (`rootCaries`; aktivuje vrstvu ilustrácie `caries-root` na prítomnom zube, s priehľadnosťou závislou od závažnosti — `active` 0,5 / `arrested` 0,7 / `active-cavitated` plná priehľadnosť):
+`none`, `active`, `arrested`, `active-cavitated`
+
+**Rádiografická hĺbka kazu** (`radiographicDepth`; na plochu, nezávislá od vizuálnej škály ICDAS/CARS `cariesSeverity`):
+`none`, `E1`, `E2`, `D1`, `D2`, `D3`
+
+**Nastavenia podrobnosti kazu** (globálne): `secondaryCariesMode` (`simple`/`standard`/`full`, predvolené `standard`), `rootCariesMode` (`simple`/`severity`, predvolené `simple`), `radiographicDepthMode` (`off`/`threeLevel`/`detailed`, predvolené `off`), `cariesDepthEnabled` (boolean, predvolené `true`) — každé zbaľuje svoju škálu do jednoduchšieho výberu bez zmeny uloženej hodnoty
+
+**Špeciálne indikátory:**
+`crownNeeded`, `crownReplace`, `missingClosed`, `extractionPlan`, `extractionWound`, `bridgePillar`, `fissureSealing`, `contactMesial`, `contactDistal`, `endoResection`, `calculus`, `parapulpalPin`
+
+**Opotrebenie zuba** (`wearEdge`, `wearCervical`; klinický typ na každé miesto, obmedzené na tooth-base + bez náhrady + prirodzený substrát; vykresľujú existujúce vrstvy `tooth-bruxism-wear`/`tooth-bruxism-neck-wear`):
+`wearEdge`: `none`, `attrition`, `erosion` — `wearCervical`: `none`, `abrasion`, `abfraction`, `erosion`
+
+**Zafarbenie** (`discoloration`; príčina na každý zub, obmedzené na prirodzený tooth-base alebo mliečny zub + bez náhrady + prirodzený substrát; zafarbuje výplň zobrazenej prirodzenej korunky — žiadne nové SVG):
+`none`, `tetracycline`, `fluorosis`, `nonvital`, `extrinsic`, `other`
+
+**Porucha výplne** (`fillingDefect`; na každú plochu, nález priamej reštaurácie nezávislý od sekundárneho kazu — obmedzený na plochy prítomné v `fillingSurfaceMaterials`; vykresľuje vrstvu ilustrácie `defect-{surface}`):
+`none`, `marginal`, `fracture`, `wear`
+
+**Retenčný prvok** (`retention` + `retentionSide`; na zub, viazané podľa prvku; bez grafickej vrstvy, kreslené v prekryve mriežky):
+`none`, `clasp`, `attachment`, `bar-abutment` — `retentionSide`: `none`, `mesial`, `distal`, `both`. **Teleskop** zostáva MATERIÁLOM korunky a rozpoznáva sa ako retencia
+
+**Postihnutie krčka** (`cervicalSurfaces`; množina nad `buccal`/`lingual`, viazaná na plochu, ktorá nesie výplň, kazovú léziu alebo oboje — bez grafickej vrstvy, zámerne nekreslené):
+`buccal`, `lingual` — značka na ploche, nikdy samostatná plocha: `getFillingSurfaceCount()` zostáva nedotknuté
+
+**Ortodoncia** (`orthoAppliance`, `orthoDrift`, `orthoVertical`, `orthoRotation`; na každý zub, obmedzené na prítomný prirodzený zub — trvalý alebo mliečny):
+`orthoAppliance`: `none`, `bracket`, `band` — `orthoDrift`: `none`, `mesial`, `distal` — `orthoVertical`: `none`, `extrusion` (glyf šípky nahor), `intrusion` (glyf šípky nadol) — `orthoRotation`: boolean
+
+**Nastavenia detailov zuba / notácie** (globálne nastavenia relácie, Nastavenia → Detaily zuba): `wearDetailLevel` a `discolorationDetailLevel` (`ToothDetailLevel`: `simple`/`complex`, predvolené `complex` — jednoduchý režim zobrazuje prepínač áno/nie namiesto plného rozbaľovacieho zoznamu typu/príčiny, bez zmeny uloženej hodnoty) a `surfaceNotation` (`simple`/`full`, predvolené `full` — určuje, či sú písmená/popisky plôch kazu/výplne citlivé na polohu zuba; pozri „Notácia plôch citlivá na polohu zuba" vyššie)
+
+### ⚙️ Nastavenia
+Otvárané cez ikonu ozubeného kolieska na hornej lište; dialóg s uzamknutým fokusom, ARIA `dialog` so záložkovým rozložením (Esc/klik mimo okna na zatvorenie, šípky na prepínanie záložiek). Všetky nastavenia sú iba stav rozhrania na úrovni relácie, pokiaľ nie je uvedené inak — žiadne z nich nemenia dáta jednotlivých zubov ani exportný payload.
+
+- **Všeobecné:** systém číslovania (FDI/Universal/Palmer), jazyk, tmavá/svetlá téma, viditeľnosť panela informácií o zuboch
+- **Panely:** nezávisle zobraziť/skryť kartu súhrnu za celé ústa Stavy a kartu Ortodoncia (obe predvolene viditeľné)
+- **Detaily zuba:** úroveň podrobnosti opotrebenia a úroveň podrobnosti zafarbenia (simple/complex, obe predvolene complex), notácia plôch (simple/full, predvolené full)
+- **Kaz:** prepínač skórovania ICDAS II (`enableIcdas`), prepínač hĺbky kazu (`cariesDepthEnabled`), podrobnosť kazu koreňa (`rootCariesMode`: simple/severity), podrobnosť sekundárneho kazu/CARS (`secondaryCariesMode`: simple/standard/full), podrobnosť rádiografickej hĺbky (`radiographicDepthMode`: off/threeLevel/detailed) — bývalá samostatná záložka „Sekundárny kaz" je zlúčená do tejto, pričom ovládací prvok CARS je umiestnený priamo nad rádiografickou hĺbkou
+- **Dreň:** úroveň podrobnosti drene (`pulpDetailLevel`: simple/AAE/praktická latinčina, predvolené AAE) — určuje, aký slovník ponúka výber „Stav drene / endo"; zmena okamžite obnoví súhrn za celé ústa a každý otvorený tooltip
+- **Poznámky:** povoliť/zakázať poznámky ku každému zubu (`enableNotes`)
+- **Periodontálne:** prepínače zobraziť/skryť pre každý index zo všetkých 16 riadkov parodontálneho grafu (`perioRowVisibility`, predvolene všetky viditeľné), zoskupené Vrecko (PD/GM/CAL/BOP) / Hygiena (Plak/PI/GI) / Mukogingválne (viditeľnosť CEJ/koreňová konkavita/KG/GT) / Podpora (Furkácia/Mobilita/Millerova trieda) / Peri-implantátové (mPI/mBI), každý riadok s vlastným popisom; plus režim názvov indexov preložené vs. kanonické (`perioIndexNameMode`: `translated` predvolené / `canonical` — pevný anglicko-latinský vedecký názov zobrazený vo všetkých jazykoch rozhrania). Iba preferencie na úrovni aplikácie (zrkadlí `perioViewMode`) — nikdy sa neserializuje, tooltipy zostávajú lokalizované v oboch režimoch
+
+### 🖼️ Systém SVG šablón
+
+**Šablóny zubov** (v `src/assets/teeth-svgs/`):
+| Šablóna | Zuby, ktoré ju používajú |
+|---|---|
+| **Trvalé zuby** | |
+| `11.svg` | 11, 21 |
+| `12.svg` | 12, 22 |
+| `13.svg` | 13, 23 |
+| `14.svg` / `14_occl.svg` | 14, 24 |
+| `15.svg` / `15_occl.svg` | 15, 25 |
+| `16.svg` / `16_occl.svg` | 16, 26 |
+| `17.svg` / `17_occl.svg` | 17, 27 |
+| `18.svg` / `18_occl.svg` | 18, 28 |
+| `41.svg` | 41, 31 |
+| `42.svg` | 42, 32 |
+| `43.svg` | 43, 33 |
+| `44.svg` / `44_occl.svg` | 44, 34 |
+| `45.svg` / `45_occl.svg` | 45, 35 |
+| `46.svg` / `46_occl.svg` | 46, 36 |
+| `47.svg` / `47_occl.svg` | 47, 37 |
+| `48.svg` / `48_occl.svg` | 48, 38 |
+| **Mliečne zuby** | |
+| `51.svg` | 51, 61 |
+| `52.svg` | 52, 62 |
+| `53.svg` | 53, 63 |
+| `54.svg` | 54, 64 |
+| `55.svg` | 55, 65 |
+| `81.svg` | 81, 71 |
+| `82.svg` | 82, 72 |
+| `83.svg` | 83, 73 |
+| `84.svg` | 84, 74 |
+| `85.svg` | 85, 75 |
+
+Zub zaznamenaný ako mliečny sa kreslí z vlastnej šablóny, ktorá sa vloží namiesto trvalej; trvalé šablóny sa pre dolnú čeľusť otáčajú o 180 stupňov a pre ľavú stranu zrkadlia vodorovne, mliečne sledujú rovnaké priradenie.
+
+**Ikony SVG** (v `src/assets/icon-svgs/`):
+`icon_8.svg` (múdrosť), `icon_gum.svg` (kosť), `icon_no_selection.svg` (zrušiť), `icon_occl.svg` (oklúzny pohľad), `icon_pulp.svg` (dreň)
+
+### 🔢 Systémy číslovania
+
+**FDI (ISO 3950):** Trvalé zuby 11-18, 21-28, 31-38, 41-48. Mliečne zuby 51-55, 61-65, 71-75, 81-85.
+
+**Universal (USA):** Trvalé zuby číslované 1-32. Mliečne zuby označené písmenami A-T.
+
+**Palmer (Zsigmondy-Palmer):** Formát kvadrant + pozícia (napr. UR-1, LL-5). Mliečne zuby používajú písmená A-E na kvadrant.
+
+### 🚀 Použitie
+Vývoj:
+```bash
+bun install
+bun run dev
+```
+Zostavenie:
+```bash
+bun run build
+```
+Náhľad:
+```bash
+bun run preview
+```
+
+### 🔗 Integrácia
+Komponent je možné vložiť do ľubovoľnej React aplikácie.
+Príklad:
+```tsx
+import App from "./App";
+
+export default function Host(){
+  return (
+    <App
+      language="sk"
+      onLanguageChange={(lang) => console.log(lang)}
+      numberingSystem="FDI"
+      onNumberingChange={(system) => console.log(system)}
+      darkMode={false}
+      onDarkModeChange={(dark) => console.log(dark)}
+    />
+  );
+}
+```
+
+**Integrácia tmavého režimu:**
+- **Samostatný režim:** Vynechajte prop `darkMode` — komponent spravuje vlastný stav témy cez prepínacie tlačidlo v hornej lište a pridáva/odstraňuje triedu `.dark` na `<html>`.
+- **Riadený režim:** Odovzdajte `darkMode` a `onDarkModeChange` — nadradená aplikácia riadi tému. Prepínacie tlačidlo sa stále zobrazuje, ale volá `onDarkModeChange` namiesto správy interného stavu. Nadradená aplikácia je zodpovedná za pridávanie/odstraňovanie triedy `.dark` na `<html>`.
+
+**Vlastná téma:**
+```tsx
+<App
+  themeConfig={{
+    colors: {
+      accent: '#e74c3c',
+      background: '#fafafa',
+      text: '#222222',
+    },
+  }}
+/>
+```
+
+**Integrácia pluginu:**
+```tsx
+import App, { type OdontogramPlugin, setPluginState } from "./App";
+
+const myPlugin: OdontogramPlugin = {
+  id: "implant-brand",
+  label: { en: "Implant Brand", hu: "Implantátum márka" },
+  layer: "overlay",
+  renderSvg: (toothNo, _quadrant, state) => {
+    if (!state) return null;
+    return `<text x="16" y="60" font-size="6" fill="#3b7bff">${state}</text>`;
+  },
+};
+
+<App plugins={[myPlugin]} />
+
+// Set plugin state for a tooth:
+setPluginState(11, "implant-brand", "Straumann");
+```
+
+**Riadená integrácia — dokument domény rozhrania (od 2.3.0):**
+
+Klinický stav komponentu je **dokument domény rozhrania**: ten istý verziovaný JSON, ktorý
+zapisuje `exportStatus()` a číta `importStatus()`. Tento dokument — nie FHIR — drží stav
+Reactu a patrí hostiteľskej aplikácii.
+
+Naviaž inštanciu na izolovanú **reláciu**, aby si ju inicializoval a sledoval a aby dva
+vložené odontogramy zostali nezávislé:
+
+```tsx
+import App, {
+  createOdontogramSession,
+  type OdontogramDocument, type OdontogramSession,
+} from "./App";
+
+const upper: OdontogramSession = createOdontogramSession(savedUpperDocument);
+const lower: OdontogramSession = createOdontogramSession(savedLowerDocument);
+
+<App session={upper} onDocumentChange={(doc: OdontogramDocument) => save("upper", doc)} />
+<App session={lower} onDocumentChange={(doc: OdontogramDocument) => save("lower", doc)} />
+```
+
+- `session.getDocument()` / `setDocument(doc)` / `subscribe(listener)` je celá zmluva;
+  `createOdontogramSession(initial?)` reláciu vytvorí. HKP hosts read treatment
+  intent from `session.getPlanChanges()`, not the module singleton.
+- Jednoduchá prop `document` namiesto `session` spôsobí, že si inštancia vytvorí vlastnú
+  reláciu inicializovanú týmto dokumentom.
+- Ak nezadáš **ani jedno**, zostáva pôvodné samostatné správanie: komponent pracuje nad
+  predvolenou reláciou procesu (`getDefaultOdontogramSession()`) a všetky modulové vstupné
+  body na ňu pôsobia presne ako predtým. **Migrácia nie je potrebná.**
+- V DOM engine je naraz *aktívna* len jedna relácia (je jediný globálny engine viazaný na
+  jednu mriežku zubov); ostatné si ponechávajú vlastný dokument a zostávajú plne čitateľné
+  a zapisovateľné cez svoje API relácie.
+
+**FHIR / Dental Core:**
+
+Konverzia FHIR je čistá voliteľná projekcia dokumentu používateľského rozhrania. Dental Core `de.cognovis.fhir.dental.core#0.10.0` je jediný FHIR kontrakt; rozpoznaná značka `odontogram-dental-core-0.6.0` zostáva čitateľná pre prázdne staršie kolekcie, neznáme značky dialektov sa odmietnu. Import, export a opätovný export zachovávajú jedenásť zdrojových osí `implantPosition`, `crownFractureType`, `orthoProgressive`, `rootResection`, `papillaLoss`, `orthoBracketSide`, `cantilever`, `endoCanals`, `rootFractureRoot`, `rootResectionRoot` a `apicalRoot`. V plánoch tieto osi používajú odkazovaný cieľový `Goal`; existujúce polia plánu naďalej používajú profilované plánované Observations. Plánovaný stav zostáva oddelený od pozorovaného a nevytvára Devices ani vykonané Procedures. Duplicitné, rozporné, chybné, nejednoznačne adresované alebo s daným zubom nezlučiteľné tvrdenia sa odmietnu. Koreňové kolíky zostávajú nezávislé cez `rootPostType`; staršie hodnoty `endo-glass-pin` a `endo-metal-pin` sa migrujú na `endo-filling` plus materiál kolíka. Od verzie 5.0.0 sa `extractionPlan`, `crownNeeded` a `crownReplace` zapisujú ako požiadavky na úrovni zuba podľa Dental Core 0.8 (SNOMED CT 55162003 / 426222000, pri korunke s `restoration-renewal`); požiadavky zapísané predchádzajúcim lokálnym kódom sa už nečítajú. Od 5.0.0 (cez `@cognovis/fhir-sdk` 0.15.6) sa každá hodnota stavu zuba alebo nálezu v diagrame zapisuje a číta iba ako jej kód Dental Core, bez lokálneho systému kódov, náhrady či aliasu; URL systémov pochádzajú z `@cognovis/fhir-sdk/terminology`.
+
+**Aidbox live režim (vývoj, od 2.50.0):**
+
+Samostatná aplikácia (`apps/standalone`) má **jeden** vstupný bod a režim si volí za behu: v živom režime sa spustí pri `?live`, pri `?patient=<id>`, alebo kedykoľvek je v jej prostredí konfigurácia Aidboxu; inak servíruje pieskovisko nad vzorovými dátami. V živom režime načíta kartu jedného pacienta priamo zo servera Aidbox, zobrazí ju v bežnom rozhraní cez vyššie uvedené session API a zapisuje zmeny späť ako zdroje Dental Core pod deterministickými id, takže opätovné uloženie aktualizuje namiesto duplikovania.
+
+Skopírujte `apps/standalone/.env.example` do `apps/standalone/.env` a vyplňte obmedzeného strojového klienta (pozri [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md)), potom z koreňa workspace:
+
+```bash
+bun install
+bun run dev                                 # potom otvorte http://localhost:5173/?live
+```
+
+Administrátorské poverenie nikdy nepatrí do `VITE_*`.
+
+HTTP polovica je vlastný balík, [`@cognovis/odontogram-fhir`](../../odontogram-fhir): obsahuje transport Aidboxu a továreň na bránu a ako jediný závisí od `@cognovis/fhir-sdk/client`. Tento balík dodáva **SPI** brány a session delegáty pre načítanie, uloženie a plán zápisu — polovicu bez HTTP — a naďalej **neobsahuje** `@cognovis/fhir-sdk/client`. Diagram a transport 5.2.6 deklarujú povinný peer SDK `^0.22.0 || ^0.23.0` a presnú vývojovú verziu `0.23.0` (Dental Core 0.10.0). Spustiteľná aplikácia pripína SDK `0.23.0` a zdieľa jednu kópiu bez override. Nastavenie a mechanika načítania/uloženia sú v [`docs/aidbox-live-mode.md`](../../../docs/aidbox-live-mode.md).
+
+**Datované vyšetrenia, stav posúdenia a peri-implantátový záznam (od 2.4.0):**
+
+Parodontálny prípad sa vyšetruje opakovane počas rokov, preto dokument teraz nesie vlastnú
+identitu vyšetrenia a archív skorších vyšetrení:
+
+```ts
+setExaminationContext({
+  id: "exam-2026-06-30", subject: "Patient/123", effectiveDateTime: "2026-06-30",
+  performer: "Practitioner/dr-mueller", encounter: "Encounter/9912",
+});
+
+captureExamination({ effectiveDateTime: "2026-06-30" });
+listExaminations();
+getExamination(id);
+loadExamination(id);
+startExamination({ effectiveDateTime: "2027-01-15" });
+```
+
+- Každé archivované vyšetrenie je **nezávislá snímka** nálezov celých úst a kontextu prípadu v
+  čase záznamu; neskoršie úpravy sa doň už nikdy nedostanú a opätovný záznam založí kontrolné
+  vyšetrenie namiesto prepísania východiskového stavu, od ktorého závisí vývoj.
+- Status a plán naďalej znamenajú **aktuálne oproti navrhovanému v rámci jedného vyšetrenia** —
+  plán nikdy nie je história a nikdy nie je súčasťou snímky.
+- Každé identifikačné pole je nepriehľadný reťazec vo vlastníctve hostiteľskej aplikácie, ktorý
+  komponent uloží a vráti, ale nikdy neinterpretuje. Dokumenty spred verzie payloadu 2.21 ich
+  neobsahujú a načítajú sa nezmenené.
+- **To, s čím pacient prišiel, sa odvodzuje z tohto archívu, nikdy sa neukladá.** Ošetrenie prítomné pri NAJSTARŠOM archivovanom vyšetrení sa kreslí **šrafovane**. `getBaselineExamination()`, `getPreExistingAxes(toothNo)`, `getChangesSinceBaseline()`, `isToothPreExisting(toothNo)`.
+- Šrafovanie označuje **prácu, nikdy zub a nikdy chorobu** — výplne, koreňové výplne a čapy, resekcia hrotu, pečatenie fisúr. Koreňový zvyšok alebo implantát je zub, nie práca; kaz, zubný kameň a parodontálne nálezy sú choroba.
+- **Vstupné vyšetrenie sa dá opraviť**: `beginBaselineCorrection()`, `commitBaselineCorrection()`, `cancelBaselineCorrection()`. Zámerne bez prepisu na jednotlivý zub.
+- **Importovaný graf bez vlastného archívu sa stane vstupným vyšetrením** (menu importu, predvolene zapnuté). Dokument s vlastným archívom si ho ponechá.
+
+Parodontálna karta ukladá nálezy, nie samotný akt vyšetrenia, takže "sondované, bez krvácania"
+a "nikto nesondoval" vyzerali rovnako. Každá dotknutá os (PD, GM, BOP, hnisanie, pohyblivosť,
+furkácia, plak, PI, GI, mPI, mBI, KG) to teraz dokáže povedať:
+
+```ts
+setAssessmentStatus(16, "bop", "MB", "assessed");
+setAssessmentStatus(16, "pd", "DB", "unmeasurable");
+getAssessmentStatus(16, "mpi", "buccal");
+perioAxisApplies(16, "gm");
+perioAxisApplies(11, "gm");
+```
+
+"Neaplikovateľné" sa odvodzuje z toho, čím zub skutočne je, a skutočné meranie vždy preváži
+zaznamenanú medzeru. Pri exporte sa nedostupná hodnota stane vlastným `dataAbsentReason` FHIR —
+nikdy vymysleným klinickým kódom — a normálny nález explicitným `false` alebo stupňom `0`.
+
+**Zaznamenávanie (od 2.7.0):** prepínač **Stav vyšetrenia** v hlavičke parodontálnej karty
+pridá pod každý viditeľný riadok indexu sprievodný riadok s jedným cyklickým tlačidlom na každý
+merací bod — meracie miesto, plocha, vstup furkácie alebo celý zub. Riadky sú predvolene vypnuté.
+Bod, ktorý už obsahuje nameranú hodnotu, je uzamknutý (hodnota sama je dôkazom vyšetrenia) a
+neaplikovateľná pozícia je zakázaná, nie ticho ignorovaná. Zaznamenané stavy sa objavia aj v
+tooltipe zuba a v celoústnom parodontálnom súhrne.
+
+Celoústna parodontálna karta teraz zaznamenáva aj **hnisanie** pre každé miesto a stĺpec
+implantátu podporuje peri-implantátové vyšetrenie: hĺbku sondovania v šiestich miestach,
+krvácanie, hnisanie, pohyblivosť implantátu a šírku keratinizovanej sliznice. Neaktívne tam
+ostávajú len osi, ktoré potrebujú sklovinno-cementovú hranicu (gingiválny okraj a z neho
+odvodený CAL) a plakové indexy prirodzeného zuba — mPI a mBI sú ich peri-implantátové
+ekvivalenty.
+### 🧪 Testovanie
+```bash
+bun run test           # Spustiť všetkých 1704 testov (1 ďalší test preskočený)
+bun run test:watch     # Sledovací režim
+bun run test:coverage  # Správa pokrytia
+```
+
+### 📖 Dokumentácia API
+```bash
+bun run docs           # Generovať dokumentáciu TypeDoc v docs/
+```
+
+### 📡 Verejné API
+
+**Props komponentu:**
+
+| Prop | Typ | Predvolené | Popis |
+|---|---|---|---|
+| `language` | `string` | `'hu'` | Jazyk rozhrania (hu/en/de/es/it/sk/pl/ru/pt-br) |
+| `onLanguageChange` | `(lang) => void` | — | Spätné volanie pri zmene jazyka |
+| `numberingSystem` | `string` | `'FDI'` | Systém číslovania (FDI/Universal/Palmer) |
+| `onNumberingChange` | `(system) => void` | — | Spätné volanie pri zmene číslovania |
+| `darkMode` | `boolean` | `undefined` | Stav tmavého režimu. Vynechajte pre samostatný režim. |
+| `onDarkModeChange` | `(dark) => void` | — | Spätné volanie pri prepnutí tmavého režimu. Vyžadované pre riadený režim. |
+| `themeConfig` | `OdontogramThemeConfig` | `undefined` | Vlastné prepísanie farieb cez CSS vlastné vlastnosti (`--odon-*`). |
+| `plugins` | `OdontogramPlugin[]` | `undefined` | Vlastné SVG pluginy pre vizuálne prekrytia a vlastný stav každého zuba. |
+| `readOnly` | `boolean` | `undefined` | Zakázanie všetkých interakcií (klik, dotyk, klávesnica). Užitočné pre zobrazenia tlače/správ. |
+| `enableNotes` | `boolean` | `undefined` | Povolenie poznámok ku každému zubu. Dvojklik na zub pre pridanie/úpravu poznámok. |
+
+**Exportované funkcie pre externú kontrolu:**
+
+| Funkcia | Popis |
+|---|---|
+| `initOdontogram()` | Inicializovať modul a vykresliť všetky zuby |
+| `destroyOdontogram()` | Vyčistiť modul a odstrániť poslucháčov udalostí |
+| `setNumberingSystem(system)` | Prepínanie medzi FDI, Universal, Palmer |
+| `clearSelection()` | Zrušiť výber všetkých zubov |
+| `setOcclusalVisible(on)` | Prepínanie oklúzneho pohľadu zap/vyp |
+| `setWisdomVisible(on)` | Zobraziť/skryť zuby múdrosti |
+| `setShowBase(on)` | Zobraziť/skryť vrstvu kosti |
+| `setHealthyPulpVisible(on)` | Zobraziť/skryť zdravú dreň |
+| `registerPlugins(plugins)` | Registrovať vlastné SVG pluginy |
+| `setPluginState(toothNo, pluginId, value)` | Nastaviť vlastný stav pluginu pre zub |
+| `getPluginState(toothNo, pluginId)` | Získať vlastný stav pluginu pre zub |
+| `getToothStateSummary(toothNo)` | Získať lokalizovaný súhrn všetkých aktívnych stavov |
+| `getOdontogramSummary()` | Získať štruktúrovaný, lokalizovaný textový súhrn celého odontogramu (počty, sekcie) |
+| `onStateChange(callback)` | Prihlásiť sa na odber zmien stavu; vracia funkciu na odhlásenie |
+| `setReadOnly(value)` | Povolenie/zakázanie režimu iba na čítanie |
+| `getReadOnly()` | Získať aktuálny stav iba na čítanie |
+| `setNotesEnabled(value)` | Povolenie/zakázanie poznámok ku každému zubu |
+| `getNotesEnabled()` | Získať aktuálny stav povolenosti poznámok |
+| `setPulpDetailLevel(level)` | Nastaviť slovník výberu drene — `"simple"`, `"aae"` alebo `"latin"` |
+| `getPulpDetailLevel()` | Získať aktuálnu úroveň podrobnosti drene |
+| `getChartMode()` | Získať aktuálne aktívny graf — `"status"` alebo `"plan"` |
+| `setChartMode(mode)` | Prepnúť aktívny graf na `"status"` alebo `"plan"`; graf plánu sa pri prvom vstupe hĺbkovo skopíruje zo stavu |
+| `getStatusChart()` | Získať payload grafu stavu (`{version, globals, teeth}`), nezávisle od toho, ktorý graf je aktuálne aktívny |
+| `getPlanChart()` | Získať payload grafu plánu (`{version, globals, teeth}`), nezávisle od toho, ktorý graf je aktuálne aktívny |
+| `setPlanChart(payload)` | Nahradiť zuby grafu plánu z payloadu (stav zostane nedotknutý); označí graf plánu ako inicializovaný |
+| `getPlanChanges()` | Získať štruktúrovaný rozdiel stav→plán (`{ toothNo, axis, from, to }[]`) — jeden záznam na zub a os ošetrenia, ktoré sa líšia medzi grafom stavu a plánu; prázdne, ak plán neexistuje. Zobrazuje sa aj v `getOdontogramSummary()` ako `plannedChanges` |
+| `setPerioSite(toothNo, site, patch)` | Nastaviť parodontálne údaje pre jedno zo šiestich miest (`patch` = `{ pd?, gm?, bop?, sup? }`); `pd` null/`<1` zruší zaznamenanie miesta. Validuje + orezáva (PD 1–15, GM −10…+20) |
+| `getToothPerio(toothNo)` | Získať parodontálny záznam zuba pre jednotlivé miesta (iba zaznamenané miesta) |
+| `getToothCal(toothNo)` | Získať odvodenú CAL pre jednotlivé miesta (`pd + gingiválny okraj`) daného zuba |
+| `getPerioSummary()` | Súhrnné parodontálne údaje za celé ústa: počet zaznamenaných miest, počet krvácajúcich miest, %BOP, najhoršia CAL, max. PD |
+| `getPerioChart()` | Získať parodontálne záznamy aktívneho grafu pre jednotlivé zuby |
+| `PerioChart` | Komponent React (pomenovaný export) — prekrytie parodontálneho grafu za celé ústa (`{ open, onClose }`), možno ho pripojiť nezávisle od `OdontogramShell` pre integráciu s hostiteľskou aplikáciou |
+| `openPerioOverlay()` / `closePerioOverlay()` / `isPerioOverlayOpen()` | Programové otvorenie/zatvorenie/zistenie stavu prekrytia parodontálneho grafu — umožňuje hostiteľovi vyvolať parodontálny graf nezávisle od základného odontogramu (zdieľaný stav prípadu) |
+| `getPerioViewMode()` / `setPerioViewMode(mode)` | Získať/nastaviť spôsob zobrazenia parodontálneho grafu — `"toggle"` (prepínač zobrazenia `Odontogram \| Dental Chart`, predvolené) alebo `"popup"` (vyskakovacie okno) |
+| `getPerioOverlayLayer()` / `setPerioOverlayLayer(layer)` | Získať/nastaviť zvýrazňovacie prekrytie Dental Chart — `"none"` (predvolené) / `"pd"` / `"cal"` / `"gr"` / `"plaque"` / `"bop"` / `"pd5"` / `"pd6"` / `"cairo"`; prekreslí zuby podľa danej miery (iba zobrazenie nad existujúcimi dátami) |
+| `getToothRecessionType(toothNo)` | Získať odvodený **Cairo typ recesie** — `"none"` / `"rt1"` / `"rt2"` / `"rt3"` (vypočítaný z interproximálnej vs. bukálnej CAL zuba) |
+| `setCejVisibility(toothNo, v)` / `getCejVisibility(toothNo)` | Viditeľnosť CEJ pre každý zub — `"none"` / `"detectable"` / `"not-detectable"` |
+| `setRootConcavity(toothNo, v)` / `getRootConcavity(toothNo)` | Konkavita povrchu koreňa pre každý zub — `"none"` / `"mild"` / `"deep"` |
+| `setPlaqueIndex(toothNo, surface, grade)` / `getPlaqueIndex(toothNo, surface)` | Stupeň Silness-Löeho Plakového indexu pre každú plochu — `0`-`3` |
+| `setGingivalIndex(toothNo, surface, grade)` / `getGingivalIndex(toothNo, surface)` | Stupeň Löe-Silnessovho Gingiválneho indexu pre každú plochu — `0`-`3` |
+| `setKeratinizedWidth(toothNo, mm)` / `getKeratinizedWidth(toothNo)` | Šírka bukálnej keratinizovanej gingívy pre každý zub v mm — `0`-`15`, alebo `null`, ak nie je zaznamenaná |
+| `setGingivalThickness(toothNo, v)` / `getGingivalThickness(toothNo)` | Fenotyp hrúbky gingívy pre každý zub — `"unknown"` / `"thin"` / `"medium"` / `"thick"` |
+| `setMillerClass(toothNo, v)` / `getMillerClass(toothNo)` | Millerova trieda recesie pre každý zub — `"none"` / `"i"` / `"ii"` / `"iii"` / `"iv"` |
+| `setPeriImplantPlaque(toothNo, surface, grade)` / `getPeriImplantPlaque(toothNo, surface)` | Iba implantáty — stupeň Mombelliho modifikovaného Plakového indexu (mPI) pre každú plochu — `0`-`3`; na neimplantátovom zube bez účinku |
+| `setPeriImplantBleeding(toothNo, surface, grade)` / `getPeriImplantBleeding(toothNo, surface)` | Iba implantáty — stupeň Mombelliho modifikovaného indexu krvácania zo sulku (mBI) pre každú plochu — `0`-`3`; na neimplantátovom zube bez účinku |
+| `furcationEntrances(toothNo)` | Vstupy do furkácie pre daný zub — `["mesial","distal","buccal"]` (horné moláre), `["buccal","lingual"]` (dolné moláre), `["mesial","distal"]` (horné prvé premoláre), inak `[]` |
+| `setFurcation(toothNo, entrance, grade)` / `getToothFurcation(toothNo)` | Nastaviť/získať postihnutie furkácie pre jednotlivé vstupy (Glickman `1`–`4`; `null` vymaže) |
+| `setPlaque(toothNo, surface, present)` / `getToothPlaque(toothNo)` | Nastaviť/získať prítomnosť plaku podľa O'Learyho pre každú plochu (mesial/distal/buccal/lingual); vstupuje do celoústneho PI% v `getPerioSummary()` |
+| `getCaseMeta()` | Získať objekt metadát na úrovni prípadu (`{age, smokingStatus, cigarettesPerDay, diabetesStatus, hba1c, toothLossPerio, maxRblPercent, patientName, patientDob, examDate}`) — jeden zdieľaný blok, nie na úrovni zuba/dvojstavový (zrkadlí kľúč `globals` na najvyššej úrovni payloadu); vstupuje do parodontálnej klasifikácie štádia/stupňa |
+| `setPatientName(v)` | Nastaviť meno pacienta v prípade (orezané; prázdny reťazec alebo `null` ho vymaže) — iba identifikačný údaj, nikdy nevstupuje do parodontálnej derivácie |
+| `setPatientDob(v)` | Nastaviť dátum narodenia pacienta v prípade (`YYYY-MM-DD`; neplatný/prázdny ho vymaže)|
+| `setExamDate(v)` | Nastaviť dátum vyšetrenia prípadu (`YYYY-MM-DD`; neplatný/prázdny ho vymaže) |
+| `setCaseAge(v)` | Nastaviť vek pacienta v prípade v rokoch — `0`-`120`, alebo `null` na vymazanie |
+| `setSmokingStatus(v)` | Nastaviť fajčiarsky stav prípadu — `"unknown"` / `"never"` / `"former"` / `"current"` |
+| `setCigarettesPerDay(v)` | Nastaviť počet cigariet denne (zmysluplné iba pri fajčiarskom stave `"current"`) — `0`-`99`, alebo `null` na vymazanie |
+| `setDiabetesStatus(v)` | Nastaviť diabetický stav prípadu — `"unknown"` / `"none"` / `"present"` |
+| `setHba1c(v)` | Nastaviť HbA1c % (zmysluplné iba pri diabetickom stave `"present"`) — `3.0`-`20.0` (jedno desatinné miesto), alebo `null` na vymazanie |
+| `setToothLossPerio(v)` | Nastaviť počet zubov stratených v dôsledku parodontitídy — `0`-`32`, alebo `null` na vymazanie |
+| `setMaxRblPercent(v)` | Nastaviť max. % rádiografickej straty kosti — `0`-`100`, alebo `null` na vymazanie |
+| `resetCaseMeta()` | Resetovať objekt metadát na úrovni prípadu na prázdne predvolené hodnoty |
+| `getPerioClassification()` | Získať parodontálnu klasifikáciu podľa 2017 World Workshop (`{diagnosis, stage, grade, extent, derived, overridden}`) — diagnóza/štádium/stupeň/rozsah odvodené zo zaznamenaných parodontálnych dát a metadát prípadu, každá os nahradená prepísaním od klinika, ak je nastavené (`derived` vždy sprístupňuje nedotknuté vypočítané hodnoty, `overridden` označuje, ktoré osi boli prepísané) |
+| `setDiagnosisOverride(v)` | Prepísať odvodenú parodontálnu diagnózu — `"health"` / `"gingivitis"` / `"periodontitis"`, alebo `null` na vymazanie (návrat k odvodenej hodnote) |
+| `setStageOverride(v)` | Prepísať odvodené parodontálne štádium — `"I"` / `"II"` / `"III"` / `"IV"`, alebo `null` na vymazanie (návrat k odvodenej hodnote) |
+| `setGradeOverride(v)` | Prepísať odvodený parodontálny stupeň — `"A"` / `"B"` / `"C"`, alebo `null` na vymazanie (návrat k odvodenej hodnote) |
+| `setExtentOverride(v)` | Prepísať odvodený parodontálny rozsah — `"localized"` / `"generalized"` / `"molar-incisor"`, alebo `null` na vymazanie (návrat k odvodenej hodnote) |
+| `exportImage(format)` | Stiahnuť odontogram ako obrázok — `"png"` alebo `"jpg"` |
+| `exportSvg()` | Stiahnuť odontogram ako škálovateľný SVG (vektor) |
+| `hasAnyPerioData()` | `true`, ak je v ústach kdekoľvek zaznamenaná aspoň jedna parodontálna os — riadi automatické preskočenie parodontálneho exportu a deaktivuje položky ponuky parodontálneho exportu pri prázdnom grafe |
+| `startIntroTour()` | Spustiť 12-krokový interaktívny úvodný sprievodca |
+
+### 💾 Formát exportu/importu stavu
+Export vytvorí súbor JSON (verzia `2.20`; import tiež akceptuje staršie verzie `1.4` a `2.0` až `2.19` a automaticky ich migruje) obsahujúci:
+
+**Globálne polia:**
+- `wisdomVisible` - zuby múdrosti viditeľné
+- `showBase` - vrstva kosti viditeľná
+- `occlusalVisible` - oklúzny pohľad aktívny
+- `showHealthyPulp` - zdravá dreň viditeľná
+- `edentulous` - bezzubý režim aktívny
+
+**Polia pre každý zub (32 zubov):**
+- `toothSelection` - základný typ zuba
+- `toothSubstrate` - substrát zuba (natural/radix/broken/crownprep), nezávislý od akejkoľvek náhrady
+- `restorationType` - typ náhrady (none/crown/inlay/onlay/veneer/bridge)
+- `restorationMaterial` - materiál náhrady (emax/gold/gradia/zircon/metal/metal-ceramic/telescope/temporary), spárovaný s `restorationType`
+- `prosthesis` - os snímateľnej protetiky/upevnenia (none/healing-abutment/locator/locator-denture/bar/bar-denture/removable-partial/removable-full), navzájom sa vylučuje s pevným `restorationType` typu korunka/mostík
+- `crownLeakage` - príznak okrajovej netesnosti korunky, zmysluplný iba keď je `restorationType` typu korunka alebo mostík
+- `endo` - endodontický stav; navzájom sa vylučuje s `pulpDx` (zobrazované spoločne cez jeden zlúčený výber „Stav drene / endo" — ošetrenie zuba normalizuje `pulpDx` na `normal`)
+- `rootPostType` - materiál koreňového kolíka (`none`, `glass-fiber`, `metal`), nezávislý od `endo`
+- `mods` - pole modifikácií (zápal, parodontálny); `inflammation` je z rozhrania na prítomných zuboch zrušený (periapikálny glyf tam určuje `apicalDx`), ale stále sa vzťahuje na chýbajúce zuby/zuby s extrakčnou ranou
+- `caries` - aktívne plochy kazu
+- `cariesActiveDepth` - hodnota hĺbky ICDAS pripravená výberom hĺbky kazu pri aplikovaní novej plochy (nie je uložená hodnota pre každú plochu; pozri `cariesSeverity` pre uložené pole pre každú plochu)
+- `rootCaries` - závažnosť kazu koreňa (none/active/arrested/active-cavitated)
+- `cariesSeverity` - zjednotená závažnosť na každú plochu (0-6): hĺbka ICDAS na primárnej (bez výplne) ploche, skóre CARS na rekurentnej (s výplňou) ploche
+- `radiographicDepth` - rádiografická hĺbka kazu na každú plochu (none/E1/E2/D1/D2/D3), nezávislá od vizuálnej škály ICDAS/CARS
+- `fillingMaterial` - materiál výplne
+- `fillingSurfaces` - plombované plochy
+- `fillingSurfaceMaterials` - materiál výplne pre každú plochu (zmiešané výplne, napr. bukálny amalgám + distálny kompozit)
+- `retention` - čo drží snímateľnú náhradu na tomto zube (none/clasp/attachment/bar-abutment)
+- `retentionSide` - strana, na ktorej retenčný prvok zaberá (none/mesial/distal/both)
+- `fillingDefect` - porucha výplne pre každú plochu (none/marginal/fracture/wear), obmedzená na plombované plochy, nezávislá od sekundárneho kazu
+- `cervicalSurfaces` - plochy, ktorých výplň alebo kazová lézia zasahuje do krčkovej oblasti (buccal/lingual); značka na ploche namiesto šiestej plochy
+- `pulpDx` - AAE diagnóza drene (normal/reversible-pulpitis/irreversible-pulpitis/necrosis); reversible-pulpitis zobrazuje zmenšený glyf
+- `pulpLatin` - praktický latinský podtyp drene (zobrazený vo výbere drene iba keď je `pulpDetailLevel` nastavené na `latin`)
+- `apicalDx` - apikálna diagnóza určujúca periapikálny glyf
+- `periapicalType` - podtyp periapikálnej lézie (none/granuloma/cyst), zobrazený iba pri symptomatickej/asymptomatickej apikálnej parodontitíde; staršia hodnota `abscess` je pri importe stále akceptovaná
+- `resorptionType` - typ resorpcie koreňa (none/internal/external-cervical)
+- `periImplant` - stav peri-implantátu iba pre implantáty (none/mucositis/peri-implantitis-mild/-moderate/-severe), stagingovanie podľa 2018 World Workshop
+- `endoResection` - príznak apikektómie
+- `fissureSealing` - príznak zapečatenia fisúr
+- `calculus` - príznak zubného kameňa
+- `contactMesial` - strata meziálneho kontaktného bodu
+- `contactDistal` - strata distálneho kontaktného bodu
+- `wearEdge` - typ incizálneho/oklúzneho opotrebenia (none/attrition/erosion)
+- `wearCervical` - typ cervikálneho opotrebenia (none/abrasion/abfraction/erosion)
+- `discoloration` - príčina zafarbenia zuba (none/tetracycline/fluorosis/nonvital/extrinsic/other), zafarbuje výplň prirodzenej korunky na prirodzenom tooth-base/mliečnom zube bez náhrady
+- `orthoAppliance` - ortodontická pomôcka (none/bracket/band)
+- `orthoDrift` - ortodontický drift (none/mesial/distal)
+- `orthoVertical` - ortodontický vertikálny pohyb (none/extrusion/intrusion)
+- `orthoRotation` - príznak ortodontickej rotácie
+- `brokenMesial`, `brokenIncisal`, `brokenDistal` - miesta zlomenín
+- `extractionWound` - poextrakčná rana
+- `extractionPlan` - plánovaná extrakcia
+- `parapulpalPin` - príznak parapulpálneho kolíka
+- `bridgePillar` - pilierový zub mostíka
+- `mobility` - stupeň mobility (none/m1/m2/m3)
+- `crownNeeded` - indikátor potreby korunky
+- `crownReplace` - indikátor potreby výmeny korunky
+- `missingClosed` - uzavretá medzera po extrakcii
+- `customStates` - vlastné stavy pluginov (objekt, kľúčovaný ID pluginu)
+- `note` - textová poznámka ku každému zubu (reťazec, voliteľný — prítomný iba keď nie je prázdny)
+
+**Pole `plan` na najvyššej úrovni (verzia 2.11+):**
+- `plan` - voliteľný objekt s rovnakým tvarom ako `teeth` (polia pre každý zub vyššie), obsahujúci graf **plánu** (plan, zamýšľaný stav po ošetrení). Prítomný iba vtedy, keď bol graf plánu inicializovaný (prepínač `Status | Plan` bol aspoň raz prepnutý na Plan) A jeho obsah sa líši od grafu stavu — export iba so stavom ho úplne vynechá a zostáva bajtovo identický s exportom pred verziou 2.11 okrem čísla verzie. Pri importe chýbajúce `plan` vymaže/zruší inicializáciu grafu plánu (nikdy neobnoví zastaraný plán ponechaný spred importu); prítomné `plan` obnoví graf plánu popri stave. Graf plánu je možné čítať/zapisovať aj nezávisle od exportu/importu cez `getPlanChart()`/`setPlanChart()` (pozri Verejné API vyššie), a `getStatusChart()` vždy vracia payload primárne založený na stave, bez ohľadu na aktívny režim grafu.
+
+**Pole `case` na najvyššej úrovni (verzia 2.17+, rozšírené vo verziách 2.18, 2.19 a 2.20):**
+- `case` - voliteľný objekt s metadátami na úrovni prípadu (nie na úrovni zuba), zdieľaný grafom stavu aj plánu (zrkadlí kľúč `globals` na najvyššej úrovni). Vynechaný, keď je prázdny: úplne chýba, keď je každé pole na svojej predvolenej hodnote, takže export bez údajov o prípade zostáva bajtovo identický okrem čísla verzie. Polia (každé vynechané pri predvolenej hodnote): `age`; `smokingStatus` (+ `cigarettesPerDay`); `diabetesStatus` (+ `hba1c`); `toothLossPerio`; `maxRblPercent`; štyri klinické prepísania podľa jednotlivých osí klasifikácie 2017 `diagnosisOverride` / `stageOverride` / `gradeOverride` / `extentOverride`; (verzia 2.19) `patientName` / `examDate`; a (verzia 2.20) `patientDob`. Vstupuje do parodontálnej klasifikácie štádia/stupňa; čítaný/zapisovaný cez `getCaseMeta()` a settery `setCase*` (pozri Verejné API vyššie). Meno pacienta, dátum narodenia a dátum vyšetrenia sú iba identifikačné metadáta grafu — **nie sú** súčasťou exportu FHIR.
+
+### 🖨️ Export
+Okrem vlastného exportu odontogramu Stav JSON / FHIR / PNG / JPG / SVG má **parodontálny graf** vlastnú exportnú cestu:
+- Meno pacienta, dátum narodenia a dátum vyšetrenia sú iba identifikačné metadáta grafu (payload `2.20`, doplnkové) — **nie sú** súčasťou exportu FHIR.
+
+### 📁 Štruktúra priečinkov
+- `src/App.tsx` - rozhranie shellu, ovládacie prvky hornej lišty, prepínač jazyka/číslovania/tmavého režimu/témy/pluginu
+- `src/odontogram.ts` - SVG vrstevnací modul, správa stavu zubov, dotykové interakcie, prekrytia pluginov, zapojenie rozhrania
+- `src/plugin.ts` - typ `OdontogramPlugin`, `PluginLayer`, `getQuadrant()`, priority z-indexu `LAYER_Z`
+- `src/theme.ts` - typ `OdontogramThemeConfig` a pomocná funkcia `applyThemeConfig()`
+- `src/status_extras.ts` - 34 preddefinovaných šablón reštaurácií (mostíky, protézy, stegové konštrukcie)
+- `src/i18n/` - preklady (HU/EN/DE/ES/IT/SK/PL/RU/PT-BR) a i18n hook
+- `src/utils/numbering.ts` - konverzia číslovania FDI, Universal, Palmer
+- `src/registry/` - deklaratívny register klinických osí a UI: metadáta osí, aktivácia SVG, matica typ×materiál náhrady, katalóg hodnôt a zoznamy možností; mapovania FHIR patria do `src/fhir/`
+- `src/fhir/` - jediné rozhranie Dental Core pre HL7 FHIR R4: kodek `toFhirDentalCore.ts`/`fromFhirDentalCore.ts` nad `@cognovis/fhir-sdk`, `dentalCoreContract.ts` a pomocné funkcie `dentalCoreLocalCoding.ts`
+- `src/bridgeOverlay.ts` - prekrytie konektora viaczubového mostíkového úseku (geometria sedla prispôsobená oblúku)
+- `src/SettingsModal.tsx` - záložkový dialóg Nastavenia (Všeobecné/Panely/Detaily zuba/Kaz/Dreň/Poznámky/Periodontálne)
+- `src/__tests__/` + `src/registry/__tests__/` - testovacia sada Vitest (1704 prebiehajúcich testov, 1 preskočený, v 163 súboroch)
+- `src/assets/teeth-svgs/` - SVG šablóny zubov (40 súborov: jedna na pozíciu - 16 bočných pohľadov trvalých zubov, 10 mliečnych, 14 oklúznych)
+- `src/assets/icon-svgs/` - SVG ikony panela nástrojov (5 súborov)
+
+### ⚙️ Technologický zásobník
+- React 18 + Vite + TypeScript
+- Tailwind CSS pre štýlovanie rozhrania
+- Vrstvenie SVG cez manipuláciu DOM (nie React stav pre výkon)
+- Ľahký vlastný systém i18n
+- Vitest + Testing Library pre automatizované testy
+- TypeDoc pre dokumentáciu API
+- Vite alias cesty: `@` mapovaný na `./src`
+
+### 📝 Poznámky
+- SVG šablóny sa načítavajú z `src/assets/teeth-svgs` a `src/assets/icon-svgs`, takže statický hosting musí poskytovať priečinok public.
+- Modul odontogramu používa vlastný interný stav (nie React stav) pre výkon a jednoduchosť.
+- Mliečne zuby majú obmedzenú sadu dostupných materiálov (žiadne amalgámové výplne, žiadne endodontické kolíky).
+- Implantátové zuby majú inú sadu možností korunky/abutmentu ako prirodzené zuby.
+
+### 📖 Ako citovať
+
+Ak tento modul použijete vo svojej práci, prosím, citujte ho.
+
+**Táto verzia (v1.49.0):**
+> Dul, Z. (2026). *React Advanced Odontogram* (v1.49.0). Zenodo. https://doi.org/10.5281/zenodo.21156787
+
+**Všetky verzie (konceptové DOI):** https://doi.org/10.5281/zenodo.21156787
+
+> Konceptové DOI pre všetky verzie vyššie sa vždy odkazuje na najnovšie archivované
+> vydanie; DOI špecifické pre danú verziu sa vytvára pri každom vydaní v čase jeho
+> archivácie na Zenodo. Kým nie je v1.49.0 archivovaná, citujte ju cez konceptové DOI.
+
+Strojovo čitateľné citačné metadáta sú v súbore [`CITATION.cff`](../../../CITATION.cff).
